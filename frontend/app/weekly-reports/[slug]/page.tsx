@@ -1,5 +1,6 @@
 "use client";
 
+import { use } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Navbar } from "@/components/Navbar";
@@ -132,9 +133,10 @@ function ScorePill({ score, label }: { score: number; label: string }) {
   );
 }
 
-export default function ReportPage({ params }: { params: { slug: string } }) {
+export default function ReportPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params);
   const [searchQuery, setSearchQuery] = useState("");
-  const report = REPORTS[params.slug];
+  const report = REPORTS[slug];
   if (!report) return notFound();
 
   return (

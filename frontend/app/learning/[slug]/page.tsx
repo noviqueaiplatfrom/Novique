@@ -1,9 +1,9 @@
 "use client";
 
+import { use, useState, useRef } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Navbar } from "@/components/Navbar";
-import { useState, useRef, useEffect } from "react";
 
 interface Resource { label: string; url: string; description: string; tag: string }
 interface Concept { title: string; body: string }
@@ -14,7 +14,7 @@ interface Lesson {
   difficulty: "Beginner" | "Intermediate" | "Advanced";
   impact: string; adopters: string[]; overview: string; whyNow: string;
   concepts: Concept[]; codeTitle: string; codeLang: string; code: string;
-  resources: Resource[]; quiz: Question[];
+  resources: Resource[]; questionBank: Question[];
 }
 
 const LESSONS: Record<string, Lesson> = {
@@ -61,17 +61,27 @@ await server.connect(transport);`,
       { label: "Awesome MCP Servers", url: "https://github.com/punkpeye/awesome-mcp-servers", description: "Community list of production MCP servers to study", tag: "GitHub" },
       { label: "Claude Desktop Config", url: "https://modelcontextprotocol.io/quickstart/user", description: "Wire your server into Claude Desktop in 5 minutes", tag: "Guide" },
     ],
-    quiz: [
+    questionBank: [
       { q: "What does MCP stand for?", options: ["Model Context Protocol", "Multi-Channel Processing", "Model Composition Pipeline", "Machine Context Provider"], answer: 0 },
       { q: "Which company developed the MCP open standard?", options: ["OpenAI", "Google DeepMind", "Anthropic", "Microsoft"], answer: 2 },
       { q: "What are the three core primitives exposed by an MCP server?", options: ["Agents, Actions, Artifacts", "Tools, Resources, Prompts", "Servers, Clients, Hosts", "APIs, SDKs, CLIs"], answer: 1 },
       { q: "Which transport type does a local MCP server use?", options: ["HTTP/REST", "gRPC", "stdio", "WebSocket"], answer: 2 },
-      { q: "What makes a Tool different from a Resource in MCP?", options: ["Tools require authentication; Resources do not", "Tools are callable functions; Resources are data the model reads", "Tools work remotely; Resources work locally", "There is no difference — the terms are interchangeable"], answer: 1 },
+      { q: "What makes a Tool different from a Resource in MCP?", options: ["Tools require authentication; Resources do not", "Tools are callable functions; Resources are data the model reads", "Tools work remotely; Resources work locally", "There is no difference"], answer: 1 },
       { q: "In the code example, what does `server.tool()` expose?", options: ["A streaming audio interface", "A function to read local files", "A database query runner", "A reusable prompt template"], answer: 1 },
       { q: "When should you migrate from stdio to HTTP transport?", options: ["When using TypeScript instead of Python", "When the server exposes more than 10 tools", "When you need to share the server across a team or deploy it", "When using Claude Desktop"], answer: 2 },
       { q: "What is the role of an MCP Resource?", options: ["Execute code on behalf of the model", "Provide data the model can read", "Define conversation turn structure", "Manage API rate limits"], answer: 1 },
       { q: "Which of these AI clients natively supports MCP?", options: ["GPT-4o Playground", "Gemini Advanced", "Cursor", "Perplexity"], answer: 2 },
       { q: "What is the primary advantage of MCP over per-client custom integrations?", options: ["It automatically generates tests", "It reduces token usage", "One server works with any MCP-compatible client", "It provides built-in authentication"], answer: 2 },
+      { q: "What is an MCP Host?", options: ["The cloud provider running the server", "The process that manages the MCP client lifecycle", "The AI model itself", "The authentication service"], answer: 1 },
+      { q: "In stdio transport, how is the MCP server process started?", options: ["It registers itself with a discovery service", "The user launches it manually before the IDE", "The client launches it as a subprocess", "It runs as a system daemon"], answer: 2 },
+      { q: "What is the purpose of a Prompt primitive in MCP?", options: ["Inject system instructions at runtime", "Reusable, parameterized message templates", "Control the model's temperature", "Define the server's name and version"], answer: 1 },
+      { q: "What does Zod provide in the TypeScript MCP code example?", options: ["HTTP request handling", "Schema validation for tool input parameters", "File system access", "Connection pooling"], answer: 1 },
+      { q: "Which official MCP SDK is used in the lesson's code example?", options: ["@anthropic-ai/sdk", "@modelcontextprotocol/sdk", "@openai/mcp", "mcp-server-core"], answer: 1 },
+      { q: "What type of data can an MCP Resource expose?", options: ["Only local files", "Only database rows", "File contents, API responses, and any readable data source", "Only JSON objects"], answer: 2 },
+      { q: "Which scenario best justifies switching from stdio to HTTP transport?", options: ["The tool has a large input schema", "Multiple engineers on different machines need to use the same server", "The LLM is making too many tool calls", "The server is written in Python instead of TypeScript"], answer: 1 },
+      { q: "What happens when an MCP client cannot find a registered tool the model requested?", options: ["The model retries with a different tool name", "The client returns a tool-not-found error to the model", "The server auto-generates the tool", "The session is terminated"], answer: 1 },
+      { q: "From a developer's perspective, what is the key responsibility when building an MCP integration?", options: ["Writing the client application", "Writing the MCP server that exposes your data/tools", "Configuring the AI model parameters", "Setting up the host process"], answer: 1 },
+      { q: "What does `server.connect(transport)` do in the MCP code example?", options: ["Sends a test ping to the client", "Starts listening for client requests over the specified transport", "Registers the server with a discovery API", "Validates all tool schemas"], answer: 1 },
     ],
   },
 
@@ -137,7 +147,7 @@ model.save_pretrained("my-fine-tuned-model")`,
       { label: "HuggingFace PEFT", url: "https://huggingface.co/docs/peft", description: "Underlying LoRA/QLoRA adapter library", tag: "Docs" },
       { label: "Replicate Deployment", url: "https://replicate.com/docs/guides/fine-tune-a-language-model", description: "Deploy your fine-tuned model as a hosted API", tag: "Guide" },
     ],
-    quiz: [
+    questionBank: [
       { q: "What does LoRA stand for?", options: ["Low-Rank Adaptation", "Large-Range Approximation", "Layer-Relative Optimization", "Low-Resource Architecture"], answer: 0 },
       { q: "What is the primary benefit of 4-bit quantization?", options: ["Faster internet bandwidth", "Dramatically reduced VRAM usage", "Higher model accuracy", "Smaller dataset requirements"], answer: 1 },
       { q: "In the code, what does `r=16` specify?", options: ["The learning rate multiplier", "The LoRA rank — size of the trainable adapter matrices", "The number of training epochs", "The quantization bit depth"], answer: 1 },
@@ -148,6 +158,16 @@ model.save_pretrained("my-fine-tuned-model")`,
       { q: "What library does Unsloth use for quantization under the hood?", options: ["ONNX Runtime", "TensorRT", "bitsandbytes", "OpenVINO"], answer: 2 },
       { q: "What does `model.save_pretrained()` save in a LoRA setup?", options: ["The full model weights", "The LoRA adapter weights only", "The tokenizer only", "A compressed GGUF file"], answer: 1 },
       { q: "What is the key trade-off when using 4-bit quantization?", options: ["Training is slower but more accurate", "Slight accuracy reduction in exchange for much lower VRAM usage", "Model files are larger but inference is faster", "Requires proprietary Nvidia hardware"], answer: 1 },
+      { q: "What does QLoRA combine?", options: ["LoRA adapters with knowledge distillation", "LoRA adapters with 4-bit quantization of the base model", "LoRA with full fine-tuning on the last layer", "Quantization with mixture-of-experts routing"], answer: 1 },
+      { q: "What is the typical range for the LoRA rank `r`?", options: ["1-4", "8-64", "100-256", "512-1024"], answer: 1 },
+      { q: "What does `gradient_accumulation_steps=4` effectively do?", options: ["Reduces learning rate by 4x", "Quadruples the effective batch size without using more VRAM", "Runs 4 separate training jobs in parallel", "Saves a checkpoint every 4 steps"], answer: 1 },
+      { q: "What is `lora_alpha` in the LoRA configuration?", options: ["The dropout rate for adapter layers", "A scaling factor that controls the magnitude of adapter updates", "The number of attention heads to target", "The maximum sequence length"], answer: 1 },
+      { q: "Which model families does Unsloth officially support?", options: ["Only Llama", "GPT-2 and BERT only", "Llama, Mistral, Gemma, and Phi", "Only models under 7B parameters"], answer: 2 },
+      { q: "What does SFTTrainer stand for in the trl library?", options: ["Supervised Fine-Tuning Trainer", "Scaled Feature Training Runner", "Sequence Fidelity Tracker", "Shared Foundation Tuner"], answer: 0 },
+      { q: "What does `load_in_4bit=True` enable in `from_pretrained()`?", options: ["4-bit gradient checkpointing", "4-bit quantization of the base model weights before loading", "4-bit tokenization", "4-bit positional encoding"], answer: 1 },
+      { q: "Why does LoRA keep the original model weights frozen?", options: ["To prevent overfitting to the adapter", "To allow the same base model to serve multiple adapters and preserve pretrained knowledge", "Because frozen weights train faster", "Because HuggingFace requires it"], answer: 1 },
+      { q: "How much VRAM reduction does Unsloth achieve compared to standard training?", options: ["~10%", "~30%", "~60%", "~90%"], answer: 2 },
+      { q: "What is `target_modules` used for in `get_peft_model()`?", options: ["Specifying which layers to freeze completely", "Specifying which layers receive LoRA adapter matrices", "Listing the modules to exclude from quantization", "Defining the output format of the saved model"], answer: 1 },
     ],
   },
 
@@ -199,7 +219,7 @@ print(model.symbolic_formula())`,
       { label: "efficient-kan", url: "https://github.com/Blealtan/efficient-kan", description: "Production-grade re-implementation, 10x faster than pykan", tag: "GitHub" },
       { label: "KAN 2.0 Paper", url: "https://arxiv.org/abs/2408.10205", description: "Updated architecture with improved scaling and expressivity", tag: "Paper" },
     ],
-    quiz: [
+    questionBank: [
       { q: "What does KAN stand for?", options: ["Kernel Attention Network", "Kolmogorov-Arnold Networks", "Knowledge-Aware Nodes", "Keyframe Activation Network"], answer: 1 },
       { q: "Where does a KAN place its learnable activation functions, unlike an MLP?", options: ["On neurons (nodes)", "On edges (weights)", "On the input embedding", "On the loss function"], answer: 1 },
       { q: "What type of functions are used as learnable activations in KANs?", options: ["ReLU variants", "Fourier series", "B-splines", "Sigmoid curves"], answer: 2 },
@@ -210,6 +230,16 @@ print(model.symbolic_formula())`,
       { q: "What does the `lamb` parameter control in `model.train()`?", options: ["Learning rate", "Regularization — prunes low-importance edges", "Spline grid resolution", "Number of training steps"], answer: 1 },
       { q: "What does `model.auto_symbolic()` attempt to do?", options: ["Convert the model to ONNX", "Recover an exact symbolic mathematical expression", "Prune all edges below a threshold", "Export spline weights to CSV"], answer: 1 },
       { q: "Where do MLPs still outperform KANs?", options: ["Physics simulations", "Symbolic regression", "High-dimensional perception tasks like vision and language", "Protein folding"], answer: 2 },
+      { q: "What does the `grid` parameter in KAN() control?", options: ["Number of hidden layers", "Number of grid intervals for each B-spline function", "The learning rate schedule", "Number of output classes"], answer: 1 },
+      { q: "What does `k=3` specify in the KAN constructor?", options: ["Number of training epochs", "The spline polynomial order (cubic)", "Number of hidden nodes", "Rank of weight matrices"], answer: 1 },
+      { q: "Which optimizer is used in the code example?", options: ["Adam", "SGD with momentum", "LBFGS", "AdaGrad"], answer: 2 },
+      { q: "What does `model.plot()` display in pykan?", options: ["A loss curve over training steps", "A visualization of the learned activation functions on each edge", "A confusion matrix", "A histogram of weight magnitudes"], answer: 1 },
+      { q: "Which university lab published the original KAN paper?", options: ["Stanford AI Lab", "Berkeley AI Research", "MIT", "Carnegie Mellon"], answer: 2 },
+      { q: "What is efficient-kan relative to pykan?", options: ["A smaller model with fewer parameters", "A faster, production-grade reimplementation of pykan", "A web interface for pykan", "A cloud-hosted version of KAN training"], answer: 1 },
+      { q: "Why are KANs considered more interpretable than MLPs?", options: ["They have fewer parameters", "Each edge's activation function can be independently visualized and simplified to a formula", "They use integer arithmetic", "Their weights are always positive"], answer: 1 },
+      { q: "What mathematical theorem underpins the KAN architecture?", options: ["Universal Approximation Theorem", "Kolmogorov-Arnold Representation Theorem", "Bayes Theorem", "Nyquist-Shannon Sampling Theorem"], answer: 1 },
+      { q: "What is a key limitation of pykan compared to efficient-kan for production use?", options: ["pykan only works on CPU", "pykan is research-quality and significantly slower than efficient-kan", "pykan requires a paid license", "pykan does not support symbolic simplification"], answer: 1 },
+      { q: "In the code, why is the training input range set to [-1, 1]?", options: ["B-splines require inputs in [-1, 1]", "The target function only has real values in that range", "It is a convention for numerical stability in spline fitting", "The LBFGS optimizer requires bounded inputs"], answer: 2 },
     ],
   },
 
@@ -278,7 +308,7 @@ async def voice_pipeline(audio_stream):
       { label: "Deepgram Streaming STT", url: "https://developers.deepgram.com/docs/getting-started-with-live-streaming-audio", description: "Low-latency real-time transcription API", tag: "Docs" },
       { label: "ElevenLabs Turbo v2", url: "https://elevenlabs.io/docs/api-reference/text-to-speech", description: "Sub-75ms TTS with streaming audio output", tag: "Docs" },
     ],
-    quiz: [
+    questionBank: [
       { q: "What is the target round-trip latency for a natural voice conversation?", options: ["Under 1000ms", "Under 500ms", "Under 200ms", "Under 50ms"], answer: 2 },
       { q: "What are the three stages in a voice AI pipeline in order?", options: ["TTS -> LLM -> STT", "LLM -> STT -> TTS", "STT -> LLM -> TTS", "STT -> TTS -> LLM"], answer: 2 },
       { q: "What does VAD stand for?", options: ["Voice API Driver", "Variable Audio Delay", "Voice Activity Detection", "Virtual Agent Dispatcher"], answer: 2 },
@@ -289,9 +319,39 @@ async def voice_pipeline(audio_stream):
       { q: "What does end-point detection determine?", options: ["When the WebSocket connection drops", "When to switch LLM providers", "When the user has finished speaking", "When TTS audio is fully buffered"], answer: 2 },
       { q: "What is the consequence of too-aggressive end-point detection settings?", options: ["Higher latency", "The bot cuts users off mid-sentence", "TTS audio becomes choppy", "The LLM generates longer responses"], answer: 1 },
       { q: "What protocol is used to stream real-time audio between pipeline stages?", options: ["HTTP long-polling", "gRPC streaming", "WebSocket", "MQTT"], answer: 2 },
+      { q: "What does `result.is_final` check in the Deepgram transcript handler?", options: ["Whether the audio stream has ended", "Whether the transcription result is a final (not partial) transcript", "Whether the LLM has finished generating", "Whether the user pressed a button"], answer: 1 },
+      { q: "What is the approximate STT-only latency achievable with Deepgram nova-2?", options: ["500ms", "200ms", "Under 50ms", "Under 10ms"], answer: 2 },
+      { q: "Why does the code collect LLM stream chunks into a list before calling ElevenLabs?", options: ["ElevenLabs requires the full text before generating audio", "WebSockets can't handle concurrent streams", "OpenAI requires it", "To reduce API costs"], answer: 0 },
+      { q: "What is a primary advantage of using Vapi or Retell over building a raw pipeline?", options: ["They provide free LLM credits", "They handle WebSocket lifecycle, barge-in, and turn-taking automatically", "They have lower STT latency than Deepgram", "They work without an internet connection"], answer: 1 },
+      { q: "What challenge is specific to phone (telephony) voice AI compared to browser-based?", options: ["Phone audio has lower quality, more noise, and narrower frequency range", "Phone calls cannot use WebSocket", "Phone microphones don't support streaming", "Phone audio cannot be transcribed by Deepgram"], answer: 0 },
+      { q: "What does the silence threshold in VAD control?", options: ["How loud the user must speak to be detected", "How long to wait after the last detected speech before marking end-of-turn", "The minimum audio chunk size to send to STT", "The maximum recording duration"], answer: 1 },
+      { q: "Which company provides the nova-2 STT model used in the code?", options: ["OpenAI", "AssemblyAI", "Deepgram", "ElevenLabs"], answer: 2 },
+      { q: "What does `punctuate=True` do in `LiveOptions`?", options: ["Adds punctuation marks to the transcription output", "Enables speaker diarization", "Activates noise reduction", "Forces lowercase output"], answer: 0 },
+      { q: "Why is buffering a full sentence before TTS harmful in a voice pipeline?", options: ["It increases token costs", "It adds hundreds of milliseconds of latency, making the conversation feel unnatural", "TTS models reject long inputs", "It prevents barge-in detection"], answer: 1 },
+      { q: "What does `el_stream(audio)` do in the ElevenLabs integration?", options: ["Saves the audio to a file", "Plays the audio chunks in real-time as they stream from the API", "Encodes audio to base64", "Sends audio back to the user over WebSocket"], answer: 1 },
     ],
   },
 };
+
+const QUIZ_SIZE = 10;
+const PASS_THRESHOLD = 0.8;
+
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function makeCertId(slug: string) {
+  const now = new Date();
+  const ymd = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}`;
+  const prefix = slug.split("-").map((w) => w[0].toUpperCase()).join("").slice(0, 4);
+  const rand = Math.random().toString(16).slice(2, 6).toUpperCase();
+  return `NVQ-${ymd}-${prefix}-${rand}`;
+}
 
 const difficultyColor: Record<string, string> = {
   Beginner: "text-tealAccent border-tealAccent/30 bg-tealAccent/5",
@@ -306,35 +366,37 @@ const tagColor: Record<string, string> = {
   Paper: "bg-purple-400/10 text-purple-400 border-purple-400/20",
 };
 
-const PASS_THRESHOLD = 0.7;
+export default function LessonPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params);
 
-function makeCertId(slug: string) {
-  const now = new Date();
-  const ymd = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}`;
-  const prefix = slug.split("-").map((w) => w[0].toUpperCase()).join("").slice(0, 4);
-  const rand = Math.random().toString(16).slice(2, 6).toUpperCase();
-  return `NVQ-${ymd}-${prefix}-${rand}`;
-}
-
-export default function LessonPage({ params }: { params: { slug: string } }) {
+  // All hooks before any conditional returns
   const [searchQuery, setSearchQuery] = useState("");
-  const lesson = LESSONS[params.slug];
-  if (!lesson) return notFound();
-
   const [quizState, setQuizState] = useState<"idle" | "naming" | "active" | "done">("idle");
   const [learnerName, setLearnerName] = useState("");
+  const [quizQuestions, setQuizQuestions] = useState<Question[]>([]);
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState<number[]>([]);
   const [selected, setSelected] = useState<number | null>(null);
-  const certId = useRef(makeCertId(params.slug));
+  const certId = useRef("");
 
-  useEffect(() => { certId.current = makeCertId(params.slug); }, [params.slug]);
+  const lesson = LESSONS[slug];
+  if (!lesson) return notFound();
 
-  const total = lesson.quiz.length;
-  const score = answers.filter((a, i) => a === lesson.quiz[i].answer).length;
+  const total = quizQuestions.length;
+  const score = answers.filter((a, i) => a === quizQuestions[i]?.answer).length;
   const pct = total > 0 ? Math.round((score / total) * 100) : 0;
   const passed = pct >= PASS_THRESHOLD * 100;
   const dateStr = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+
+  function beginQuiz() {
+    const selected = shuffle(lesson.questionBank).slice(0, QUIZ_SIZE);
+    setQuizQuestions(selected);
+    setAnswers([]);
+    setCurrentQ(0);
+    setSelected(null);
+    certId.current = makeCertId(slug);
+    setQuizState("active");
+  }
 
   function selectAnswer(idx: number) {
     if (selected !== null) return;
@@ -353,15 +415,7 @@ export default function LessonPage({ params }: { params: { slug: string } }) {
     }
   }
 
-  function restart() {
-    setAnswers([]);
-    setCurrentQ(0);
-    setSelected(null);
-    certId.current = makeCertId(params.slug);
-    setQuizState("active");
-  }
-
-  const q = lesson.quiz[currentQ];
+  const q = quizQuestions[currentQ];
 
   return (
     <>
@@ -379,7 +433,6 @@ export default function LessonPage({ params }: { params: { slug: string } }) {
 
         <main className="max-w-4xl mx-auto px-6 py-12 flex flex-col gap-12 relative z-10">
 
-          {/* Back nav */}
           <Link href="/opportunities" className="inline-flex items-center gap-2 text-xs font-semibold text-zinc-500 hover:text-zinc-300 transition-colors w-fit">
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>
             All Opportunities
@@ -483,19 +536,19 @@ export default function LessonPage({ params }: { params: { slug: string } }) {
             </div>
           </section>
 
-          {/* ---- QUIZ SECTION ---- */}
+          {/* QUIZ */}
           <section className="flex flex-col gap-6 border-t border-white/[0.05] pt-10">
             <div className="flex items-start justify-between flex-wrap gap-4">
               <div>
                 <span className="text-[10px] font-extrabold uppercase tracking-widest text-accent block mb-1">Noviqe Assessment</span>
                 <h2 className="text-lg font-display font-extrabold text-white">Test Your Knowledge</h2>
-                <p className="text-xs text-textSecondary mt-1">{total} questions · Pass with {Math.round(PASS_THRESHOLD * 100)}% or higher to earn your certificate</p>
+                <p className="text-xs text-textSecondary mt-1">
+                  {QUIZ_SIZE} randomly selected questions · Pass with {Math.round(PASS_THRESHOLD * 100)}%+ to earn your certificate · {lesson.questionBank.length} questions in pool
+                </p>
               </div>
               {quizState === "idle" && (
-                <button
-                  onClick={() => setQuizState("naming")}
-                  className="px-5 py-2.5 bg-accent hover:bg-accent/90 text-white rounded-xl text-xs font-bold transition-all shrink-0"
-                >
+                <button onClick={() => setQuizState("naming")}
+                  className="px-5 py-2.5 bg-accent hover:bg-accent/90 text-white rounded-xl text-xs font-bold transition-all shrink-0">
                   Start Assessment
                 </button>
               )}
@@ -505,34 +558,24 @@ export default function LessonPage({ params }: { params: { slug: string } }) {
             {quizState === "naming" && (
               <div className="bg-panel border border-white/[0.06] rounded-2xl p-6 flex flex-col gap-4">
                 <p className="text-sm text-textSecondary">Enter your name as it should appear on your certificate.</p>
-                <input
-                  type="text"
-                  placeholder="Your full name"
-                  value={learnerName}
+                <input type="text" placeholder="Your full name" value={learnerName}
                   onChange={(e) => setLearnerName(e.target.value)}
                   className="bg-[#0D1520] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 outline-none focus:border-accent/50 transition-colors max-w-sm"
-                  onKeyDown={(e) => e.key === "Enter" && learnerName.trim() && setQuizState("active")}
-                />
-                <button
-                  onClick={() => setQuizState("active")}
-                  disabled={!learnerName.trim()}
-                  className="px-5 py-2.5 bg-accent hover:bg-accent/90 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl text-xs font-bold transition-all w-fit"
-                >
+                  onKeyDown={(e) => e.key === "Enter" && learnerName.trim() && beginQuiz()} />
+                <button onClick={beginQuiz} disabled={!learnerName.trim()}
+                  className="px-5 py-2.5 bg-accent hover:bg-accent/90 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl text-xs font-bold transition-all w-fit">
                   Begin Assessment
                 </button>
               </div>
             )}
 
             {/* Active quiz */}
-            {quizState === "active" && (
+            {quizState === "active" && q && (
               <div className="bg-panel border border-white/[0.06] rounded-2xl p-6 md:p-8 flex flex-col gap-6">
-                {/* Progress */}
                 <div className="flex items-center gap-3">
                   <div className="flex-1 h-1.5 bg-white/[0.05] rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-accent rounded-full transition-all duration-500"
-                      style={{ width: `${((currentQ) / total) * 100}%` }}
-                    />
+                    <div className="h-full bg-accent rounded-full transition-all duration-500"
+                      style={{ width: `${(currentQ / total) * 100}%` }} />
                   </div>
                   <span className="text-[10px] font-bold text-zinc-500 shrink-0">{currentQ + 1} / {total}</span>
                 </div>
@@ -550,9 +593,7 @@ export default function LessonPage({ params }: { params: { slug: string } }) {
                       return (
                         <button key={i} onClick={() => selectAnswer(i)}
                           className={`text-left px-4 py-3 rounded-xl text-sm transition-all ${cls}`}>
-                          <span className="font-semibold text-[10px] uppercase tracking-widest mr-3 opacity-50">
-                            {["A", "B", "C", "D"][i]}
-                          </span>
+                          <span className="font-semibold text-[10px] uppercase tracking-widest mr-3 opacity-50">{["A", "B", "C", "D"][i]}</span>
                           {opt}
                         </button>
                       );
@@ -561,14 +602,12 @@ export default function LessonPage({ params }: { params: { slug: string } }) {
                 </div>
 
                 {selected !== null && (
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between gap-4">
                     <p className={`text-xs font-bold ${selected === q.answer ? "text-tealAccent" : "text-red-400"}`}>
-                      {selected === q.answer ? "Correct!" : `Incorrect — the answer is: ${q.options[q.answer]}`}
+                      {selected === q.answer ? "Correct!" : `Incorrect — correct answer: ${q.options[q.answer]}`}
                     </p>
-                    <button
-                      onClick={advance}
-                      className="px-4 py-2 bg-accent hover:bg-accent/90 text-white rounded-xl text-xs font-bold transition-all"
-                    >
+                    <button onClick={advance}
+                      className="px-4 py-2 bg-accent hover:bg-accent/90 text-white rounded-xl text-xs font-bold transition-all shrink-0">
                       {currentQ + 1 < total ? "Next Question" : "See Results"}
                     </button>
                   </div>
@@ -579,7 +618,6 @@ export default function LessonPage({ params }: { params: { slug: string } }) {
             {/* Results */}
             {quizState === "done" && (
               <div className="flex flex-col gap-6">
-                {/* Score summary */}
                 <div className={`rounded-2xl p-6 border flex flex-col sm:flex-row items-start sm:items-center gap-6 ${passed ? "bg-tealAccent/[0.03] border-tealAccent/20" : "bg-red-400/[0.03] border-red-400/20"}`}>
                   <div className={`w-20 h-20 rounded-2xl flex flex-col items-center justify-center shrink-0 font-extrabold ${passed ? "bg-tealAccent/10 text-tealAccent" : "bg-red-400/10 text-red-400"}`}>
                     <span className="text-2xl">{pct}%</span>
@@ -587,15 +625,16 @@ export default function LessonPage({ params }: { params: { slug: string } }) {
                   </div>
                   <div>
                     <h3 className={`text-lg font-display font-extrabold mb-1 ${passed ? "text-tealAccent" : "text-red-400"}`}>
-                      {passed ? "Assessment Passed!" : "Keep Studying"}
+                      {passed ? "Assessment Passed!" : "Not quite — try again"}
                     </h3>
                     <p className="text-xs text-textSecondary leading-relaxed">
                       {passed
                         ? `You scored ${pct}% — your Noviqe certificate is ready below.`
-                        : `You scored ${pct}%. A score of ${Math.round(PASS_THRESHOLD * 100)}% or higher is required. Review the lesson and try again.`}
+                        : `You scored ${pct}%. You need ${Math.round(PASS_THRESHOLD * 100)}% to pass. Questions are randomised each attempt, so keep studying and try again.`}
                     </p>
                     {!passed && (
-                      <button onClick={restart} className="mt-3 px-4 py-2 bg-accent hover:bg-accent/90 text-white rounded-xl text-xs font-bold transition-all">
+                      <button onClick={() => { setQuizState("naming"); }}
+                        className="mt-3 px-4 py-2 bg-accent hover:bg-accent/90 text-white rounded-xl text-xs font-bold transition-all">
                         Retake Assessment
                       </button>
                     )}
@@ -605,7 +644,7 @@ export default function LessonPage({ params }: { params: { slug: string } }) {
                 {/* Per-question review */}
                 <div className="flex flex-col gap-2">
                   <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">Question Review</p>
-                  {lesson.quiz.map((qq, i) => {
+                  {quizQuestions.map((qq, i) => {
                     const correct = answers[i] === qq.answer;
                     return (
                       <div key={i} className={`flex items-start gap-3 px-4 py-3 rounded-xl border text-xs ${correct ? "border-tealAccent/15 bg-tealAccent/[0.02]" : "border-red-400/15 bg-red-400/[0.02]"}`}>
@@ -626,10 +665,8 @@ export default function LessonPage({ params }: { params: { slug: string } }) {
                   <div className="flex flex-col gap-4 pt-4">
                     <div className="flex items-center justify-between flex-wrap gap-3">
                       <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Your Certificate</p>
-                      <button
-                        onClick={() => window.print()}
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-goldAccent hover:bg-[#e0b23f] text-black rounded-xl text-xs font-bold transition-all"
-                      >
+                      <button onClick={() => window.print()}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-goldAccent hover:bg-[#e0b23f] text-black rounded-xl text-xs font-bold transition-all">
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.056 48.056 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659" /></svg>
                         Print Certificate
                       </button>
@@ -642,12 +679,9 @@ export default function LessonPage({ params }: { params: { slug: string } }) {
                       </div>
                       <p className="text-[10px] font-extrabold uppercase tracking-[0.3em] text-[#6C63FF] mb-3">Certificate of Completion</p>
                       <p className="text-sm text-[#4a5568] mb-4">This certifies that</p>
-                      <p className="text-3xl md:text-4xl font-display font-extrabold text-[#07111F] mb-4 leading-tight">
-                        {learnerName || "AI Practitioner"}
-                      </p>
-                      <p className="text-sm text-[#4a5568] mb-2">has successfully completed</p>
+                      <p className="text-3xl md:text-4xl font-display font-extrabold text-[#07111F] mb-4 leading-tight">{learnerName}</p>
+                      <p className="text-sm text-[#4a5568] mb-2">has successfully completed the Noviqe assessment for</p>
                       <p className="text-xl font-bold text-[#6C63FF] mb-8 max-w-sm leading-snug">{lesson.title}</p>
-
                       <div className="flex items-center gap-8 mb-8">
                         <div className="text-center">
                           <p className="text-[9px] font-bold text-[#9aa3af] uppercase tracking-widest">Score</p>
@@ -664,9 +698,8 @@ export default function LessonPage({ params }: { params: { slug: string } }) {
                           <p className="text-[11px] font-mono font-bold text-[#07111F]">{certId.current}</p>
                         </div>
                       </div>
-
                       <div className="w-full max-w-xs h-px bg-[#e2e8f0] mb-6" />
-                      <p className="text-[10px] text-[#9aa3af]">Issued by Noviqe AI Intelligence Platform · noviqe.com</p>
+                      <p className="text-[10px] text-[#9aa3af]">Issued by Noviqe AI Intelligence Platform</p>
                     </div>
                   </div>
                 )}
@@ -674,11 +707,8 @@ export default function LessonPage({ params }: { params: { slug: string } }) {
             )}
           </section>
 
-          {/* Footer nav */}
           <div className="border-t border-white/[0.05] pt-8 flex justify-between items-center">
-            <Link href="/opportunities" className="text-xs font-semibold text-zinc-500 hover:text-zinc-300 transition-colors">
-              View all opportunities
-            </Link>
+            <Link href="/opportunities" className="text-xs font-semibold text-zinc-500 hover:text-zinc-300 transition-colors">View all opportunities</Link>
             <Link href="/signals" className="inline-flex items-center gap-2 px-5 py-2.5 bg-accent hover:bg-accent/90 text-white rounded-xl text-xs font-bold transition-all">
               Explore live signals
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" /></svg>
