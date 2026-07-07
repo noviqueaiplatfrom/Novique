@@ -600,7 +600,7 @@ export default function Home() {
             {/* Right CTA */}
             <div className="md:w-1/6 flex flex-col justify-center items-end gap-2">
               <Link
-                href="/opportunities"
+                href="/learning/mcp-server-development"
                 className="w-full md:w-auto px-5 py-3 rounded-xl font-bold bg-[#F6C453] hover:bg-[#e0b23f] text-black transition-all text-xs text-center shadow-lg shadow-[#F6C453]/10"
               >
                 Start Learning
@@ -623,12 +623,12 @@ export default function Home() {
             </p>
           </div>
 
-          <button
-            onClick={() => alert("Downloading Weekly Executive PDF...")}
+          <Link
+            href="/weekly-reports/july-week-1-2026"
             className="py-3 px-6 bg-[#F6C453] hover:bg-[#e0b23f] text-black rounded-xl text-xs font-bold transition-all shrink-0 shadow-lg shadow-[#F6C453]/10"
           >
-            Download PDF Report
-          </button>
+            Read This Week's Report
+          </Link>
         </section>
 
       </main>

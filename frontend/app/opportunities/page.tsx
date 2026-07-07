@@ -1,13 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/Navbar";
 
 export default function OpportunitiesPage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
 
   const opportunities = [
     {
+      slug: "mcp-server-development",
       type: "Skill",
       title: "Model Context Protocol (MCP) Server Development",
       reason: "Mentions in job postings for AI integration engineers have spiked 38% this week. Companies are standardizing context loading pipelines.",
@@ -17,6 +20,7 @@ export default function OpportunitiesPage() {
       highlight: true
     },
     {
+      slug: "local-llm-fine-tuning-unsloth",
       type: "Technology",
       title: "Local LLM Fine-Tuning with Unsloth",
       reason: "Unsloth training speedups reduce Llama 3 fine-tuning times by 2x to 5x. Essential for startups building domain-specific models.",
@@ -26,6 +30,7 @@ export default function OpportunitiesPage() {
       highlight: false
     },
     {
+      slug: "kolmogorov-arnold-networks",
       type: "Research Paper Practice",
       title: "Implementing Kolmogorov-Arnold Networks (KANs)",
       reason: "KANs have shown a high performance-to-compute ratio in scientific models. High demand for engineers who can convert KAN research into production code.",
@@ -35,6 +40,7 @@ export default function OpportunitiesPage() {
       highlight: false
     },
     {
+      slug: "voice-ai-agent-pipeline",
       type: "Startup Integration",
       title: "Voice AI Agent Pipeline Engineering",
       reason: "Low-latency WebSocket voice bots are replacing legacy IVR telephone directories. Massive demand for software engineers who can configure real-time audio channels.",
@@ -105,7 +111,7 @@ export default function OpportunitiesPage() {
 
             <div className="md:w-1/6 flex items-center justify-end">
               <button
-                onClick={() => alert(`Starting: ${opportunities[0].title}`)}
+                onClick={() => router.push(`/learning/${opportunities[0].slug}`)}
                 className="w-full md:w-auto px-5 py-3 rounded-xl font-bold bg-goldAccent hover:bg-[#e0b23f] text-black transition-all text-xs text-center shadow-lg shadow-goldAccent/10"
               >
                 Start Learning
@@ -136,7 +142,7 @@ export default function OpportunitiesPage() {
                   <span className="font-semibold text-white">{opp.adopters.join(", ")}</span>
                 </div>
                 <button
-                  onClick={() => alert(`Starting: ${opp.title}`)}
+                  onClick={() => router.push(`/learning/${opp.slug}`)}
                   className="w-full text-center py-2 bg-secondaryBg/60 hover:bg-secondaryBg border border-white/[0.05] hover:border-accent/30 rounded-xl text-xs font-bold text-zinc-300 hover:text-white transition-all"
                 >
                   Start Learning &rarr;

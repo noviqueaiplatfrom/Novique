@@ -1,32 +1,34 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/Navbar";
 
 export default function WeeklyReportsPage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
 
   const reports = [
     {
+      slug: "july-week-1-2026",
       title: "Weekly AI Synthesis — July Week 1, 2026",
       summary: "This week, open-source coding benchmarks surged as local MCP integrations matured. Model updates show Anthropic holding logic advantages while OpenAI expands low-latency audio pipelines.",
       date: "July 5, 2026",
-      downloads: "1,248 downloads",
-      size: "2.4 MB PDF"
+      reads: "1,248 reads",
     },
     {
+      slug: "june-week-4-2026",
       title: "Weekly AI Synthesis — June Week 4, 2026",
       summary: "Academic papers highlighted Kolmogorov-Arnold Networks (KANs) showing competitive scaling against traditional MLPs. VC funding reached new highs for robotics spin-offs.",
       date: "June 28, 2026",
-      downloads: "2,094 downloads",
-      size: "2.1 MB PDF"
+      reads: "2,094 reads",
     },
     {
+      slug: "june-week-3-2026",
       title: "Weekly AI Synthesis — June Week 3, 2026",
       summary: "Meta's Llama 3.1 405B release continues to shift custom fine-tuning pipelines. Edge model parameter ratios were evaluated.",
       date: "June 21, 2026",
-      downloads: "1,940 downloads",
-      size: "2.5 MB PDF"
+      reads: "1,940 reads",
     }
   ];
 
@@ -56,7 +58,7 @@ export default function WeeklyReportsPage() {
               <div className="flex-1">
                 <div className="flex items-center gap-3 text-[10px] font-bold text-goldAccent uppercase tracking-widest mb-2">
                   <span>{report.date}</span>
-                  <span className="text-zinc-500 font-semibold">{report.downloads}</span>
+                  <span className="text-zinc-500 font-semibold">{report.reads}</span>
                 </div>
                 <h3 className="text-lg md:text-xl font-display font-extrabold text-white mb-2 leading-snug">{report.title}</h3>
                 <p className="text-xs text-textSecondary leading-relaxed max-w-2xl font-normal">{report.summary}</p>
@@ -64,19 +66,10 @@ export default function WeeklyReportsPage() {
 
               <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto shrink-0">
                 <button
-                  onClick={() => alert(`Downloading: ${report.title}`)}
+                  onClick={() => router.push(`/weekly-reports/${report.slug}`)}
                   className="px-5 py-2.5 bg-goldAccent hover:bg-[#e0b23f] text-black rounded-xl text-xs font-bold transition-all text-center shadow-lg shadow-goldAccent/5"
                 >
-                  Download ({report.size})
-                </button>
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(window.location.href);
-                    alert("Report share link copied to clipboard.");
-                  }}
-                  className="px-5 py-2.5 bg-secondaryBg hover:bg-secondaryBg/80 border border-white/[0.05] text-zinc-300 rounded-xl text-xs font-bold transition-all text-center"
-                >
-                  Share Link
+                  Read Report
                 </button>
               </div>
             </div>
