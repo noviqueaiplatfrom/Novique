@@ -36,16 +36,74 @@ _SYSTEM = (
 )
 
 
+_TOPIC_PATTERNS: list[tuple[list[str], str]] = [
+    (["agent", "autonomous", "agentic", "mcp", "multi-agent", "tool use", "tool call"], "Agents"),
+    (["llm", "language model", "open source", "fine-tun", "quantiz", "gguf", "inference", "transformer"], "LLMs"),
+    (["fund", "raised", "invest", "series a", "series b", "acqui", "valuation", "ipo"], "Funding"),
+    (["robot", "hardware", "embodied", "drone", "sensor", "actuator", "physical"], "Robotics"),
+    (["voice", "audio", "speech", "tts", "whisper", "sound", "real-time audio"], "Voice AI"),
+    (["coding", "code", "cursor", "copilot", "ide", "developer tool", "github", "devtool", "pair programming"], "Developer Tools"),
+    (["hiring", "jobs", "recruit", "career", "resume", "talent", "workforce", "salary", "interview"], "Hiring"),
+    (["safety", "alignment", "jailbreak", "bias", "ethic", "regulation", "policy", "governance"], "AI Safety"),
+    (["image", "video", "vision", "diffusion", "stable diffusion", "sora", "generation", "generative media"], "Generative Media"),
+    (["search", "retrieval", "rag", "embedding", "vector", "knowledge graph"], "Knowledge & RAG"),
+]
+
+_WHO: dict[str, str] = {
+    "Agents": "Software teams building automation workflows, product managers evaluating AI-native pipelines, and enterprises reducing manual processes.",
+    "LLMs": "ML engineers selecting models for production, startups weighing build-vs-buy decisions, and researchers tracking capability improvements.",
+    "Funding": "Founders benchmarking their own positioning, investors tracking deal flow, and engineers monitoring acquisition targets.",
+    "Robotics": "Hardware engineers, supply-chain operators, and research labs working on embodied AI.",
+    "Voice AI": "Product teams building conversational interfaces, call-center operators, and accessibility-tool developers.",
+    "Developer Tools": "Software engineers adopting AI-assisted workflows, engineering managers setting team tooling standards, and technical recruiters updating evaluation criteria.",
+    "Hiring": "Software engineers, technical recruiters, and engineering managers navigating AI-augmented hiring expectations.",
+    "AI Safety": "Policy teams, AI researchers, legal counsel at AI companies, and regulators drafting AI governance frameworks.",
+    "Generative Media": "Creative teams, media companies, content platforms, and IP lawyers tracking synthetic media.",
+    "Knowledge & RAG": "Enterprise AI teams building internal search, data engineers, and product teams shipping knowledge assistants.",
+}
+
+_WATCH: dict[str, str] = {
+    "Agents": "Emerging MCP integrations, standardization proposals, and enterprise pilots measuring agent error rates.",
+    "LLMs": "Follow-up benchmarks, downstream fine-tune results, and hardware cost curves as newer models ship.",
+    "Funding": "Follow-on rounds, product announcements, and whether the acquired team ships under the new parent.",
+    "Robotics": "Hardware cost-per-unit trends, VLA model transfer results, and pilot deployments in logistics.",
+    "Voice AI": "Latency improvements, real-time API pricing changes, and regulatory stances on synthetic voice.",
+    "Developer Tools": "Adoption rates in open job postings, changes to interview rubrics at large tech companies, and competing tool benchmarks.",
+    "Hiring": "How major employers update job descriptions, new AI screening tools, and survey data on tool adoption among engineers.",
+    "AI Safety": "Regulatory timelines, company responses to new requirements, and independent audit results.",
+    "Generative Media": "Platform content policies, watermarking standards, and litigation outcomes on synthetic content.",
+    "Knowledge & RAG": "Retrieval accuracy benchmarks, enterprise adoption case studies, and open-source retrieval framework updates.",
+}
+
+
 def _heuristic(item: RawItem, domain: str) -> Explainer:
-    """Key-free fallback so the slice runs without an API key."""
-    blurb = (item.content[:240] + "…") if item.content else f"{item.title} (via {item.source})."
+    """Key-free fallback: derives context from title+content instead of hardcoded strings."""
+    combined = f"{item.title} {item.content or ''}".lower()
+
+    detected: list[str] = []
+    for keywords, label in _TOPIC_PATTERNS:
+        if any(kw in combined for kw in keywords):
+            detected.append(label)
+    if not detected:
+        detected = ["Research"] if item.kind == "paper" else ["AI"]
+
+    primary = detected[0]
+
+    blurb = (item.content[:240] + "...") if item.content and len(item.content) > 60 else f"{item.title}."
+
+    if item.content and len(item.content) > 120:
+        first_sentence = item.content[:300].split(". ")[0].strip()
+        why = (first_sentence + ".") if len(first_sentence) > 40 else blurb
+    else:
+        why = f"{item.title}."
+
     return Explainer(
         summary_30s=blurb,
         key_takeaways=[item.title, f"Source: {domain or item.source}"],
-        why_it_matters="Heuristic summary — set ANTHROPIC_API_KEY for AI-generated analysis.",
-        who_is_impacted="AI researchers and practitioners following this topic.",
-        what_to_watch="Follow-up coverage, citations, and official announcements.",
-        topics=["Research" if item.kind == "paper" else "AI"],
+        why_it_matters=why,
+        who_is_impacted=_WHO.get(primary, "Engineers, product teams, and researchers tracking AI developments."),
+        what_to_watch=_WATCH.get(primary, "Follow-up coverage, related announcements, and technical deep-dives."),
+        topics=detected[:6],
         sentiment="neutral",
     )
 

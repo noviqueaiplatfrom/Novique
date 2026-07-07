@@ -18,18 +18,26 @@ function getRecommendedActions(article: Article) {
   let founder = "Look at integration opportunities to enhance user workflows and team productivity.";
   let researcher = "Track how this theoretical contribution or tool performs under standard benchmarks.";
 
-  if (topics.some((t) => t.includes("agent") || t.includes("mcp"))) {
+  if (topics.some((t) => t.includes("hiring") || t.includes("jobs") || t.includes("recruit") || t.includes("workforce"))) {
+    engineer = "Document the AI tools you use daily and be ready to discuss your workflow in depth. This is now part of the hiring bar.";
+    founder = "Add AI tool proficiency to your hiring rubric and update job descriptions to reflect the new baseline expectations.";
+    researcher = "Analyze how AI tool adoption correlates with engineering productivity metrics and code quality across teams.";
+  } else if (topics.some((t) => t.includes("developer") || t.includes("coding") || t.includes("devtool") || t.includes("cursor") || t.includes("copilot"))) {
+    engineer = "Benchmark the tool against your current workflow on real tasks. Track output quality, latency, and token cost.";
+    founder = "Assess whether this shifts the build-vs-buy calculus for your team's internal tooling and developer experience budget.";
+    researcher = "Measure the effect on code quality, bug density, and PR cycle time in controlled team experiments.";
+  } else if (topics.some((t) => t.includes("agent") || t.includes("mcp"))) {
     engineer = "Build a custom MCP server to securely expose local databases or dev environments to Cursor/Claude.";
     founder = "Identify business workflows where autonomous agents can eliminate high-friction manual data entry.";
     researcher = "Study tool-calling architectures and planning mechanisms to reduce recursive loop hallucination.";
-  } else if (topics.some((t) => t.includes("model") || t.includes("llm") || t.includes("open source"))) {
+  } else if (topics.some((t) => t.includes("llm") || t.includes("model") || t.includes("open source"))) {
     engineer = "Benchmark local inference models against hosted cloud APIs. Test performance in GGUF/llama.cpp format.";
     founder = "Evaluate replacing premium proprietary APIs with fine-tuned open-source alternatives to increase margins.";
     researcher = "Compare the architecture alterations (activation functions, attention heads) against base models.";
   } else if (topics.some((t) => t.includes("funding") || t.includes("startup") || t.includes("acquisition"))) {
-    engineer = "Analyze their technical stack, API latency, and scale challenges; monitor hiring portals.";
-    founder = "Examine their product differentiation and pricing strategy to target gaps in their offerings.";
-    researcher = "Identify commercial applications of theoretical frameworks driving venture funding.";
+    engineer = "Analyze their technical stack, API latency, and scale challenges; monitor their hiring portals for signal.";
+    founder = "Examine their product differentiation and pricing strategy to identify gaps in their offerings.";
+    researcher = "Identify commercial applications of theoretical frameworks driving venture funding in this area.";
   } else if (topics.some((t) => t.includes("robotics") || t.includes("hardware"))) {
     engineer = "Explore ROS2, Isaac Sim, and web controllers for interfacing hardware pipelines with remote agents.";
     founder = "Evaluate automating physical warehousing, packaging, or manual tasks using vision-guided robots.";
@@ -38,10 +46,18 @@ function getRecommendedActions(article: Article) {
     engineer = "Implement low-latency WebSocket connections for real-time speech-to-speech pipelines.";
     founder = "Deploy voice agents to intercept inbound leads or handle simple customer support queries.";
     researcher = "Investigate acoustic feature extraction and watermarking to prevent voice forgery.";
+  } else if (topics.some((t) => t.includes("safety") || t.includes("alignment") || t.includes("policy") || t.includes("regulation"))) {
+    engineer = "Review how proposed requirements affect your model deployment pipelines, logging, and audit trails.";
+    founder = "Assess regulatory exposure for your AI features and engage legal counsel on compliance timelines.";
+    researcher = "Evaluate proposed safety benchmarks against current research and publish findings on measurable gaps.";
   } else if (article.kind === "paper") {
-    engineer = "Examine the reference implementation on GitHub; check for efficiency gains in inference.";
-    founder = "Determine if this theoretical improvement can be turned into a commercial model wrapper.";
-    researcher = "Identify the university labs and researchers behind this paper for potential incubator spin-offs.";
+    engineer = "Examine the reference implementation on GitHub; check for efficiency gains applicable to production inference.";
+    founder = "Determine if this theoretical improvement can be turned into a commercial model or wrapper service.";
+    researcher = "Identify the labs and researchers behind this paper and track follow-up citations for emerging applications.";
+  } else {
+    engineer = "Read the primary source and identify any APIs, SDKs, or open-source repos worth integrating or monitoring.";
+    founder = "Assess how this development shifts the competitive landscape and whether it creates a near-term product opportunity.";
+    researcher = "Cross-reference this with recent papers and industry benchmarks to contextualize its significance.";
   }
 
   return { engineer, founder, researcher };
