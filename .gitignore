@@ -16,6 +16,10 @@ npm-debug.log*
 .env.local
 frontend/.env.local
 
+# Root-level stray files (playwright tooling lives in ./frontend)
+/package.json
+/package-lock.json
+
 # OS / editor
 .DS_Store
 .idea/

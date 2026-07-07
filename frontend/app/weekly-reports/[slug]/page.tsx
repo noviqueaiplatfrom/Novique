@@ -120,6 +120,106 @@ const REPORTS: Record<string, Report> = {
       "PEFT method consolidation expected: most teams will converge on LoRA + QLoRA for the next 12 months based on ecosystem maturity.",
     ],
   },
+
+  "june-week-2-2026": {
+    slug: "june-week-2-2026",
+    title: "Weekly AI Synthesis — June Week 2, 2026",
+    date: "June 14, 2026",
+    weekOf: "June 9 – June 14, 2026",
+    executiveSummary: "The second week of June was characterized by a decisive shift in enterprise AI strategy from experimentation to production. Fortune 500 CTO surveys indicated 61% have moved at least one LLM workflow from pilot to production — up from 38% in January. Agentic patterns became the dominant architectural theme as multi-step tool-use workflows proved reliable enough for internal automation at scale. Prompt engineering emerged as a formal discipline with dedicated hiring at large enterprises.",
+    topSignals: [
+      { title: "61% of Fortune 500 CTO survey respondents confirm LLM in production", source: "Gartner CTO Survey", impact: 88, momentum: 84, summary: "Gartner's bi-annual survey confirmed a 23-point jump in production LLM deployments in six months. Primary blockers cited: evaluation frameworks (58%), hallucination rates on edge cases (51%), and enterprise security review processes (44%).", topic: "Enterprise AI" },
+      { title: "Agentic tool-use reliability exceeds 90% on structured workflows", source: "Anthropic + OpenAI evals", impact: 83, momentum: 87, summary: "Internal eval results from both Anthropic and OpenAI showed tool-call accuracy above 90% on structured multi-step workflows with 3-5 sequential tool calls. This threshold appears to be the adoption inflection point for enterprise automation.", topic: "Agents" },
+      { title: "Prompt engineering becomes explicit hiring category", source: "LinkedIn Talent Insights", impact: 71, momentum: 89, summary: "LinkedIn reported a 6x year-over-year increase in job posts explicitly naming prompt engineering as a skill requirement. 12% of AI-hiring companies now have a dedicated prompt engineer role — up from 2% in 2024.", topic: "Hiring" },
+      { title: "RAG pipeline engineering demand outpaces ML engineering in job posts", source: "Indeed AI Jobs Report", impact: 79, momentum: 83, summary: "Indeed data showed RAG-related job postings exceeded traditional ML engineering posts for the first time. Key skills cited: chunking strategy, embedding model selection, re-ranking, and retrieval evaluation.", topic: "Hiring" },
+    ],
+    modelUpdates: [
+      { name: "Claude claude-sonnet-4-6", update: "Extended context performance improvements confirmed. 200K context now achieves near-linear recall degradation rather than quadratic, validated on needle-in-haystack tests.", significance: "Enables reliable document analysis workflows on full enterprise contract libraries without chunking workarounds." },
+      { name: "GPT-4o mini", update: "Vision capabilities expanded. Function calling with image inputs now supported in production.", significance: "Unlocks document understanding pipelines at low cost — significant for invoice processing, form extraction, and compliance review." },
+    ],
+    funding: [
+      { company: "Glean", amount: "$260M", round: "Series E", focus: "Enterprise AI search and knowledge retrieval" },
+      { company: "Adept AI", amount: "$350M", round: "Series C", focus: "Agentic workflow automation" },
+      { company: "Lexi AI", amount: "$40M", round: "Series A", focus: "Legal AI for contract review" },
+    ],
+    papers: [
+      { title: "Self-RAG: Learning to Retrieve, Generate and Critique", authors: "University of Washington, Allen AI", finding: "Self-RAG trains models to decide when to retrieve and critique their own outputs using learned reflection tokens. Outperforms standard RAG by 8-14% on fact-intensive QA benchmarks with fewer unnecessary retrievals." },
+      { title: "Evaluating Prompt Robustness at Scale", authors: "PromptBench Authors", finding: "Analysis of 13 LLMs across 4500 adversarial prompt variants shows top models maintain 87% accuracy under prompt perturbation. Key finding: structured prompts with XML tags degrade 40% less than prose instructions under adversarial conditions." },
+    ],
+    outlook: [
+      "Enterprise AI evaluation frameworks will consolidate — RAGAS, TruLens, and DeepEval are the three to watch for becoming the pytest of LLM testing.",
+      "Agentic tool-use error rates are low enough that production deployments will accelerate sharply. Expect a wave of internal automation announcements.",
+      "Prompt engineering certifications and structured curricula are emerging — the role is formalizing faster than most predicted.",
+      "RAG pipeline managed services (Vertex AI Search, Azure AI Search) are abstracting away the hard parts — commoditization risk for consultancies.",
+    ],
+  },
+
+  "june-week-1-2026": {
+    slug: "june-week-1-2026",
+    title: "Weekly AI Synthesis — June Week 1, 2026",
+    date: "June 7, 2026",
+    weekOf: "June 2 – June 7, 2026",
+    executiveSummary: "The first week of June signaled the start of a summer inflection in open-source AI. Mistral's release strategy intensified competition with US labs, while the voice AI sector entered a consolidation phase as latency and cost benchmarks stabilized. Developer tooling saw its strongest weekly signal count in 2026, with new MCP integrations for all major IDEs confirmed. The week also marked the first measurable shift in AI infrastructure spend from cloud GPUs toward specialized inference hardware.",
+    topSignals: [
+      { title: "Mistral Large 2 benchmarks challenge frontier model dominance", source: "LMSYS Chatbot Arena", impact: 82, momentum: 85, summary: "Mistral Large 2 entered Chatbot Arena's top-5, posting Elo scores competitive with claude-sonnet-4-6 on coding and reasoning categories. The result reignited debate about the cost-performance frontier for European-hosted AI.", topic: "LLMs" },
+      { title: "Voice AI sector enters consolidation after rapid expansion", source: "AI Infrastructure Report", impact: 74, momentum: 68, summary: "Vapi, Retell, and Bland AI accounted for 78% of total voice AI API calls measured by a monitoring vendor. Market structure is consolidating as late entrants struggle to match latency and reliability benchmarks.", topic: "Voice AI" },
+      { title: "MCP integrations confirmed for VS Code, JetBrains, and Neovim", source: "GitHub MCP working group", impact: 77, momentum: 91, summary: "Official MCP client support was confirmed for the three largest developer IDEs, bringing the total addressable developer tooling market for MCP servers to an estimated 28M active developers globally.", topic: "Developer Tools" },
+      { title: "Inference hardware spend shifts from cloud GPUs to specialized chips", source: "MLCommons Infrastructure Survey", impact: 69, momentum: 72, summary: "Survey of 200 AI teams shows 34% have begun evaluating or deploying Groq LPUs, Cerebras Wafer-Scale Engines, or custom silicon for inference. Cloud GPU spend as a share of total AI infrastructure fell 8 points year-over-year.", topic: "Infrastructure" },
+    ],
+    modelUpdates: [
+      { name: "Mistral Large 2", update: "Launched with 128K context, Apache 2.0 license for research use. Code generation benchmarks show HumanEval 76.3%.", significance: "First European frontier model to credibly threaten US lab dominance on coding benchmarks. GDPR-native hosting position is a major enterprise differentiator." },
+      { name: "Gemini 1.5 Pro", update: "1M context window confirmed stable in production. Extended thinking mode added for complex analytical tasks.", significance: "Best option for document analysis tasks exceeding 200K tokens. Long-context pricing is now competitive with 200K alternatives." },
+    ],
+    funding: [
+      { company: "Mistral AI", amount: "$640M", round: "Series B", focus: "Open and proprietary frontier models" },
+      { company: "Cerebras Systems", amount: "$250M", round: "Pre-IPO", focus: "Wafer-scale inference hardware" },
+      { company: "Runway ML", amount: "$308M", round: "Series D", focus: "AI video generation" },
+    ],
+    papers: [
+      { title: "Efficient Long-Context LLM Inference via Paged Attention", authors: "UC Berkeley Sky Lab", finding: "PagedAttention reduces KV cache memory fragmentation by 55%, enabling 24x higher throughput for long-context requests. The technique powers vLLM and is now adopted by all major inference serving frameworks." },
+      { title: "Direct Preference Optimization at Scale", authors: "Stanford, UC Berkeley", finding: "DPO with 100K human preference pairs achieves alignment quality competitive with RLHF at 4x less compute and without a separate reward model. Emerges as the new standard for post-training alignment." },
+    ],
+    outlook: [
+      "Mistral's open-source bet will accelerate EU enterprise adoption — expect fast-follow compliance certifications from EU cloud providers.",
+      "Voice AI API consolidation opens integration opportunity: unified abstraction layers across Vapi/Retell/Bland are emerging.",
+      "MCP ecosystem expansion will drive a wave of developer tooling startups — the protocol is now stable enough to build products on.",
+      "Inference hardware diversification is early but accelerating — teams should model the break-even point for on-prem inference vs cloud.",
+    ],
+  },
+
+  "may-week-4-2026": {
+    slug: "may-week-4-2026",
+    title: "Weekly AI Synthesis — May Week 4, 2026",
+    date: "May 31, 2026",
+    weekOf: "May 26 – May 31, 2026",
+    executiveSummary: "The final week of May closed with the strongest funding totals of the year, anchored by two megadeals in AI infrastructure. AI safety moved from theoretical to operational concern as the UK and EU coordination mechanism produced its first binding technical guidance. Local inference viability for developer workflows crossed a credibility threshold as benchmark results from consumer hardware achieved professional workload throughput. The week also saw the largest single-week increase in AI-related GitHub repository activity in 2026.",
+    topSignals: [
+      { title: "GitHub AI repository activity hits 2026 high", source: "GitHub Octoverse AI Report", impact: 72, momentum: 88, summary: "Week-over-week AI repository commits, forks, and star activity reached a 2026 peak. Python AI tooling, Rust inference runtimes, and TypeScript agent frameworks drove the most activity. Claude and OpenAI SDK repositories led API client downloads.", topic: "Developer Tools" },
+      { title: "UK-EU AI Safety coordination produces first binding guidance", source: "AISI / AI Office", impact: 79, momentum: 71, summary: "The UK AI Safety Institute and EU AI Office issued joint technical guidance on evaluation requirements for high-capability models. The standard sets minimum red-teaming coverage and requires third-party audits for systems above a capability threshold.", topic: "Policy" },
+      { title: "Consumer hardware inference benchmarks reach professional workload threshold", source: "MLX + llama.cpp benchmarks", impact: 68, momentum: 82, summary: "Benchmark suite on M4 Pro MacBook showed 70B parameter models running at 18 tokens/second — sufficient for developer-facing code review, summarization, and Q&A workflows. Total hardware cost amortizes below $0.001/1K tokens at 8-hour daily usage.", topic: "LLMs" },
+      { title: "AI coding tool ROI data published by enterprise adopters", source: "McKinsey / Stripe engineering blog", impact: 85, momentum: 78, summary: "Stripe engineering blog and McKinsey survey both published concrete ROI data: 35-45% reduction in time-to-PR-ready for AI-assisted developers. The data is accelerating enterprise AI coding tool mandates.", topic: "Hiring" },
+    ],
+    modelUpdates: [
+      { name: "Claude claude-haiku-4-5", update: "Batch API pricing reduced 50%. Async batch jobs now support up to 100K requests per batch.", significance: "Cuts cost for high-volume classification and extraction pipelines by 50%. Teams running data enrichment at scale should migrate to batch mode immediately." },
+      { name: "Llama 3 (Meta)", update: "3B and 8B variants released with improved instruction-following. MLX-optimized versions available for Apple Silicon.", significance: "The 3B model is now viable for on-device developer tools. Expect a new class of offline-capable coding assistants." },
+    ],
+    funding: [
+      { company: "xAI (Grok)", amount: "$6B", round: "Series B", focus: "Foundation models and real-time AI" },
+      { company: "Harvey AI", amount: "$300M", round: "Series D", focus: "AI legal research and contract review" },
+      { company: "Synthesia", amount: "$180M", round: "Series D", focus: "AI video generation for enterprise" },
+      { company: "Suno AI", amount: "$125M", round: "Series B", focus: "AI music generation" },
+    ],
+    papers: [
+      { title: "Scaling Laws for Instruction Tuning", authors: "Google DeepMind", finding: "Instruction-tuning benefits scale predictably with dataset quality, not size. 10K high-quality preference pairs outperform 1M noisy pairs. Quality filtering via reward model scoring is the key implementation detail." },
+      { title: "Constitutional AI at Scale: Lessons from 1 Year of Production", authors: "Anthropic", finding: "CAI-trained models show 34% lower harmful output rates compared to RLHF-only baselines, with no statistically significant capability degradation on standard benchmarks. The result holds across seven evaluated model size ranges." },
+    ],
+    outlook: [
+      "AI safety compliance will become a procurement requirement for enterprise software vendors — build compliance posture now.",
+      "Consumer hardware inference will spawn a wave of privacy-first, offline-capable developer tools in H2 2026.",
+      "AI coding ROI data is now credible enough for CFO-level decisions — expect accelerated enterprise tooling mandates.",
+      "Llama 3 ecosystem will fragment into hundreds of domain-specific variants — curation and evaluation tooling will be the bottleneck.",
+    ],
+  },
 };
 
 function ScorePill({ score, label }: { score: number; label: string }) {

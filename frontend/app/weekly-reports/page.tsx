@@ -29,7 +29,28 @@ export default function WeeklyReportsPage() {
       summary: "Meta's Llama 3.1 405B release continues to shift custom fine-tuning pipelines. Edge model parameter ratios were evaluated.",
       date: "June 21, 2026",
       reads: "1,940 reads",
-    }
+    },
+    {
+      slug: "june-week-2-2026",
+      title: "Weekly AI Synthesis — June Week 2, 2026",
+      summary: "61% of Fortune 500 CTOs confirm LLM in production. Agentic tool-use reliability crossed 90%, and prompt engineering emerged as a formal hiring category.",
+      date: "June 14, 2026",
+      reads: "1,612 reads",
+    },
+    {
+      slug: "june-week-1-2026",
+      title: "Weekly AI Synthesis — June Week 1, 2026",
+      summary: "Mistral Large 2 challenged frontier model dominance. Voice AI entered consolidation phase and MCP integrations were confirmed for VS Code, JetBrains, and Neovim.",
+      date: "June 7, 2026",
+      reads: "1,405 reads",
+    },
+    {
+      slug: "may-week-4-2026",
+      title: "Weekly AI Synthesis — May Week 4, 2026",
+      summary: "GitHub AI activity hit a 2026 high, consumer hardware inference crossed professional workload thresholds, and AI coding ROI data went enterprise-credible.",
+      date: "May 31, 2026",
+      reads: "1,187 reads",
+    },
   ];
 
   const filteredReports = reports.filter((r) => {
