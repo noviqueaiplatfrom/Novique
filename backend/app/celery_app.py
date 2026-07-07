@@ -21,10 +21,10 @@ celery_app.conf.update(
     task_acks_late=True,
     worker_max_tasks_per_child=200,
     beat_schedule={
-        # Breaking news — every 5 minutes.
-        "ingest-news-every-5-min": {
+        # Breaking news — every 60 seconds.
+        "ingest-news-every-60-sec": {
             "task": "app.tasks.ingest_news",
-            "schedule": 300.0,
+            "schedule": 60.0,
         },
         # Research papers — every 30 minutes.
         "ingest-papers-every-30-min": {

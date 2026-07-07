@@ -1,215 +1,359 @@
 ================================================================================
- AI PULSE  —  The Real-Time AI Intelligence Platform
- Features + Setup Guide (current build: vertical slice)
+ NOVIQUE  —  The Real-Time AI Intelligence Platform
+ Developer Guide  (updated: multi-source, real-time feed, topic filters)
 ================================================================================
 
 WHAT IT IS
 --------------------------------------------------------------------------------
-AI Pulse aggregates what's happening in AI from multiple sources, uses Claude to
-summarize each item, scores everything with a proprietary engine, and presents a
-fast, dark-mode feed. It answers, for every item:
+Novique aggregates what's happening in AI from 10+ live sources, uses Claude
+to summarize and score each item, and presents a fast, dark-mode feed. For
+every item it answers:
     What happened?  Why does it matter?  Who is impacted?  What to watch next?
 
-This build is a working VERTICAL SLICE: the full stack runs end-to-end across two
-sources (news + research). The remaining modules from the master spec plug into
-the same pipeline as it grows.
+The full stack runs end-to-end across news, research, and open-source activity.
+New sources plug into a single fetcher contract — nothing downstream changes.
 
 
-FEATURES IN THIS BUILD
+FEATURES
 --------------------------------------------------------------------------------
-[x] Multi-source ingestion
-      - Hacker News (AI/LLM stories)      -> News
-      - Reddit (r/MachineLearning, r/LocalLLaMA, r/OpenAI, ...) -> News
-      - arXiv (cs.AI / cs.LG / cs.CL)     -> Research Hub
-      Adding a new source = one function; nothing downstream changes. Links
-      shared on both HN and Reddit automatically dedupe to a single entry.
+[x] Multi-source real-time ingestion (10 sources, polled every 60 seconds)
 
-[x] Scheduled ingestion (Celery + Redis), on the spec's tiered cadences
-      - News    : every 5 minutes
-      - Papers  : every 30 minutes
-      - Re-score: every hour (keeps Trend Score fresh as items age)
-      Content shows up on its own; no need to trigger ingestion by hand.
+      NEWS  (every 60 seconds)
+      - Hacker News          AI/LLM stories via Algolia API (points > 5)
+      - Reddit               r/MachineLearning, r/artificial, r/LocalLLaMA, r/OpenAI
+      - VentureBeat AI       RSS feed
+      - TechCrunch AI        RSS feed
+      - The Verge AI         RSS feed
+      - Wired AI             RSS feed
+      - AI News              RSS feed (artificialintelligence-news.com)
+      - MIT Tech Review      RSS feed
+      - IEEE Spectrum        RSS feed
+      - Dev.to               AI-tagged articles via public REST API
+      - GitHub Trending      AI/ML repos pushed in last 24h via GitHub search API
 
-[x] Citation counts for research papers (Semantic Scholar)
-      Each arXiv paper is enriched with its live citation count, shown on the
-      card and folded into its Impact Score (citations are the paper's
-      "engagement" signal, the way upvotes are for news).
+      RESEARCH  (every 30 minutes)
+      - arXiv                cs.AI / cs.LG / cs.CL, enriched with Semantic Scholar
+                             citation counts
 
-[x] AI Explainer Engine (Claude, claude-opus-4-8)
-      For each item it generates: a 30-second summary, key takeaways,
-      why it matters, who is impacted, what to watch next, topic tags, and
-      sentiment. For papers it explains the contribution in plain English.
-      (If no API key is set, a deterministic fallback keeps the pipeline running.)
+      Links shared across multiple sources deduplicate to one entry automatically
+      (SHA-256 of the normalized URL).
 
-[x] Proprietary scoring engine  (the platform's differentiator / IP)
-      - AI IMPACT SCORE (0-100): how much this matters. Blends source authority,
-        audience engagement, entity importance, and high-signal events
-        (launch / funding / breakthrough...). Recency-agnostic.
-      - AI TREND SCORE (0-100): how fast it's rising. Blends engagement velocity
-        (points/hour), a recency boost, and topic momentum across the batch.
+[x] AI Explainer Engine  (Claude claude-opus-4-8)
+      For each item: 30-second summary, key takeaways, why it matters, who is
+      impacted, what to watch next, topic tags, and sentiment. For arXiv papers,
+      the contribution is explained in plain English.
+      Without an API key the pipeline runs with a deterministic heuristic fallback.
 
-[x] Clean + dedupe
-      URL normalization (strips tracking params, www, trailing slashes) so the
-      same story from different places collapses to one entry.
+[x] Proprietary scoring engine
+      - AI IMPACT SCORE (0-100): significance. Blends source authority, engagement,
+        entity importance (GPT/Claude/Anthropic/...), and content signals
+        (launch/funding/breakthrough...). Recency-agnostic.
+      - AI TREND SCORE (0-100): momentum. Blends engagement velocity (points/hour),
+        recency boost, and topic co-occurrence across the batch. Decays hourly.
 
-[x] Accounts (JWT auth, bcrypt-hashed passwords)
-      Sign up / sign in right from the header. Access + refresh tokens; a
-      role field is in place for future admin/RBAC.
+[x] Automatic front-end refresh  (every 60 seconds)
+      React Query refetches the feed on a 60-second interval. Users see new
+      articles without reloading the page. The hero countdown timer reflects
+      the real 60-second ingest cycle.
+
+[x] Topic / interest filter chips  (Signals page)
+      AI-generated topic tags (from the Claude explainer) are surfaced as
+      clickable chips below the kind selector. Multi-select — pick "LLMs" +
+      "Funding" to see only articles tagged with either. "Clear all" resets.
+      Filtering is instant, client-side.
+
+[x] Time-aware greeting
+      The hero greeting reads the visitor's browser clock and says
+      "Good Morning / Good Afternoon / Good Evening / Good Night" correctly
+      in any timezone without a server roundtrip.
+
+[x] Feed sort + kind filters
+      - Sort  : Top Impact / Trending / Latest
+      - Kind  : All / News / Research Papers
+      - Mode  : Discover (public) / For You (personalised, signed-in only)
 
 [x] Personalized "For You" feed
-      Signed-in users get the corpus re-ranked for them. Two signals:
-        - Topics you FOLLOW (tap any topic tag to follow/unfollow)
-        - Articles you SAVE  (tap the star; your saved items' topics count too)
-      A developer who follows "LLMs"/"Coding" sees a different feed from a
-      founder who follows "Funding"/"Startups" — same corpus, ranked for you.
+      Signed-in users get the corpus re-ranked. Two signals:
+        - Topics you FOLLOW (tap any topic tag)
+        - Articles you SAVE  (tap the star; saved articles' topics count too)
 
-[x] Feed UI (Next.js 15, dark-mode first)
-      - Discover (public) vs For You (personalized, when signed in)
-      - Rank by: Top Impact / Trending / Latest
-      - Filter by: All / News / Research
-      - Per-item Impact & Trend badges, topic tags, save (star), engagement counts
+[x] Accounts  (JWT auth, bcrypt passwords)
+      Sign up / sign in from the header. Access + refresh tokens. A role field
+      is in place for future admin/RBAC.
 
-[x] REST API (FastAPI) with auto-generated docs
+[x] Clean + dedupe
+      URL normalization strips tracking params, www, and trailing slashes so
+      the same story arriving from different sources collapses to one entry.
+
+[x] REST API  (FastAPI, auto-generated OpenAPI docs at /docs)
 
 
 TECH STACK
 --------------------------------------------------------------------------------
-Frontend : Next.js 15, TypeScript, Tailwind CSS, React Query
-Backend  : FastAPI, SQLAlchemy 2, Pydantic
-Database : PostgreSQL 16
-Queue    : Celery + Redis (scheduled ingestion)
-Auth     : JWT (PyJWT) + bcrypt password hashing
-AI       : Anthropic Claude (claude-opus-4-8)
-Enrich   : Semantic Scholar (paper citation counts)
-Infra    : Docker Compose
+Frontend   Next.js 15, TypeScript, Tailwind CSS, React Query
+Backend    FastAPI (Python 3.12), SQLAlchemy 2, Pydantic v2
+Database   PostgreSQL 16
+Queue      Celery 5 + Redis 7  (scheduled ingestion, result backend)
+Auth       PyJWT + bcrypt
+AI         Anthropic Claude  (claude-opus-4-8, structured outputs)
+Enrich     Semantic Scholar  (paper citation counts, no key required)
+RSS        feedparser 6      (VentureBeat, TechCrunch, The Verge, Wired, ...)
+Infra      Docker Compose  (or run locally — see below)
 
-
-PREREQUISITES
---------------------------------------------------------------------------------
-- Docker Desktop (includes "docker compose")            <- the only hard requirement
-- (Optional) An Anthropic API key for real AI summaries:
-      https://console.anthropic.com  ->  API Keys
-
-
-SETUP — RUN THE WHOLE THING (recommended)
---------------------------------------------------------------------------------
-1. Open a terminal in the project folder (the one containing docker-compose.yml).
-
-2. (Optional but recommended) enable AI summaries:
-       cp .env.example .env
-   Then open .env and paste your key:
-       ANTHROPIC_API_KEY=sk-ant-...
-   (Skip this and the app still runs, using the heuristic fallback summaries.)
-
-3. Build and start everything (Postgres + Redis + backend + worker + frontend):
-       docker compose up --build
-   Leave this running. First build takes a few minutes.
-
-4. Get content. Two options:
-     a) Wait — the Celery worker auto-ingests news within ~5 min, papers ~30 min.
-     b) Don't wait — trigger one cycle now (pulls + scores both sources):
-          curl -X POST http://localhost:8000/api/ingest
-        You'll get back counts like: {"fetched":N,"cleaned":N,"created":N,"updated":N}
-
-5. View the site:
-       http://localhost:3000
-   Browse anonymously (Discover), or click "Create account" in the header to
-   get a personalized "For You" feed — then tap topic tags to follow and the
-   star to save articles.
-
-   API docs (try endpoints in the browser):
-       http://localhost:8000/docs
-
-To stop:  press Ctrl+C, then  `docker compose down`
-To wipe the database too:      `docker compose down -v`
-
-
-HOW PEOPLE COME VIEW THE SITE
---------------------------------------------------------------------------------
-On the same computer:
-    Open http://localhost:3000 in a browser.
-
-Others on the SAME Wi-Fi / network:
-    1. Find this machine's local IP (e.g. 192.168.1.50):
-         macOS:  ipconfig getifaddr en0
-    2. They visit:  http://<that-ip>:3000
-    NOTE: the browser also calls the API directly, so for LAN sharing set the
-    frontend's API URL to that IP. Easiest: in frontend/Dockerfile change
-        ENV NEXT_PUBLIC_API_URL=http://localhost:8000
-    to
-        ENV NEXT_PUBLIC_API_URL=http://<that-ip>:8000
-    then `docker compose up --build` again.
-
-A quick public demo link (no server needed):
-    Use a tunnel like ngrok or cloudflared to expose both ports, e.g.:
-        ngrok http 3000     (and a second tunnel for 8000)
-    Point NEXT_PUBLIC_API_URL at the public 8000 URL, rebuild, share the 3000 URL.
-
-A real public deployment (from the master spec):
-    Put it on a server (e.g. AWS EC2) behind Nginx with HTTPS, serve the built
-    Next.js app, run the API with uvicorn/gunicorn, use a managed Postgres, and
-    schedule ingestion. (This is the next infrastructure milestone.)
-
-
-API ENDPOINTS
---------------------------------------------------------------------------------
-GET  /health
-        Liveness check.
-
-GET  /api/feed?sort=impact|trend|recent&kind=news|paper&limit=40
-        The ranked feed. `kind` is optional (omit for the mixed feed;
-        kind=paper powers the Research Hub view).
-
-POST /api/ingest
-        Run one ingestion cycle now (fetch -> clean -> summarize -> score -> store).
-        Also runs automatically on the Celery schedule.
-
-Auth & personalization:
-POST /api/auth/register            {email, password}        -> tokens
-POST /api/auth/login               {email, password}        -> tokens
-POST /api/auth/refresh             {refresh_token}          -> access token
-GET  /api/me                       (Bearer token)           -> profile
-GET/POST/DELETE /api/me/interests  follow / unfollow topics
-GET/POST/DELETE /api/me/bookmarks  save / unsave articles
-GET  /api/feed/me?sort=&kind=      (Bearer token)           -> personalized feed
-
-Interactive docs: http://localhost:8000/docs
-
-
-TROUBLESHOOTING
---------------------------------------------------------------------------------
-"Could not reach the API" on the site:
-    The backend isn't up or you haven't ingested yet. Confirm
-    http://localhost:8000/health returns {"status":"ok"}, then run the POST
-    /api/ingest command above.
-
-Feed is empty:
-    You haven't ingested. Run:  curl -X POST http://localhost:8000/api/ingest
-
-Summaries look generic / say "set ANTHROPIC_API_KEY":
-    No API key configured. Add it to .env and `docker compose up --build`.
-    (The app intentionally still works without a key.)
-
-Port already in use (3000, 8000, or 5432):
-    Something else is using that port. Stop it, or edit the port mappings in
-    docker-compose.yml.
-
-arXiv returned nothing this run:
-    arXiv occasionally rate-limits or is slow. The pipeline tolerates a single
-    source failing — Hacker News still ingests. Just run /api/ingest again later.
-
-
-WHAT'S NEXT (ROADMAP)
---------------------------------------------------------------------------------
-- More sources: Product Hunt, the official lab blogs.
-- Admin panel + RBAC roles, trend dashboard, model tracker, daily briefing
-  email, and the rest of the modules from the spec.
-- Alembic migrations + a public deployment (Nginx/HTTPS on a server).
-
-DONE recently: third source (Reddit) with cross-source dedup; accounts (JWT +
-bcrypt); personalized "For You" feed (follow topics + save articles); Celery
-beat scheduling; Semantic Scholar citation counts.
 
 ================================================================================
- Questions or to view the live data: start at  http://localhost:3000
+ OPTION A — Run with Docker Compose  (easiest, zero local installs)
+================================================================================
+
+PREREQUISITES
+  - Docker Desktop running (the only hard requirement)
+  - Optional: Anthropic API key for real AI summaries
+
+STEPS
+  1. Clone / open the project folder (the one with docker-compose.yml).
+
+  2. (Optional) enable AI summaries:
+         cp .env.example .env
+     Open .env and paste your key:
+         ANTHROPIC_API_KEY=sk-ant-...
+
+  3. Build and start everything:
+         docker compose up --build
+     First build: a few minutes. Subsequent starts: a few seconds.
+
+  4. Seed the database (two options):
+       a) Wait — the Celery worker auto-ingests within ~60 seconds.
+       b) Trigger one cycle right now:
+              curl -X POST http://localhost:8000/api/ingest
+
+  5. Open  http://localhost:3000
+
+  To stop:           Ctrl+C  then  docker compose down
+  To wipe the DB:    docker compose down -v
+
+WHEN YOU CHANGE PYTHON DEPENDENCIES  (e.g. added feedparser)
+  Python packages are baked into the Docker image at build time.
+  Any time requirements.txt changes you must rebuild the backend image:
+      docker compose build backend
+      docker compose up
+  This is a one-time rebuild per dependency change, not every run.
+
+  Shortcut to install a single package without a full rebuild (temporary — lost
+  on next container restart, useful for quick testing):
+      docker compose exec backend pip install feedparser==6.0.11
+      docker compose exec worker  pip install feedparser==6.0.11
+
+
+================================================================================
+ OPTION B — Run locally, no Docker  (good for active development)
+================================================================================
+
+PREREQUISITES
+  Install these once on your machine:
+
+  PostgreSQL 16
+      Windows:  winget install PostgreSQL.PostgreSQL.16
+                or download installer from https://www.postgresql.org/download/
+      macOS:    brew install postgresql@16 && brew services start postgresql@16
+      Linux:    sudo apt install postgresql-16
+
+  Redis 7
+      Windows:  Option 1 — WSL2: wsl --install, then inside WSL: sudo apt install redis
+                Option 2 — Memurai (native Windows Redis): https://www.memurai.com/
+                Option 3 — use Docker just for Redis:
+                             docker run -d -p 6379:6379 redis:7-alpine
+      macOS:    brew install redis && brew services start redis
+      Linux:    sudo apt install redis-server && sudo systemctl start redis
+
+  Python 3.12+
+      Windows:  winget install Python.Python.3.12
+      macOS/Linux: brew install python@3.12  /  sudo apt install python3.12
+
+  Node.js 20+
+      Windows/macOS/Linux: https://nodejs.org or  nvm install 20
+
+CREATE THE DATABASE (first time only)
+  psql -U postgres
+  CREATE USER aipulse WITH PASSWORD 'aipulse';
+  CREATE DATABASE aipulse OWNER aipulse;
+  \q
+
+SET ENVIRONMENT VARIABLES
+  Create backend/.env  (or export in each terminal):
+
+      DATABASE_URL=postgresql+psycopg2://aipulse:aipulse@localhost:5432/aipulse
+      REDIS_URL=redis://localhost:6379/0
+      ANTHROPIC_API_KEY=sk-ant-...   # optional; omit for heuristic fallback
+      JWT_SECRET=change-me-in-production-please-use-32-chars
+
+BACKEND  (terminal 1 — API server)
+  cd backend
+  python -m venv .venv
+  .venv\Scripts\activate          # Windows
+  # source .venv/bin/activate     # macOS / Linux
+  pip install -r requirements.txt
+  python -m app.bootstrap         # creates tables
+  uvicorn app.main:app --reload --port 8000
+
+CELERY WORKER  (terminal 2 — scheduled ingestion)
+  cd backend
+  .venv\Scripts\activate          # Windows
+  # source .venv/bin/activate     # macOS / Linux
+  celery -A app.celery_app worker --beat --loglevel=info
+
+FRONTEND  (terminal 3)
+  cd frontend
+  npm install
+  npm run dev                     # http://localhost:3000
+
+FIRST CONTENT
+  Either wait ~60 seconds for the worker to auto-ingest, or trigger manually:
+      curl -X POST http://localhost:8000/api/ingest
+
+ADDING A NEW PYTHON PACKAGE  (local mode — no Docker needed)
+  Just pip install it in the activated venv:
+      pip install feedparser==6.0.11
+  Then add it to requirements.txt so collaborators pick it up on next install.
+  No rebuild step needed when running locally.
+
+
+================================================================================
+ HOW TO SHARE THE SITE
+================================================================================
+
+Same machine:
+    http://localhost:3000
+
+Others on the same Wi-Fi:
+    1. Find your local IP: ipconfig (Windows) / ipconfig getifaddr en0 (macOS)
+    2. Set NEXT_PUBLIC_API_URL=http://<your-ip>:8000 in frontend/.env.local
+    3. Restart the frontend
+    4. Share  http://<your-ip>:3000
+
+Quick public demo (no server):
+    Use ngrok to tunnel both ports:
+        ngrok http 3000   (second tunnel for 8000)
+    Set NEXT_PUBLIC_API_URL to the public 8000 URL, restart frontend.
+
+Production deployment:
+    Server (e.g. AWS EC2 / DigitalOcean) + Nginx + HTTPS
+    Managed Postgres (RDS / Supabase), managed Redis (Upstash / ElastiCache)
+    Run uvicorn behind gunicorn, serve Next.js with `npm run build && npm start`
+
+
+================================================================================
+ API ENDPOINTS
+================================================================================
+
+GET  /health
+        Liveness check.  {"status":"ok"}
+
+GET  /api/feed?sort=impact|trend|recent&kind=news|paper&limit=40
+        Ranked feed. kind is optional (omit for mixed; kind=paper = Research Hub).
+        Returns ArticleOut[] with full AI explainer fields.
+
+POST /api/ingest
+        Trigger one full ingest cycle manually.
+        Returns {"fetched":N,"cleaned":N,"created":N,"updated":N}
+
+POST /api/auth/register            {email, password}   -> {access_token, refresh_token}
+POST /api/auth/login               {email, password}   -> {access_token, refresh_token}
+POST /api/auth/refresh             {refresh_token}     -> {access_token}
+GET  /api/me                       Bearer token        -> user profile
+GET  /api/me/interests             Bearer token        -> [{topic}]
+POST /api/me/interests             {topic}             -> 204
+DELETE /api/me/interests/{topic}                       -> 204
+GET  /api/me/bookmarks             Bearer token        -> ArticleOut[]
+POST /api/me/bookmarks             {article_id}        -> 204
+DELETE /api/me/bookmarks/{id}                          -> 204
+GET  /api/feed/me?sort=&kind=      Bearer token        -> personalized ArticleOut[]
+
+Interactive docs (try everything in the browser):
+    http://localhost:8000/docs
+
+
+================================================================================
+ TROUBLESHOOTING
+================================================================================
+
+"Could not reach the API" on the site:
+    Backend isn't up. Confirm http://localhost:8000/health returns {"status":"ok"}.
+    Local mode: check uvicorn is running and DATABASE_URL is set correctly.
+    Docker mode: docker compose ps — all services should show "healthy".
+
+Feed is empty:
+    You haven't ingested yet. Run:  curl -X POST http://localhost:8000/api/ingest
+    Or wait 60 seconds for the Celery worker to run automatically.
+
+feedparser ImportError / ModuleNotFoundError:
+    Local mode: pip install feedparser==6.0.11  (inside activated venv)
+    Docker mode: docker compose build backend && docker compose up
+
+Summaries look generic / say "ANTHROPIC_API_KEY not set":
+    Add ANTHROPIC_API_KEY to .env (Docker) or export it in your terminal (local).
+    The app still works without it — summaries use the heuristic fallback.
+
+Port already in use (3000, 8000, 5432, 6379):
+    Docker: edit port mappings in docker-compose.yml.
+    Local: stop the conflicting process or change the port in the run command.
+
+Redis connection refused (local mode):
+    Windows: start Memurai service, or run Redis in WSL2: sudo service redis start
+    macOS: brew services start redis
+
+arXiv returned nothing:
+    arXiv rate-limits occasionally. The pipeline tolerates a single source
+    failing — other sources still ingest. Retry in a few minutes.
+
+RSS feed returned nothing for one source:
+    Some feeds (MIT Tech Review, Wired) occasionally change URLs or add
+    paywalls. The per-feed try/except swallows the failure; other feeds
+    still run. Check the Celery worker logs for the specific error.
+
+
+================================================================================
+ ADDING A NEW SOURCE  (developer notes)
+================================================================================
+
+1. Add a fetch_* function to  backend/app/ingestion/crawler.py
+   The only contract: return a list[RawItem].
+   RawItem fields: title, url, source, author, published_at, points,
+                   num_comments, content (optional), kind ("news"|"paper"),
+                   citation_count (papers only).
+
+2. Import it in  backend/app/tasks.py  and add it to the fetchers=[] list
+   in ingest_news() (for news cadence) or ingest_papers() (30-min cadence).
+
+3. That's it. The pipeline (clean, summarize, score, store) is unchanged.
+
+Example — adding Product Hunt AI:
+    def fetch_producthunt() -> list[RawItem]:
+        ...  # call their GraphQL API
+    # then in tasks.py:
+    fetchers=[..., fetch_producthunt]
+
+
+================================================================================
+ ROADMAP
+================================================================================
+
+DONE in this build:
+  - 10 live sources (HN, Reddit, 7x RSS, Dev.to, GitHub Trending, arXiv)
+  - 60-second ingest cadence (was 5 minutes)
+  - Frontend auto-refresh every 60 seconds
+  - Topic / interest filter chips on the Signals page
+  - Time-aware greeting (browser clock, no timezone mismatch)
+  - Personalized "For You" feed, bookmarks, topic follows
+  - JWT accounts, proprietary impact + trend scoring
+
+NEXT:
+  - Product Hunt AI category
+  - Official lab blogs (OpenAI, Anthropic, Google DeepMind, Meta AI)
+  - Admin panel + RBAC roles
+  - Daily briefing email digest
+  - Alembic DB migrations
+  - Production deployment (server + Nginx + HTTPS + managed Postgres)
+
+================================================================================
+ http://localhost:3000   |   API docs: http://localhost:8000/docs
 ================================================================================

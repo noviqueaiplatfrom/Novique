@@ -9,19 +9,29 @@ import { ArticleCard } from "@/components/ArticleCard";
 import { Navbar } from "@/components/Navbar";
 import { useAuth } from "./auth-context";
 
+function getGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good Morning";
+  if (hour < 17) return "Good Afternoon";
+  if (hour < 21) return "Good Evening";
+  return "Good Night";
+}
+
 export default function Home() {
   const { token } = useAuth();
   const qc = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
+  const [greeting, setGreeting] = useState("Welcome");
+  useEffect(() => { setGreeting(getGreeting()); }, []);
   const [sort, setSort] = useState<"impact" | "trend" | "recent">("recent");
   const [kind, setKind] = useState<"all" | "news" | "paper">("all");
 
-  // Brief Countdown Timer State (5 minutes loop)
-  const [secondsLeft, setSecondsLeft] = useState(300);
+  // Brief Countdown Timer State (60 seconds loop)
+  const [secondsLeft, setSecondsLeft] = useState(60);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setSecondsLeft((prev) => (prev <= 1 ? 300 : prev - 1));
+      setSecondsLeft((prev) => (prev <= 1 ? 60 : prev - 1));
     }, 1000);
     return () => clearInterval(timer);
   }, []);
@@ -32,10 +42,11 @@ export default function Home() {
     return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   };
 
-  // Fetch Signals (Discover default on home, now dynamic)
+  // Fetch Signals — auto-refresh every 60 seconds
   const { data, isLoading, isError } = useQuery({
     queryKey: ["feed", "discover", sort, kind, !!token],
     queryFn: () => fetchFeed(sort, kind),
+    refetchInterval: 60000,
   });
 
   // Bookmark & interest states for cards
@@ -108,7 +119,7 @@ export default function Home() {
               The AI Intelligence Platform
             </span>
             <h1 className="text-4xl md:text-5xl lg:text-6.5xl font-display font-extrabold text-white mb-4 leading-[1.1] tracking-tight">
-              Good Morning 👋
+              {greeting} 👋
             </h1>
             <p className="text-lg md:text-xl text-[#9AA8BD] font-light mb-4">
               Understand today's AI landscape in under 5 minutes.

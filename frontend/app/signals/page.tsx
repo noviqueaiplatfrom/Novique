@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { fetchFeed } from "@/lib/api";
 import * as authApi from "@/lib/auth";
 import type { Kind, Sort } from "@/lib/types";
@@ -30,16 +30,31 @@ export default function SignalsPage() {
   const [kind, setKind] = useState<Kind>("all");
   const [mode, setMode] = useState<Mode>("discover");
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const effectiveMode: Mode = token ? mode : "discover";
 
-  // Feed fetching
+  const toggleTopic = (topic: string) =>
+    setSelectedTopics((prev) =>
+      prev.includes(topic) ? prev.filter((t) => t !== topic) : [...prev, topic]
+    );
+
+  // Feed fetching — auto-refresh every 60 seconds
   const { data, isLoading, isError } = useQuery({
     queryKey: ["feed", effectiveMode, sort, kind, !!token],
     queryFn: () =>
       effectiveMode === "foryou" && token
         ? authApi.fetchMyFeed(token, sort === "recent" ? "impact" : sort, kind)
         : fetchFeed(sort, kind),
+    refetchInterval: 60000,
   });
+
+  // Unique topics derived from current corpus
+  const allTopics = useMemo(() => {
+    if (!data) return [];
+    const seen = new Set<string>();
+    data.forEach((a) => (a.topics ?? []).forEach((t) => seen.add(t)));
+    return Array.from(seen).sort();
+  }, [data]);
 
   // Personalization signals
   const { data: bookmarks } = useQuery({
@@ -77,16 +92,19 @@ export default function SignalsPage() {
     onSuccess: refresh,
   });
 
-  // Client-side search filtering
+  // Client-side filtering: search text + selected topic chips
   const filteredArticles = data?.filter((a) => {
     const query = searchQuery.toLowerCase();
-    if (!query) return true;
-    return (
+    const matchesSearch =
+      !query ||
       a.title.toLowerCase().includes(query) ||
       a.source.toLowerCase().includes(query) ||
       (a.topics ?? []).some((t) => t.toLowerCase().includes(query)) ||
-      (a.summary_30s ?? "").toLowerCase().includes(query)
-    );
+      (a.summary_30s ?? "").toLowerCase().includes(query);
+    const matchesTopics =
+      selectedTopics.length === 0 ||
+      selectedTopics.some((t) => (a.topics ?? []).includes(t));
+    return matchesSearch && matchesTopics;
   });
 
   return (
@@ -159,7 +177,7 @@ export default function SignalsPage() {
             </div>
 
             {/* Kind Pill Selectors */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               {KINDS.map((k) => (
                 <button
                   key={k.key}
@@ -180,6 +198,38 @@ export default function SignalsPage() {
                 </span>
               )}
             </div>
+
+            {/* Topic Interest Filter Chips */}
+            {allTopics.length > 0 && (
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Filter by Interest</span>
+                  {selectedTopics.length > 0 && (
+                    <button
+                      onClick={() => setSelectedTopics([])}
+                      className="text-[10px] text-zinc-500 hover:text-white font-bold transition-colors"
+                    >
+                      Clear all
+                    </button>
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {allTopics.map((topic) => (
+                    <button
+                      key={topic}
+                      onClick={() => toggleTopic(topic)}
+                      className={`rounded-full px-3 py-1 text-[11px] font-semibold border transition-all ${
+                        selectedTopics.includes(topic)
+                          ? "bg-[#6C63FF]/20 border-[#6C63FF]/60 text-[#a8a3ff]"
+                          : "bg-white/[0.02] border-white/[0.06] text-zinc-500 hover:border-zinc-600 hover:text-zinc-300"
+                      }`}
+                    >
+                      {topic}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Articles List */}
             {isLoading && <p className="text-zinc-500 text-sm">Querying active signals...</p>}
@@ -248,9 +298,13 @@ export default function SignalsPage() {
               </h4>
               <div className="flex flex-col gap-3">
                 {[
-                  { name: "Hacker News Aggregator", articles: "24 articles today" },
-                  { name: "arXiv Computer Science", articles: "18 papers today" },
-                  { name: "Reddit AI Researchers", articles: "12 briefs today" },
+                  { name: "Hacker News", articles: "Live · News" },
+                  { name: "Reddit AI", articles: "Live · Community" },
+                  { name: "VentureBeat / TechCrunch", articles: "Live · RSS" },
+                  { name: "The Verge / Wired", articles: "Live · RSS" },
+                  { name: "Dev.to", articles: "Live · Community" },
+                  { name: "GitHub Trending", articles: "Live · Open Source" },
+                  { name: "arXiv CS", articles: "Every 30 min · Research" },
                 ].map((contrib, idx) => (
                   <div key={idx} className="flex items-center justify-between text-xs">
                     <div>
