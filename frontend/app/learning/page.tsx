@@ -78,7 +78,7 @@ export default function LearningPage() {
   const [completed, setCompleted] = useState<Record<string, { pct: number; certId: string }>>({});
 
   useEffect(() => {
-    try { setCompleted(JSON.parse(localStorage.getItem("noviqe_completed") || "{}")); } catch {}
+    try { setCompleted(JSON.parse(localStorage.getItem("novique_completed") || "{}")); } catch {}
   }, []);
 
   const filtered = LESSONS.filter((l) => {
@@ -93,7 +93,7 @@ export default function LearningPage() {
 
       <main className="max-w-7xl mx-auto px-6 py-12 flex flex-col gap-10 relative z-10 animate-fade-in">
         <div>
-          <span className="text-[10px] font-extrabold uppercase tracking-widest text-tealAccent mb-1.5 block">Noviqe Academy</span>
+          <span className="text-[10px] font-extrabold uppercase tracking-widest text-tealAccent mb-1.5 block">Novique Academy</span>
           <h1 className="text-3xl md:text-4xl font-display font-extrabold text-white">Learn What&apos;s Next</h1>
           <p className="text-sm text-textSecondary mt-1">Modular developer-focused lessons covering emerging protocols, techniques, and architectures — each with a graded assessment and certificate.</p>
         </div>

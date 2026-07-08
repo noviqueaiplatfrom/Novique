@@ -9,7 +9,7 @@ function timeAgo(iso: string): string {
   return `${Math.floor(h / 24)}d ago`;
 }
 
-// Tailored Noviqe role-specific recommended actions
+// Tailored Novique role-specific recommended actions
 function getRecommendedActions(article: Article) {
   const topics = (article.topics ?? []).map((t) => t.toLowerCase());
   const title = article.title.toLowerCase();

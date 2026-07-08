@@ -53,7 +53,7 @@ export default function ProfilePage() {
             {/* Targeted Role Preference */}
             <div className="bg-panel border border-white/[0.05] p-6 rounded-3xl">
               <h3 className="text-xs font-bold uppercase tracking-widest text-[#9AA8BD] mb-1">Targeted Role Focus</h3>
-              <p className="text-xs text-textSecondary mb-4">Noviqe customizes recommended actions in signals based on your functional role.</p>
+              <p className="text-xs text-textSecondary mb-4">Novique customizes recommended actions in signals based on your functional role.</p>
               
               <div className="grid grid-cols-3 gap-4">
                 {[

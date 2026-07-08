@@ -2071,9 +2071,9 @@ export default function LessonPage({ params }: { params: Promise<{ slug: string 
         : 0;
       if (scorePct >= PASS_THRESHOLD * 100 && certId.current && learnerName) {
         try {
-          const prev = JSON.parse(localStorage.getItem("noviqe_completed") || "{}");
+          const prev = JSON.parse(localStorage.getItem("novique_completed") || "{}");
           prev[slug] = { pct: scorePct, certId: certId.current, date: new Date().toISOString(), name: learnerName };
-          localStorage.setItem("noviqe_completed", JSON.stringify(prev));
+          localStorage.setItem("novique_completed", JSON.stringify(prev));
         } catch {}
       }
     }
@@ -2233,7 +2233,7 @@ export default function LessonPage({ params }: { params: Promise<{ slug: string 
           <section className="flex flex-col gap-6 border-t border-white/[0.05] pt-10">
             <div className="flex items-start justify-between flex-wrap gap-4">
               <div>
-                <span className="text-[10px] font-extrabold uppercase tracking-widest text-accent block mb-1">Noviqe Assessment</span>
+                <span className="text-[10px] font-extrabold uppercase tracking-widest text-accent block mb-1">Novique Assessment</span>
                 <h2 className="text-lg font-display font-extrabold text-white">Test Your Knowledge</h2>
                 <p className="text-xs text-textSecondary mt-1">
                   Pass with {Math.round(PASS_THRESHOLD * 100)}%+ to earn your certificate
@@ -2324,7 +2324,7 @@ export default function LessonPage({ params }: { params: Promise<{ slug: string 
                     </h3>
                     <p className="text-xs text-textSecondary leading-relaxed">
                       {passed
-                        ? `You scored ${pct}% — your Noviqe certificate is ready below.`
+                        ? `You scored ${pct}% — your Novique certificate is ready below.`
                         : `You scored ${pct}%. You need ${Math.round(PASS_THRESHOLD * 100)}% to pass. Questions are randomised each attempt — keep studying and try again.`}
                     </p>
                     {!passed && (
@@ -2373,12 +2373,12 @@ export default function LessonPage({ params }: { params: Promise<{ slug: string 
                     <div id="certificate" className="bg-white rounded-3xl p-10 md:p-14 flex flex-col items-center text-center border-[6px] border-double border-[#6C63FF] shadow-2xl">
                       <div className="flex items-center gap-2 mb-8">
                         <span className="w-8 h-8 rounded-full bg-[#6C63FF] flex items-center justify-center text-white font-black text-sm">N</span>
-                        <span className="text-[#07111F] font-extrabold text-xl tracking-tight">Noviqe</span>
+                        <span className="text-[#07111F] font-extrabold text-xl tracking-tight">Novique</span>
                       </div>
                       <p className="text-[10px] font-extrabold uppercase tracking-[0.3em] text-[#6C63FF] mb-3">Certificate of Completion</p>
                       <p className="text-sm text-[#4a5568] mb-4">This certifies that</p>
                       <p className="text-3xl md:text-4xl font-display font-extrabold text-[#07111F] mb-4 leading-tight">{learnerName}</p>
-                      <p className="text-sm text-[#4a5568] mb-2">has successfully completed the Noviqe assessment for</p>
+                      <p className="text-sm text-[#4a5568] mb-2">has successfully completed the Novique assessment for</p>
                       <p className="text-xl font-bold text-[#6C63FF] mb-8 max-w-sm leading-snug">{lesson.title}</p>
                       <div className="flex items-center gap-8 mb-8">
                         <div className="text-center">
@@ -2397,7 +2397,7 @@ export default function LessonPage({ params }: { params: Promise<{ slug: string 
                         </div>
                       </div>
                       <div className="w-full max-w-xs h-px bg-[#e2e8f0] mb-6" />
-                      <p className="text-[10px] text-[#9aa3af]">Issued by Noviqe AI Intelligence Platform</p>
+                      <p className="text-[10px] text-[#9aa3af]">Issued by Novique AI Intelligence Platform</p>
                     </div>
                   </div>
                 )}

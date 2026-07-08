@@ -157,7 +157,7 @@ export default function Home() {
             </div>
 
             <p className="text-sm text-textSecondary leading-relaxed mb-6 font-normal">
-              Noviqe engines are aggregating reference nodes. Read the snapshot or skip directly to active signals.
+              Novique engines are aggregating reference nodes. Read the snapshot or skip directly to active signals.
             </p>
 
             <div className="text-[11px] text-[#9AA8BD] border-t border-white/[0.05] pt-4 flex items-center justify-between">

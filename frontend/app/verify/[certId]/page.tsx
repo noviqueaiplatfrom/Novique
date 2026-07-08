@@ -46,14 +46,14 @@ export default function VerifyPage({ params }: { params: Promise<{ certId: strin
 
         <Link href="/" className="inline-flex items-center gap-2 text-xs font-semibold text-zinc-500 hover:text-zinc-300 transition-colors w-fit">
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>
-          Back to Noviqe
+          Back to Novique
         </Link>
 
         <div className="flex items-center gap-3">
           <span className="w-9 h-9 rounded-full bg-[#6C63FF] flex items-center justify-center text-white font-black text-base">N</span>
           <div>
             <p className="text-[10px] font-extrabold uppercase tracking-widest text-zinc-500">Certificate Verification</p>
-            <p className="text-lg font-display font-extrabold text-white">Noviqe Certificate Registry</p>
+            <p className="text-lg font-display font-extrabold text-white">Novique Certificate Registry</p>
           </div>
         </div>
 
@@ -65,7 +65,7 @@ export default function VerifyPage({ params }: { params: Promise<{ certId: strin
               </div>
               <div>
                 <p className="text-sm font-extrabold text-tealAccent">Certificate Verified</p>
-                <p className="text-xs text-zinc-400">This certificate ID is valid and was issued by Noviqe.</p>
+                <p className="text-xs text-zinc-400">This certificate ID is valid and was issued by Novique.</p>
               </div>
             </div>
 
@@ -93,7 +93,7 @@ export default function VerifyPage({ params }: { params: Promise<{ certId: strin
             </div>
 
             <div className="border-t border-white/[0.05] pt-4 flex items-center justify-between flex-wrap gap-3">
-              <p className="text-xs text-zinc-500">Issued by the Noviqe AI Intelligence Platform</p>
+              <p className="text-xs text-zinc-500">Issued by the Novique AI Intelligence Platform</p>
               {result.lesson && (
                 <Link href={`/learning/${result.lesson.slug}`}
                   className="inline-flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent/90 text-white rounded-xl text-xs font-bold transition-all">
@@ -111,10 +111,10 @@ export default function VerifyPage({ params }: { params: Promise<{ certId: strin
               </div>
               <div>
                 <p className="text-sm font-extrabold text-red-400">Certificate Not Recognized</p>
-                <p className="text-xs text-zinc-400">The ID <span className="font-mono text-zinc-300">{decoded}</span> does not match a valid Noviqe certificate format.</p>
+                <p className="text-xs text-zinc-400">The ID <span className="font-mono text-zinc-300">{decoded}</span> does not match a valid Novique certificate format.</p>
               </div>
             </div>
-            <p className="text-xs text-zinc-500 leading-relaxed">Valid Noviqe certificate IDs follow the format <span className="font-mono text-zinc-300">NVQ-YYYYMMDD-PREFIX-XXXX</span> and are printed on certificates issued after passing an assessment with 80% or higher.</p>
+            <p className="text-xs text-zinc-500 leading-relaxed">Valid Novique certificate IDs follow the format <span className="font-mono text-zinc-300">NVQ-YYYYMMDD-PREFIX-XXXX</span> and are printed on certificates issued after passing an assessment with 80% or higher.</p>
             <Link href="/opportunities" className="inline-flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent/90 text-white rounded-xl text-xs font-bold transition-all w-fit">
               Browse Assessments
             </Link>

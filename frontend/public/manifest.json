@@ -1,0 +1,21 @@
+{
+  "name": "Novique",
+  "short_name": "Novique",
+  "description": "Real-time AI Intelligence Platform",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07111F",
+  "theme_color": "#07111F",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

@@ -57,6 +57,9 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
   const [authError, setAuthError] = useState<string | null>(null);
   const [authBusy, setAuthBusy] = useState(false);
 
+  // Mobile menu state
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   // Suggestions state
   const [focused, setFocused] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -112,17 +115,17 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
   return (
     <>
       <header className="sticky top-0 z-50 w-full border-b border-white/[0.05] bg-ink/75 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
-          
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+
           {/* Left: Brand Logo & Navigation */}
           <div className="flex items-center gap-6">
-            <Link href="/" className="flex items-center gap-2.5">
+            <Link href="/" className="flex items-center gap-2.5 shrink-0" onClick={() => setMobileOpen(false)}>
               <span className="w-2.5 h-2.5 rounded-full bg-accent logo-pulse shadow-[0_0_8px_rgba(108,99,255,0.4)]"></span>
               <span className="font-display text-xl font-extrabold tracking-tight text-textPrimary">
-                Noviqe
+                Novique
               </span>
             </Link>
-            
+
             <nav className="hidden xl:flex items-center gap-1.5 text-[11px] font-bold text-textSecondary tracking-wider uppercase">
               {navLinks.map((link) => {
                 const isActive = pathname === link.path;
@@ -141,7 +144,7 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
             </nav>
           </div>
 
-          {/* Center: Ask Noviqe Search Bar with intelligent suggestions */}
+          {/* Center: Ask Novique Search Bar with intelligent suggestions */}
           <div ref={containerRef} className="flex-1 max-w-md relative hidden md:block">
             <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-zinc-500">
               <svg className="w-4 h-4 text-textSecondary" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -202,7 +205,7 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
             )}
           </div>
 
-          {/* Right: Saved, Notifications, Auth */}
+          {/* Right: Saved, Notifications, Auth, Hamburger */}
           <div className="flex items-center gap-3">
             {/* Bookmarks Toggle linking directly to Saved Page */}
             <Link
@@ -245,7 +248,7 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
               user ? (
                 <button
                   onClick={logout}
-                  className="px-3.5 py-1.5 rounded-xl border border-white/[0.08] text-xs font-bold text-zinc-400 hover:text-white hover:border-zinc-700 transition-all"
+                  className="hidden sm:block px-3.5 py-1.5 rounded-xl border border-white/[0.08] text-xs font-bold text-zinc-400 hover:text-white hover:border-zinc-700 transition-all"
                 >
                   Sign Out
                 </button>
@@ -255,15 +258,83 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
                     setAuthMode("login");
                     setIsAuthModalOpen(true);
                   }}
-                  className="px-4.5 py-2 rounded-xl bg-accent hover:bg-accent/80 text-xs font-bold text-white transition-all hover:scale-[1.02] shadow-lg shadow-accent/10"
+                  className="hidden sm:block px-4 py-2 rounded-xl bg-accent hover:bg-accent/80 text-xs font-bold text-white transition-all hover:scale-[1.02] shadow-lg shadow-accent/10"
                 >
                   Sign In
                 </button>
               )
             )}
+
+            {/* Hamburger — visible below xl */}
+            <button
+              aria-label="Toggle navigation menu"
+              onClick={() => setMobileOpen((v) => !v)}
+              className="xl:hidden p-2 rounded-xl border border-white/[0.05] text-textSecondary hover:text-white hover:bg-white/[0.04] transition-all"
+            >
+              {mobileOpen ? (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                </svg>
+              )}
+            </button>
           </div>
 
         </div>
+
+        {/* Mobile menu panel */}
+        {mobileOpen && (
+          <div className="xl:hidden border-t border-white/[0.05] bg-ink/95 backdrop-blur-xl px-4 py-4 flex flex-col gap-1">
+            {/* Mobile search */}
+            <div className="mb-3">
+              <input
+                type="text"
+                placeholder="Search companies, models, topics..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full h-10 px-4 rounded-xl border border-white/[0.06] bg-white/[0.03] text-xs font-semibold text-textPrimary placeholder-textSecondary/55 outline-none focus:border-accent/50 transition-all"
+              />
+            </div>
+            {navLinks.map((link) => {
+              const isActive = pathname === link.path;
+              return (
+                <Link
+                  key={link.path}
+                  href={link.path}
+                  onClick={() => setMobileOpen(false)}
+                  className={`px-4 py-3 rounded-xl text-sm font-bold transition-colors ${
+                    isActive ? "text-white bg-white/[0.06]" : "text-textSecondary hover:text-white hover:bg-white/[0.03]"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+            {/* Auth in mobile menu */}
+            <div className="border-t border-white/[0.05] mt-3 pt-3">
+              {ready && (
+                user ? (
+                  <button
+                    onClick={() => { logout(); setMobileOpen(false); }}
+                    className="w-full px-4 py-2.5 rounded-xl border border-white/[0.08] text-xs font-bold text-zinc-400 hover:text-white transition-all text-left"
+                  >
+                    Sign Out
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => { setAuthMode("login"); setIsAuthModalOpen(true); setMobileOpen(false); }}
+                    className="w-full px-4 py-2.5 rounded-xl bg-accent hover:bg-accent/80 text-xs font-bold text-white transition-all text-center"
+                  >
+                    Sign In
+                  </button>
+                )
+              )}
+            </div>
+          </div>
+        )}
       </header>
 
       {/* AUTHENTICATION MODAL */}
@@ -286,7 +357,7 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
             {/* Logo */}
             <div className="flex items-center gap-2 mb-6">
               <span className="w-2.5 h-2.5 rounded-full bg-accent"></span>
-              <span className="font-display text-lg font-bold text-white">Noviqe Auth</span>
+              <span className="font-display text-lg font-bold text-white">Novique Auth</span>
             </div>
 
             <h3 className="text-xl font-bold tracking-tight text-white mb-2">

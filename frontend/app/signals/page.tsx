@@ -117,7 +117,7 @@ export default function SignalsPage() {
 
       <main className="max-w-7xl mx-auto px-6 py-12 flex flex-col gap-10 relative z-10 animate-fade-in">
         <div>
-          <span className="text-[10px] font-extrabold uppercase tracking-widest text-accent mb-1.5 block">Noviqe Pipeline</span>
+          <span className="text-[10px] font-extrabold uppercase tracking-widest text-accent mb-1.5 block">Novique Pipeline</span>
           <h1 className="text-3xl md:text-4xl font-display font-extrabold text-white">Market Signals</h1>
           <p className="text-sm text-textSecondary mt-1">Real-time intelligence aggregation of corporate, academic and open-source updates.</p>
         </div>
@@ -132,7 +132,7 @@ export default function SignalsPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.05]">
               <div>
                 <h2 className="text-lg font-bold tracking-tight text-white">Active Intelligence</h2>
-                <p className="text-xs text-textSecondary mt-0.5">Scored by Noviqe proprietary scoring matrix</p>
+                <p className="text-xs text-textSecondary mt-0.5">Scored by Novique proprietary scoring matrix</p>
               </div>
 
               {/* Controls */}
@@ -235,7 +235,7 @@ export default function SignalsPage() {
             {isLoading && <p className="text-zinc-500 text-sm">Querying active signals...</p>}
             {isError && (
               <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-xl text-sm">
-                Noviqe Engine connection failure.
+                Novique Engine connection failure.
               </div>
             )}
 

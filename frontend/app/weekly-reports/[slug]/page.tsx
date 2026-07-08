@@ -272,7 +272,7 @@ export default function ReportPage({ params }: { params: Promise<{ slug: string 
 
           {/* Header */}
           <div className="print-section">
-            <span className="text-[10px] font-extrabold uppercase tracking-widest text-goldAccent block mb-2">Noviqe Weekly Synthesis</span>
+            <span className="text-[10px] font-extrabold uppercase tracking-widest text-goldAccent block mb-2">Novique Weekly Synthesis</span>
             <h1 className="text-3xl md:text-4xl font-display font-extrabold text-white mb-2 leading-tight">{report.title}</h1>
             <p className="text-xs text-zinc-500 font-semibold">Week of {report.weekOf}</p>
           </div>

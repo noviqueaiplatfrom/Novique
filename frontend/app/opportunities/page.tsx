@@ -10,7 +10,7 @@ export default function OpportunitiesPage() {
   const router = useRouter();
 
   useEffect(() => {
-    try { setCompleted(JSON.parse(localStorage.getItem("noviqe_completed") || "{}")); } catch {}
+    try { setCompleted(JSON.parse(localStorage.getItem("novique_completed") || "{}")); } catch {}
   }, []);
 
   const opportunities = [

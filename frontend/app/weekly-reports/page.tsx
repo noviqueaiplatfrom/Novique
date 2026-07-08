@@ -67,7 +67,7 @@ export default function WeeklyReportsPage() {
         <div>
           <span className="text-[10px] font-extrabold uppercase tracking-widest text-goldAccent mb-1.5 block">Synthesis Archives</span>
           <h1 className="text-3xl md:text-4xl font-display font-extrabold text-white">Weekly Reports</h1>
-          <p className="text-sm text-textSecondary mt-1">Download and share comprehensive historical PDF synthesis reports aggregated by Noviqe models.</p>
+          <p className="text-sm text-textSecondary mt-1">Download and share comprehensive historical PDF synthesis reports aggregated by Novique models.</p>
         </div>
 
         <div className="flex flex-col gap-6">
