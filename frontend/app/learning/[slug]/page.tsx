@@ -379,6 +379,107 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
         options: ["Sets environment variables in the user's shell", "Passes environment variables to the MCP server subprocess", "Configures database connection pooling", "Defines the server's API keys"],
         answer: 1
       },
+      { q: "What are the three primitive types in the MCP specification?", options: ["Tools, Resources, and Prompts", "Servers, Clients, and Hosts", "Commands, Queries, and Events", "Methods, Properties, and Events"], answer: 0 },
+      { q: "What does a Resource primitive in MCP represent?", options: ["A database table", "Any data the server can expose to clients, such as files, database records, or API responses", "A server-side function the client can call", "A reusable prompt template"], answer: 1 },
+      { q: "What transport does MCP use for local stdio servers?", options: ["HTTP/2", "WebSocket", "Standard input/output (stdin/stdout)", "gRPC"], answer: 2 },
+      { q: "What transport does MCP use for remote/networked servers?", options: ["stdio", "HTTP with Server-Sent Events (SSE)", "WebRTC", "TCP sockets"], answer: 1 },
+      { q: "What is the role of the MCP Host?", options: ["The server that provides tools", "The application (e.g. Claude Desktop, Cursor) that manages MCP client connections and presents results to the user", "The JSON-RPC serialization layer", "The authentication gateway"], answer: 1 },
+      { q: "What does `inputSchema` define in an MCP tool?", options: ["The output format of the tool's response", "The JSON Schema describing the arguments the tool accepts", "The authentication requirements for the tool", "The transport protocol for the tool call"], answer: 1 },
+      { q: "What JSON-RPC version does MCP use?", options: ["1.0", "2.0", "3.0", "REST, not JSON-RPC"], answer: 1 },
+      { q: "What does `server.setRequestHandler` do in the MCP SDK?", options: ["Sets the HTTP request timeout", "Registers a handler function for a specific MCP request method", "Configures authentication for incoming requests", "Sets the server's display name"], answer: 1 },
+      { q: "What is the purpose of MCP Prompts?", options: ["System prompts embedded in the model weights", "Reusable, parameterized prompt templates the server exposes to clients", "HTTP prompts for API calls", "Prompts stored in the client's local cache"], answer: 1 },
+      { q: "How does Claude Desktop discover MCP servers?", options: ["It scans localhost ports on startup", "It reads server configs from claude_desktop_config.json", "It queries a central MCP registry", "It uses DNS-SD/mDNS service discovery"], answer: 1 },
+      { q: "What does the `ListTools` request return?", options: ["The list of connected MCP clients", "An array of tool definitions including names, descriptions, and inputSchemas", "The server's available transport methods", "The server's version and capabilities"], answer: 1 },
+      { q: "What does `CallTool` do?", options: ["Registers a new tool on the server", "Invokes a specific tool by name with provided arguments and returns the result", "Lists available tools", "Tests if a tool is callable"], answer: 1 },
+      { q: "What does `ListResources` return?", options: ["The list of registered MCP servers", "An array of resource URIs and metadata the server can provide", "The server's resource usage statistics", "All available MCP tools"], answer: 1 },
+      { q: "What is a resource URI in MCP?", options: ["The server's HTTP endpoint", "A unique identifier for a resource (e.g. file://path/to/file or db://table/row)", "The client's connection address", "The tool's schema identifier"], answer: 1 },
+      { q: "What is `ResourceTemplate` in MCP used for?", options: ["Defining output schemas for tools", "Parameterized resource URIs that clients can instantiate with arguments", "HTML templates for server responses", "Default values for resource fields"], answer: 1 },
+      { q: "What Zod schema type would you use for a required string argument in an MCP tool?", options: ["z.optional(z.string())", "z.string()", "z.string().nullable()", "z.any()"], answer: 1 },
+      { q: "What happens when an MCP tool throws an error?", options: ["The entire MCP server crashes", "The error is returned as a structured error response in the CallTool result, not an unhandled exception", "The client automatically retries", "The tool is unregistered"], answer: 1 },
+      { q: "What does `server.connect(transport)` do?", options: ["Connects to a database", "Attaches the MCP server instance to a transport layer to start accepting requests", "Joins the server to a cluster", "Authenticates with the MCP host"], answer: 1 },
+      { q: "Why use `zodToJsonSchema` in MCP servers?", options: ["To validate HTTP requests", "To convert Zod type definitions into JSON Schema format required by MCP's inputSchema field", "To generate TypeScript types from schemas", "To serialize tool results"], answer: 1 },
+      { q: "What is MCP sampling?", options: ["A method to reduce token usage", "An MCP primitive that lets servers request LLM completions from the host, enabling agentic server-side reasoning", "A load balancing technique", "A way to sample random resources"], answer: 1 },
+      { q: "What does `StdioServerTransport` handle for you?", options: ["HTTP request parsing", "JSON-RPC serialization/deserialization over stdin/stdout", "Authentication tokens", "Tool argument validation"], answer: 1 },
+      { q: "What is the advantage of MCP over custom API integrations?", options: ["MCP is faster than REST APIs", "One MCP server works with any MCP-compatible client, eliminating the need to build per-client integrations", "MCP provides built-in authentication", "MCP servers run in the cloud automatically"], answer: 1 },
+      { q: "What does `server.onerror` handle?", options: ["HTTP 500 errors from upstream APIs", "Unhandled errors in the MCP server's message processing loop", "Tool-specific validation errors", "Client disconnection events"], answer: 1 },
+      { q: "Which npm package provides the MCP server SDK for TypeScript?", options: ["@anthropic/mcp", "@modelcontextprotocol/sdk", "mcp-server-ts", "@anthropic-ai/mcp"], answer: 1 },
+      { q: "What does Cursor use MCP servers for?", options: ["Hosting the AI model", "Providing context to the AI — files, docs, database records, API data — without leaving the editor", "Running code in sandboxed environments only", "Authenticating API requests"], answer: 1 },
+      { q: "What does `ReadResource` do?", options: ["Reads a file from the server filesystem directly", "Fetches the content of a specific resource by URI", "Lists all readable resources", "Reads tool definitions"], answer: 1 },
+      { q: "What format does MCP use for resource content?", options: ["Only plain text", "Text (UTF-8 string) or blob (base64-encoded binary)", "JSON exclusively", "HTML"], answer: 1 },
+      { q: "What is the purpose of MCP capability negotiation during the `initialize` handshake?", options: ["Setting API rate limits", "Allowing client and server to announce which optional features (sampling, subscriptions) each supports", "Exchanging authentication tokens", "Choosing the transport protocol"], answer: 1 },
+      { q: "Why are MCP tool descriptions important?", options: ["They affect tool execution speed", "The LLM reads descriptions to decide which tool to call and how to construct arguments", "They are required for JSON Schema validation", "They configure authentication scopes"], answer: 1 },
+      { q: "What does `process.stderr` serve as in a stdio MCP server?", options: ["The response channel for tool results", "The only safe channel for debug logging, since stdout is reserved for MCP protocol messages", "The error response channel for JSON-RPC errors", "The channel for resource content"], answer: 1 },
+      {
+        q: "What does this MCP tool registration do?",
+        code: `server.setRequestHandler(ListToolsRequestSchema, async () => ({
+  tools: [{
+    name: "get_weather",
+    description: "Get current weather for a city",
+    inputSchema: zodToJsonSchema(z.object({
+      city: z.string().describe("City name"),
+      units: z.enum(["celsius","fahrenheit"]).default("celsius")
+    }))
+  }]
+}));`,
+        options: ["Creates a REST endpoint for weather data", "Registers a 'get_weather' tool that accepts a city name and optional unit preference, exposing it to any MCP client", "Calls the weather API directly", "Validates incoming weather requests"],
+        answer: 1
+      },
+      {
+        q: "What is wrong with this MCP tool handler?",
+        code: `server.setRequestHandler(CallToolRequestSchema, async (request) => {
+  if (request.params.name === "read_file") {
+    const { path } = request.params.arguments;
+    const content = fs.readFileSync(path, "utf-8");
+    return { content: [{ type: "text", text: content }] };
+  }
+});`,
+        options: ["readFileSync is not available in Node.js", "The path argument is used directly without sanitization — a directory traversal vulnerability (e.g. path='../../etc/passwd')", "The return format is incorrect", "MCP does not support file reading"],
+        answer: 1
+      },
+      {
+        q: "What does this Claude Desktop config entry do?",
+        code: `{
+  "mcpServers": {
+    "my-db": {
+      "command": "node",
+      "args": ["/home/user/mcp-servers/db-server/build/index.js"],
+      "env": { "DATABASE_URL": "postgresql://localhost/mydb" }
+    }
+  }
+}`,
+        options: ["Installs a new MCP SDK", "Registers 'my-db' as an MCP server that Claude Desktop will launch via Node.js with the given database URL", "Sets a global database connection", "Configures Claude's system prompt"],
+        answer: 1
+      },
+      {
+        q: "What does this code accomplish?",
+        code: `server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
+  const url = new URL(request.params.uri);
+  if (url.protocol === "memo:") {
+    const id = url.pathname.slice(1);
+    const memo = await db.memos.findById(id);
+    return {
+      contents: [{
+        uri: request.params.uri,
+        mimeType: "text/plain",
+        text: memo.content
+      }]
+    };
+  }
+  throw new Error("Unsupported URI scheme");
+});`,
+        options: ["Lists all memos in the database", "Handles ReadResource requests for memo:// URIs by fetching a memo from the database and returning its content", "Creates a new memo via MCP", "Validates memo URIs"],
+        answer: 1
+      },
+      {
+        q: "Why does this MCP server log to stderr instead of stdout?",
+        code: `const server = new Server({ name: "demo", version: "1.0.0" }, { capabilities: {} });
+
+server.onerror = (error) => {
+  console.error("[MCP Error]", error); // stderr
+};`,
+        options: ["console.error is faster than console.log", "stdout carries JSON-RPC protocol messages; any non-protocol output to stdout corrupts the MCP message stream", "stderr messages are ignored by Claude Desktop", "It is a style convention only"],
+        answer: 1
+      },
     ],
   },
 
@@ -689,6 +790,86 @@ tokenizer.save_pretrained("./adapter")`,
         options: ["100 steps", "500 steps", "1500 steps", "3000 steps"],
         answer: 2
       },
+      { q: "What does LoRA stand for?", options: ["Low-Rank Adaptation", "Low-Resource Alignment", "Latent Output Regularization Adjustment", "Layer-Output Rank Adaptation"], answer: 0 },
+      { q: "What does the rank parameter `r` control in LoRA?", options: ["The learning rate multiplier", "The dimensionality of the low-rank decomposition matrices, controlling how many parameters are trained", "The number of training epochs", "The attention head count"], answer: 1 },
+      { q: "What does QLoRA add on top of standard LoRA?", options: ["Quantized dataset preprocessing", "Quantized base model weights (4-bit) to reduce VRAM while still training LoRA adapters in full precision", "Quality loss reduction via averaging", "Queue-based learning rate scheduling"], answer: 1 },
+      { q: "What is `target_modules` in a LoRA config?", options: ["The Python modules to import for training", "The specific layer names (e.g. q_proj, v_proj) where LoRA adapters are injected", "The GPU device targets", "The output layers to freeze"], answer: 1 },
+      { q: "What does Unsloth's `FastLanguageModel.get_peft_model` do?", options: ["Downloads a new base model", "Wraps a base model with LoRA adapters configured for efficient fine-tuning", "Converts the model to ONNX format", "Runs model evaluation benchmarks"], answer: 1 },
+      { q: "Why is gradient checkpointing used in fine-tuning?", options: ["To speed up forward passes", "To reduce VRAM by recomputing intermediate activations during backprop instead of storing them", "To improve model accuracy", "To checkpoint training every N steps"], answer: 1 },
+      { q: "What is the Alpaca prompt format used for?", options: ["Instruction tuning: a structured template with instruction, input context, and expected response fields", "Pretraining on raw text", "RLHF reward model training", "Tokenizer training"], answer: 0 },
+      { q: "What does `lora_alpha` control in LoRA training?", options: ["The LoRA learning rate", "A scaling factor applied to LoRA updates — typically set to 2x rank to scale gradients appropriately", "The number of LoRA layers", "The dropout applied to LoRA layers"], answer: 1 },
+      { q: "What does merging LoRA weights into the base model do?", options: ["Creates a separate adapter file", "Bakes the trained adapter updates directly into the base model weights, eliminating adapter overhead at inference time", "Increases model size by the rank factor", "Resets the base model to original weights"], answer: 1 },
+      { q: "What is the ShareGPT format used for?", options: ["Sharing fine-tuned models publicly", "Multi-turn conversation fine-tuning using a list of human/assistant message pairs", "Single-instruction fine-tuning only", "Reward model training"], answer: 1 },
+      { q: "What does `per_device_train_batch_size` × `gradient_accumulation_steps` equal?", options: ["The effective learning rate", "The effective global batch size seen per optimizer update", "The number of training epochs", "The LoRA rank"], answer: 1 },
+      { q: "What is VRAM's primary constraint during fine-tuning?", options: ["CPU speed", "Storing model weights, optimizer states, gradients, and activations simultaneously", "Disk I/O speed", "Network bandwidth for dataset download"], answer: 1 },
+      { q: "What does 4-bit quantization do to model weights?", options: ["Reduces weight precision from 32/16-bit floating point to 4-bit integers, cutting VRAM by 4-8x", "Adds 4-bit error correction to weights", "Splits weights across 4 GPUs", "Reduces the model to 4 layers"], answer: 0 },
+      { q: "What is the Unsloth `max_seq_length` parameter?", options: ["The maximum number of training examples", "The maximum token length of each training example — longer examples are truncated", "The model's output sequence length limit", "The context window used for evaluation"], answer: 1 },
+      { q: "What does `save_pretrained_merged` do in Unsloth?", options: ["Saves only the LoRA adapters", "Merges the LoRA weights into the base model and saves the full merged model", "Saves the optimizer state for resuming", "Exports to GGUF format automatically"], answer: 1 },
+      { q: "What is GGUF format used for?", options: ["Cloud model deployment", "Quantized model format compatible with llama.cpp for local CPU/GPU inference", "Training large models efficiently", "Storing dataset files"], answer: 1 },
+      { q: "What does the `lora_dropout` parameter do?", options: ["Randomly drops entire LoRA layers", "Applies dropout regularization to LoRA adapter outputs to reduce overfitting", "Drops training examples randomly", "Controls data augmentation rate"], answer: 1 },
+      { q: "What is catastrophic forgetting in fine-tuning?", options: ["The model forgets the training dataset after saving", "The model loses general capabilities while overfitting to the fine-tuning domain", "GPU memory being cleared between runs", "Loss of gradient history"], answer: 1 },
+      { q: "What does `bias='none'` mean in a LoRA config?", options: ["Disables model bias terms entirely", "Does not train bias parameters alongside LoRA adapters — only adapter weights are updated", "Sets all biases to zero", "Removes regularization"], answer: 1 },
+      { q: "Why is a lower learning rate used for fine-tuning vs pretraining?", options: ["Fine-tuning uses smaller datasets", "To make small, controlled updates to existing knowledge rather than overwriting it with large gradient steps", "GPU memory limitations require it", "Lower LR improves VRAM efficiency"], answer: 1 },
+      { q: "What does `warmup_ratio=0.05` do in training?", options: ["Keeps the LR low for the first 5% of steps, gradually ramping up to avoid destabilizing early training", "Warms up the GPU before training", "Sets the minimum learning rate", "Trains only 5% of model parameters initially"], answer: 0 },
+      { q: "What is the difference between `num_train_epochs` and `max_steps`?", options: ["They are identical parameters", "num_train_epochs completes full passes over the dataset; max_steps caps total gradient update steps regardless of dataset size", "max_steps is for evaluation only", "num_train_epochs is for LoRA only"], answer: 1 },
+      { q: "What does Unsloth's 2x speed claim refer to?", options: ["2x faster inference vs PyTorch baseline", "2x faster training throughput via custom CUDA kernels and memory optimizations vs standard HuggingFace Trainer", "2x larger models trainable on the same hardware", "2x more training examples per second"], answer: 1 },
+      { q: "What is the purpose of `EOS_TOKEN` appended to training examples?", options: ["Marks the beginning of each training example", "Signals the model where the response ends, teaching it to stop generating rather than continuing indefinitely", "Adds a special tokenizer boundary", "Required by the Alpaca format spec"], answer: 1 },
+      {
+        q: "What does this LoRA config prioritize?",
+        code: `peft_config = LoraConfig(
+    r=64,
+    lora_alpha=128,
+    target_modules=["q_proj","k_proj","v_proj","o_proj",
+                    "gate_proj","up_proj","down_proj"],
+    lora_dropout=0,
+    bias="none",
+)`,
+        options: ["Memory efficiency with a tiny adapter", "High-capacity fine-tuning — r=64 with all attention and MLP layers targeted gives maximum expressiveness at the cost of more parameters", "Speed over accuracy", "Minimal overfitting via high dropout"],
+        answer: 1
+      },
+      {
+        q: "What does this training argument configuration control?",
+        code: `training_args = TrainingArguments(
+    per_device_train_batch_size=2,
+    gradient_accumulation_steps=8,
+    warmup_steps=5,
+    num_train_epochs=1,
+    learning_rate=2e-4,
+    fp16=not is_bfloat16_supported(),
+    bf16=is_bfloat16_supported(),
+)`,
+        options: ["Sets an effective batch size of 2", "Sets an effective batch size of 16 (2×8), uses bf16 if supported else fp16, with 5-step LR warmup", "Trains for 8 epochs", "Uses fp32 precision exclusively"],
+        answer: 1
+      },
+      {
+        q: "What is wrong with this fine-tuning dataset?",
+        code: `dataset = [
+    {"instruction": "Summarize this article", "output": "The article discusses AI trends."},
+    {"instruction": "Summarize this article", "output": "AI is advancing quickly."},
+    # ... 500 more with same instruction, no input field
+]`,
+        options: ["The dataset is too small", "All examples use the same instruction with no variation in the input field — the model will overfit to 'Summarize this article' and fail on other tasks", "The output field name is wrong", "Alpaca format requires a 'response' field not 'output'"],
+        answer: 1
+      },
+      {
+        q: "What does this code check before training?",
+        code: `import torch
+print(torch.cuda.get_device_properties(0).total_memory / 1e9, "GB VRAM")
+print(torch.cuda.memory_allocated(0) / 1e9, "GB used")
+print(torch.cuda.memory_reserved(0) / 1e9, "GB reserved")`,
+        options: ["Validates the CUDA installation", "Audits available vs allocated VRAM to decide if 4-bit quantization or gradient checkpointing is needed before loading the model", "Benchmarks GPU training speed", "Checks if the model fits in RAM"],
+        answer: 1
+      },
+      {
+        q: "What does this GGUF export enable?",
+        code: `model.save_pretrained_gguf(
+    "model_q4",
+    tokenizer,
+    quantization_method="q4_k_m"
+)`,
+        options: ["Saves a 4-bit quantized PyTorch checkpoint", "Exports the model in Q4_K_M GGUF format, making it runnable on CPU-only hardware via llama.cpp or Ollama", "Creates a 4-layer model variant", "Exports for HuggingFace Hub upload"],
+        answer: 1
+      },
     ],
   },
 
@@ -921,6 +1102,67 @@ mlp = nn.Sequential(
 x_uncentered = torch.rand(1000, 2)`,
         options: ["x_centered is in [-1, 1]; x_uncentered is in [0, 1]", "x_centered is in [0, 2]; x_uncentered is in [-1, 0]", "They produce the same values", "x_centered has 2x more samples"],
         answer: 0
+      },
+      { q: "What is the core theoretical result that motivates KANs?", options: ["The Universal Approximation Theorem for MLPs", "The Kolmogorov-Arnold Representation Theorem: any multivariate continuous function can be expressed as compositions of univariate functions", "The No Free Lunch Theorem", "Vapnik-Chervonenkis dimension theory"], answer: 1 },
+      { q: "In a KAN, where are the learnable activation functions placed?", options: ["On nodes (neurons), like standard MLPs", "On edges (connections between nodes), replacing fixed weights", "On the input layer only", "On the output layer only"], answer: 1 },
+      { q: "What are B-splines used for in KANs?", options: ["Batch normalization", "As the learnable basis functions on each KAN edge", "Backpropagation through discontinuities", "Bias initialization"], answer: 1 },
+      { q: "What does the `grid` parameter control in a KAN?", options: ["The batch size", "The number of control points in the B-spline basis functions — more grid points = more expressive activations", "The network architecture dimensions", "The learning rate grid search"], answer: 1 },
+      { q: "What does grid refinement in KAN training do?", options: ["Makes the computational graph smaller", "Progressively increases B-spline resolution during training, starting coarse for stability then refining for precision", "Reduces the number of KAN layers", "Applies dropout to grid points"], answer: 1 },
+      { q: "What does `kan.plot()` show?", options: ["Training loss curves", "A visual diagram of each edge's learned activation function as a plotted curve", "The gradient flow through the network", "The B-spline control points as a table"], answer: 1 },
+      { q: "What does `kan.prune()` do?", options: ["Removes gradient history to save memory", "Eliminates edges with near-zero learned activations, simplifying the network for interpretability", "Reduces the grid resolution", "Crops the training dataset"], answer: 1 },
+      { q: "What does `kan.auto_symbolic()` attempt to do?", options: ["Automatically design the KAN architecture", "Replace learned B-spline activations with known mathematical functions (sin, exp, x²) if a close match is found", "Run symbolic regression on the training data", "Convert the KAN to an MLP"], answer: 1 },
+      { q: "Why are KANs called interpretable compared to MLPs?", options: ["Their learned functions are smaller files", "Each edge's activation can be visualized and potentially identified as a known mathematical formula", "They have fewer parameters", "They use explainable AI post-hoc methods"], answer: 1 },
+      { q: "What does the `width` parameter define in a KAN?", options: ["The hidden layer size in pixels", "The number of neurons per layer — e.g. [2,5,1] means 2 inputs, 5 hidden neurons, 1 output", "The B-spline width (bandwidth)", "The maximum activation value"], answer: 1 },
+      { q: "What task are KANs particularly well-suited for?", options: ["Image classification at scale", "Symbolic regression and scientific discovery — finding mathematical expressions from data", "Natural language processing", "Reinforcement learning control tasks"], answer: 1 },
+      { q: "What does `kan.fit()` minimize during training?", options: ["Cross-entropy loss only", "A configurable loss (MSE by default) plus optional entropy regularization to encourage sparse, interpretable activations", "Binary cross-entropy only", "Cosine similarity loss"], answer: 1 },
+      { q: "How does a KAN with width [n, 1] differ from width [n, 10, 1]?", options: ["[n,1] is a deep network; [n,10,1] is shallow", "[n,1] maps inputs directly to output with n learnable functions; [n,10,1] adds a hidden layer of 10 neurons for more complex mappings", "They are equivalent by universal approximation", "[n,10,1] has fewer parameters"], answer: 1 },
+      { q: "What mathematical operation does a KAN node perform?", options: ["Weighted sum followed by activation (like MLP)", "A simple sum of the incoming edge function outputs", "Max-pooling of incoming values", "Dot product of incoming vectors"], answer: 1 },
+      { q: "What does `steps=100` control in `kan.fit()`?", options: ["Number of B-spline grid points", "Number of LBFGS optimization steps", "Batch size per step", "Number of epochs before grid refinement"], answer: 1 },
+      { q: "What optimizer do KAN authors recommend over Adam?", options: ["SGD with momentum", "LBFGS — a second-order optimizer that works well for small-to-medium KAN networks", "Adagrad", "RMSProp"], answer: 1 },
+      { q: "What library provides the reference KAN implementation?", options: ["torch-kan", "pykan (pip install pykan)", "efficient-kan", "symbolic-net"], answer: 1 },
+      { q: "What does `entropy_gamma` regularization encourage in KANs?", options: ["High entropy distributions over edge weights", "Sparse activations — many edges learn near-zero functions, making pruning more effective", "Diversity in B-spline shapes", "High-entropy output distributions"], answer: 1 },
+      { q: "What does `kan.suggest_symbolic()` return?", options: ["A suggested KAN architecture", "The top mathematical function candidates that best match a specific edge's learned activation", "Training hyperparameter suggestions", "A list of similar published KAN models"], answer: 1 },
+      { q: "What is the main computational disadvantage of KANs vs MLPs at scale?", options: ["KANs cannot run on GPUs", "KANs are slower to train at large scale due to B-spline evaluation overhead — they are most practical for small-medium scientific models", "KANs require more labeled data", "KANs have no gradient flow"], answer: 1 },
+      { q: "What does setting `bias_trainable=False` in KAN do?", options: ["Disables all training", "Freezes the bias terms in the KAN layer, training only the B-spline edge functions", "Removes the output bias", "Prevents overfitting to bias in small datasets"], answer: 1 },
+      {
+        q: "What does this KAN initialization create?",
+        code: `from kan import KAN
+model = KAN(width=[4, 8, 8, 1], grid=5, k=3, seed=42)`,
+        options: ["A 4-layer MLP with 8 hidden units", "A KAN with 4 inputs, two hidden layers of 8 neurons, 1 output, B-splines of degree 3 with 5 grid points per edge", "A KAN with 4 grid refinements", "A CNN with kernel size 3"],
+        answer: 1
+      },
+      {
+        q: "What does this training loop accomplish?",
+        code: `results = model.fit(
+    {"train_input": X_train, "train_label": y_train,
+     "test_input": X_test, "test_label": y_test},
+    opt="LBFGS",
+    steps=200,
+    lamb=0.001
+)`,
+        options: ["Trains for 200 epochs with Adam optimizer", "Trains for 200 LBFGS steps with L1 regularization (lamb=0.001) to encourage sparse, interpretable activations", "Runs 200 random restarts", "Trains 200 separate KAN models"],
+        answer: 1
+      },
+      {
+        q: "What does this grid refinement sequence achieve?",
+        code: `model = KAN(width=[2, 5, 1], grid=3, k=3)
+model.fit(data, steps=100)
+model = model.refine(grid=10)
+model.fit(data, steps=100)
+model = model.refine(grid=20)
+model.fit(data, steps=100)`,
+        options: ["Trains three separate models and ensembles them", "Progressively increases B-spline resolution from coarse (3 points) to fine (20 points), training at each scale for stability", "Doubles model capacity at each step", "Applies three rounds of pruning"],
+        answer: 1
+      },
+      {
+        q: "What does this pruning and symbolic fitting sequence produce?",
+        code: `model.prune(threshold=0.01)
+model.plot()
+lib = ['x', 'x^2', 'sin', 'exp', 'log']
+model.auto_symbolic(lib=lib)
+formula = model.symbolic_formula()`,
+        options: ["Removes 1% of the data and plots it", "Eliminates near-zero edges, then attempts to match remaining edges to known functions from lib, producing a closed-form mathematical expression", "Prunes 99% of weights and visualizes loss", "Converts the KAN to symbolic logic"],
+        answer: 1
       },
     ],
   },
@@ -1195,6 +1437,58 @@ async def vapi_handler(request: Request):
         options: ["Audio binary data", "A JSON config telling Vapi what assistant to use and its opening message", "A transcription of the caller's speech", "ElevenLabs audio chunks"],
         answer: 1
       },
+      { q: "What does VAD stand for in voice AI pipelines?", options: ["Voice Activation Driver", "Voice Activity Detection — detecting when a speaker is talking vs silence", "Variable Audio Decoding", "Voice Agent Dispatch"], answer: 1 },
+      { q: "What is the purpose of an endpointing model in STT?", options: ["Detecting the audio file endpoint (EOF)", "Detecting when a speaker has finished their utterance so the pipeline can begin responding", "Identifying the audio codec in use", "Terminating the WebSocket connection"], answer: 1 },
+      { q: "What does 'time to first byte' (TTFB) measure in voice AI?", options: ["Time to establish the WebSocket connection", "Latency from the end of the user's speech to the first audio byte of the assistant's response", "Time to load the TTS model", "Network round-trip time"], answer: 1 },
+      { q: "What is barge-in in a voice agent context?", options: ["A network error recovery technique", "The ability for a user to interrupt the agent mid-response and have the agent immediately stop and listen", "A buffer size setting in audio streaming", "A PSTN connection protocol"], answer: 1 },
+      { q: "What does PSTN stand for?", options: ["Packet Switched Telephone Network", "Public Switched Telephone Network — the traditional telephone system voice agents can connect to via providers like Twilio", "Private Secure Tunneling Network", "Protocol Standard for Telephony Nodes"], answer: 1 },
+      { q: "What audio codec does Deepgram recommend for telephony integration?", options: ["MP3", "AAC", "mulaw/ulaw (G.711) at 8kHz, matching telephone network standards", "FLAC"], answer: 2 },
+      { q: "What does Deepgram's `interim_results=True` setting do?", options: ["Returns low-quality drafts of transcriptions for debugging", "Sends partial transcription updates as the user speaks, enabling the pipeline to start processing before speech ends", "Caches results for repeated identical utterances", "Returns results in JSON format"], answer: 1 },
+      { q: "What is ElevenLabs' streaming API used for in voice pipelines?", options: ["Streaming audio input to ElevenLabs", "Receiving synthesized speech audio as a stream of chunks rather than waiting for the full audio to be generated", "Real-time voice cloning", "Streaming STT results"], answer: 1 },
+      { q: "What does `model_id='eleven_turbo_v2'` select in ElevenLabs?", options: ["The highest quality but slowest TTS model", "A low-latency TTS model optimized for real-time conversational applications", "A voice cloning model", "The multilingual TTS model"], answer: 1 },
+      { q: "What does Vapi's `endCallFunctionEnabled` setting do?", options: ["Prevents the user from hanging up", "Gives the AI assistant the ability to decide when to end the call and trigger hangup", "Enables call recording", "Configures the end-of-call webhook"], answer: 1 },
+      { q: "What is a voice pipeline's 'context window' constraint?", options: ["The maximum audio file size", "LLMs have finite context — a long conversation must be summarized or trimmed to fit within the token limit", "The audio buffer size in WebSocket frames", "The number of concurrent calls supported"], answer: 1 },
+      { q: "What does `smart_format=True` do in Deepgram?", options: ["Applies machine learning to improve accuracy", "Automatically adds punctuation, capitalization, and formats numbers/dates in the transcript", "Converts audio to a smarter codec", "Enables noise cancellation"], answer: 1 },
+      { q: "What does Retell AI abstract away compared to building a raw pipeline?", options: ["The LLM entirely", "The WebSocket transport, STT, TTS, turn-taking, barge-in, and PSTN integration — you just implement a conversational agent logic endpoint", "The audio codec", "The database integration"], answer: 1 },
+      { q: "What is the purpose of a system prompt in a voice agent?", options: ["To configure the WebSocket connection", "To define the assistant's persona, scope, tone, and constraints before any user speech is processed", "To set the TTS voice parameters", "To configure VAD sensitivity"], answer: 1 },
+      { q: "What does `stability` control in ElevenLabs voice settings?", options: ["Network connection reliability", "How consistent vs expressive the synthesized voice sounds — higher stability = more monotone, lower = more varied emotional delivery", "The sample rate of output audio", "The number of voice cloning samples required"], answer: 1 },
+      { q: "What is the latency budget breakdown for a sub-200ms voice pipeline?", options: ["STT: 100ms, LLM: 100ms, TTS: 100ms (impossible to achieve under 200ms)", "STT: ~40ms, LLM first token: ~80ms, TTS TTFB: ~60ms = ~180ms total when all components stream", "STT: 200ms alone", "Only achievable with on-device models"], answer: 1 },
+      { q: "What does `utterance_end_ms` configure in Deepgram?", options: ["The maximum utterance duration", "The silence duration in milliseconds that Deepgram waits after speech ends before finalizing the transcript", "The audio frame size", "The maximum API response time"], answer: 1 },
+      { q: "What is turn-taking in a voice conversation?", options: ["The technique for rotating API keys", "The mechanism that determines when the user is done speaking and the agent should begin responding", "Switching between STT providers mid-call", "Alternating between system and user prompts"], answer: 1 },
+      { q: "What does Vapi's `firstMessage` field set?", options: ["The first message the user can send", "The opening greeting the assistant speaks when the call connects", "The welcome webhook payload", "The first item in conversation history"], answer: 1 },
+      { q: "What does `similarity_boost` control in ElevenLabs?", options: ["How similar the output is to the training data", "How closely the synthesized voice matches the original voice clone — higher values = more similar but potentially less natural", "The audio similarity detection threshold", "Noise reduction aggressiveness"], answer: 1 },
+      {
+        q: "What does this WebSocket message handler do?",
+        code: `ws.on('message', async (data) => {
+  const msg = JSON.parse(data);
+  if (msg.type === 'transcript' && msg.is_final) {
+    const reply = await llm.chat(msg.transcript);
+    const audio = await tts.synthesize(reply);
+    ws.send(audio);
+  }
+});`,
+        options: ["Handles all WebSocket messages by forwarding them", "Processes only final (not interim) transcripts, generates a reply via LLM, synthesizes speech, and sends audio back over the WebSocket", "Streams audio to Deepgram", "Manages connection lifecycle only"],
+        answer: 1
+      },
+      {
+        q: "What is the bottleneck in this voice pipeline?",
+        code: `const transcript = await deepgram.transcribe(audioBuffer); // 150ms
+const fullResponse = await openai.complete(transcript);       // 2000ms
+const audio = await elevenlabs.synthesize(fullResponse);      // 800ms
+ws.send(audio);`,
+        options: ["The transcription step", "Waiting for the complete LLM response before starting TTS — streaming the LLM token-by-token into TTS in real-time would reduce total latency from ~3s to ~300ms", "The WebSocket send", "The ElevenLabs synthesis"],
+        answer: 1
+      },
+      {
+        q: "What does this Vapi config accomplish?",
+        code: `const call = await vapi.calls.create({
+  assistantId: "asst_abc123",
+  phoneNumberId: "pn_xyz789",
+  customer: { number: "+15551234567" }
+});`,
+        options: ["Creates an inbound phone number", "Initiates an outbound phone call to the customer using the specified Vapi assistant", "Registers a new Vapi assistant", "Configures the call's TTS voice"],
+        answer: 1
+      },
     ],
   },
 
@@ -1367,6 +1661,68 @@ if grade.content.strip().lower() == "no":
 # Sparse: BM25Retriever.from_documents(docs, k=10)
 # Hybrid: EnsembleRetriever([dense, sparse], weights=[0.6, 0.4])`,
         options: ["Dense retrieves exact keyword matches; BM25 retrieves semantic neighbors", "BM25 retrieves via keyword frequency/rarity scores (TF-IDF style); dense retrieves by semantic similarity", "BM25 is always slower than dense retrieval", "They retrieve identical results"],
+        answer: 1
+      },
+      { q: "What is a RAGAS evaluation metric?", options: ["A GPU benchmark", "A framework for evaluating RAG pipelines across faithfulness, answer relevancy, context precision, and context recall", "A ranking algorithm for search results", "A dataset augmentation technique"], answer: 1 },
+      { q: "What does 'faithfulness' measure in RAGAS?", options: ["Whether the retrieved documents are relevant to the query", "Whether every claim in the generated answer is supported by the retrieved context", "Whether the answer matches a human reference", "Whether the retriever finds enough documents"], answer: 1 },
+      { q: "What does 'context precision' measure in RAGAS?", options: ["The accuracy of chunk boundaries", "The proportion of retrieved chunks that are actually relevant to answering the question", "The embedding model precision score", "The vector database query precision"], answer: 1 },
+      { q: "What is metadata filtering in a vector store?", options: ["Removing metadata before embedding", "Pre-filtering documents by structured metadata (date, category, author) before vector similarity search to improve relevance", "Filtering out low-quality embeddings", "Removing duplicate metadata fields"], answer: 1 },
+      { q: "What does a multi-query retriever do?", options: ["Queries multiple vector stores simultaneously", "Generates several rephrasings of the original query and combines retrieved results, improving recall for ambiguous questions", "Runs multiple models in parallel", "Searches multiple namespaces at once"], answer: 1 },
+      { q: "What is a namespace in Pinecone?", options: ["A Python namespace for imports", "A partition within an index that isolates vectors — used for multi-tenancy (one namespace per user/org)", "A global Pinecone registry", "A metadata field type"], answer: 1 },
+      { q: "What does `score_threshold` do in a retriever?", options: ["Caps the number of results", "Filters out retrieved chunks below a minimum cosine similarity score", "Sets the maximum retrieval time", "Throttles API calls"], answer: 1 },
+      { q: "What is a parent-child chunking strategy?", options: ["Using parent and child classes in Python to organize chunks", "Embedding small child chunks for precise retrieval, but returning the larger parent chunk for context-rich generation", "Recursively splitting documents by headings then paragraphs", "Chunking documents by their DOM hierarchy"], answer: 1 },
+      { q: "What does contextual compression do in a retrieval pipeline?", options: ["Compresses the vector index for storage", "Uses an LLM to extract only the relevant parts of each retrieved chunk before passing to the generator", "Reduces embedding dimensionality", "Compresses the user query"], answer: 1 },
+      { q: "What is GraphRAG?", options: ["A graph database indexing approach", "A RAG technique that builds a knowledge graph from documents and uses graph traversal alongside vector search for multi-hop reasoning", "A library for visualizing RAG pipelines", "A GPU-accelerated retrieval method"], answer: 1 },
+      { q: "What does 'answer relevancy' measure in RAGAS?", options: ["Whether the answer is factually correct", "Whether the generated answer directly addresses the original question", "Whether retrieved documents are on-topic", "Whether the answer is concise enough"], answer: 1 },
+      { q: "What is late interaction retrieval (ColBERT)?", options: ["A retrieval method that indexes documents after a delay", "A retrieval approach where all query and document token embeddings interact at retrieval time rather than being compressed to single vectors", "A lazy loading optimization for large indexes", "A caching strategy for repeated queries"], answer: 1 },
+      { q: "What does `fetch_k` control in MMR retrieval?", options: ["The final number of returned documents", "The initial candidate pool size before diversity-based re-selection — larger fetch_k gives MMR more candidates to choose from", "The metadata filter match count", "The maximum re-ranking score"], answer: 1 },
+      { q: "What is the purpose of document summarization in RAG?", options: ["Replacing chunks with shorter versions", "Indexing summaries alongside full chunks, allowing retrieval on high-level meaning with generation from full text", "Reducing API costs for indexing", "Improving BM25 keyword overlap"], answer: 1 },
+      { q: "What does TruLens provide for RAG systems?", options: ["A vector database", "An evaluation and observability framework for LLM apps, tracking RAG metrics across runs", "A chunking library", "A managed embedding API"], answer: 1 },
+      { q: "What is the 'context window stuffing' anti-pattern in RAG?", options: ["Adding too many metadata fields to each chunk", "Retrieving as many chunks as possible and filling the entire LLM context window, hoping the model finds the answer", "Stuffing multiple queries into one retrieval call", "Using the same chunk in multiple queries"], answer: 1 },
+      { q: "What does `InMemoryVectorStore` provide vs Pinecone?", options: ["Better accuracy", "A zero-setup, in-process vector store for development/testing — no external service required but not persistent", "Faster search for large indexes", "Native BM25 support"], answer: 1 },
+      { q: "What is sentence window retrieval?", options: ["Retrieving entire sentences only", "Embedding individual sentences but returning a surrounding window of sentences as context, balancing precision and context richness", "A sliding window over document chunks", "Retrieval limited to single-sentence queries"], answer: 1 },
+      { q: "What does `EnsembleRetriever` do?", options: ["Trains an ensemble of embedding models", "Combines results from multiple retrievers (e.g. dense + BM25) with weighted reciprocal rank fusion", "Selects the best retriever per query", "Runs multiple RAG chains in parallel"], answer: 1 },
+      { q: "What is 'context recall' in RAGAS?", options: ["Whether the model recalls previously seen documents", "The proportion of ground-truth answer information that is contained in the retrieved context", "How many chunks are retrieved vs requested", "The embedding model's recall score on benchmarks"], answer: 1 },
+      {
+        q: "What does this RAGAS evaluation measure?",
+        code: `from ragas import evaluate
+from ragas.metrics import faithfulness, answer_relevancy, context_precision
+
+result = evaluate(
+    dataset,
+    metrics=[faithfulness, answer_relevancy, context_precision]
+)
+print(result)`,
+        options: ["Benchmarks retrieval speed", "Evaluates the RAG pipeline on three dimensions: whether answers are grounded in context, whether they answer the question, and whether retrieved context is precise", "Trains the RAG pipeline on the dataset", "Computes BM25 scores for the dataset"],
+        answer: 1
+      },
+      {
+        q: "What does this retriever strategy accomplish?",
+        code: `retriever = MultiQueryRetriever.from_llm(
+    retriever=vectorstore.as_retriever(),
+    llm=ChatOpenAI(temperature=0)
+)`,
+        options: ["Queries multiple vector stores", "Uses an LLM to generate query variants, retrieving documents for each and combining results to improve recall on ambiguous queries", "Runs queries in parallel threads", "Selects the best query from multiple candidates"],
+        answer: 1
+      },
+      {
+        q: "What does this metadata filter accomplish?",
+        code: `results = vectorstore.similarity_search(
+    query="refund policy",
+    k=10,
+    filter={"source": "support_docs", "language": "en"}
+)`,
+        options: ["Searches only English support documents for the refund policy query, excluding all other document types", "Searches all documents for English text", "Filters results by similarity score above 10%", "Translates results to English"],
+        answer: 0
+      },
+      {
+        q: "What anti-pattern does this code exhibit?",
+        code: `chain = RetrievalQA.from_chain_type(
+    llm=llm,
+    retriever=vectorstore.as_retriever(search_kwargs={"k": 50}),
+)
+response = chain.invoke({"query": user_query})`,
+        options: ["Using RetrievalQA instead of LCEL", "Retrieving 50 chunks stuffs the context window with mostly irrelevant text — 5-10 well-re-ranked chunks almost always outperform 50 raw chunks", "Missing a custom prompt template", "The query should be a list"],
         answer: 1
       },
     ],
@@ -1576,6 +1932,87 @@ of your thinking before giving me a one-word label."
 # After (concise):
 "Classify the text topic. Return one word only.\n\nText: {text}"`,
         options: ["None — verbose prompts are more accurate", "The concise version uses ~80% fewer tokens while producing the same structured output, directly reducing API costs", "The verbose version uses fewer tokens", "Token count does not affect cost"],
+        answer: 1
+      },
+      { q: "What is ReAct prompting?", options: ["Reactive programming applied to prompting", "A prompting pattern that interleaves Reasoning and Acting steps — the model thinks, then calls a tool, then reasons about the result", "Prompting for React.js code generation", "A technique for reducing hallucinations via re-activation"], answer: 1 },
+      { q: "What is Tree of Thoughts (ToT) prompting?", options: ["A hierarchical prompt structure with parent and child prompts", "An approach where the model explores multiple reasoning paths in parallel and evaluates which branch leads to the best answer", "A prompt library organized as a decision tree", "A method for decomposing complex prompts into sub-prompts"], answer: 1 },
+      { q: "What does 'role prompting' do?", options: ["Assigns the model a user role instead of assistant role", "Giving the model a specific expert persona ('You are a senior security engineer') to prime domain-appropriate reasoning and tone", "Switches between system and user roles mid-conversation", "Uses role-based access control in prompts"], answer: 1 },
+      { q: "What does 'constitutional AI' refer to in prompting?", options: ["Legal compliance prompting for AI systems", "A technique where the model critiques and revises its own outputs based on a set of principles (the constitution)", "Prompting with constitutional law examples", "A government-mandated AI prompting standard"], answer: 1 },
+      { q: "What is a 'meta-prompt'?", options: ["A prompt about metadata", "A prompt that instructs the model to generate or improve other prompts", "The system prompt's system prompt", "A prompt template stored in memory"], answer: 1 },
+      { q: "What does 'context stuffing' mean in prompt engineering?", options: ["Inserting user data into the context window", "An anti-pattern of filling the context window with too much irrelevant information, diluting the signal for the model", "Using the full context window efficiently", "Compressing documents before prompting"], answer: 1 },
+      { q: "What is 'prompt chaining'?", options: ["Linking prompts with AND/OR logic operators", "Breaking a complex task into sequential prompts where each step's output feeds into the next", "Caching prompt responses for reuse", "Connecting multiple models in a pipeline"], answer: 1 },
+      { q: "What does `stop_sequences` control in an API call?", options: ["Stops the API call on error", "Tokens or strings at which the model will immediately stop generating — useful for enforcing output boundaries", "Sets a maximum output character limit", "Stops streaming mid-response"], answer: 1 },
+      { q: "What is 'few-shot calibration'?", options: ["Testing few-shot prompts on a small dataset", "Choosing few-shot examples that cover edge cases, not just happy paths, to improve model reliability across all input variations", "Calibrating temperature based on few-shot results", "Using few examples to calibrate model confidence"], answer: 1 },
+      { q: "What does `stream=True` in an API call do?", options: ["Uses faster model weights", "Returns tokens incrementally as they are generated, enabling real-time display before the full response completes", "Streams the prompt to the model", "Enables concurrent requests"], answer: 1 },
+      { q: "What does 'hallucination grounding' refer to in prompt design?", options: ["Teaching models to ground planes", "Prompting techniques that reduce fabricated facts — such as citing sources, saying 'I don't know' explicitly, or retrieving before generating", "A benchmarking technique for hallucination rates", "A post-processing filter on model outputs"], answer: 1 },
+      { q: "What is the 'sandwich' technique in system prompt layout?", options: ["Putting the most important instructions in the middle", "Placing key constraints at both the start and end of the system prompt to counteract the 'lost in the middle' attention pattern", "Using a bread/filling/bread token structure", "A formatting approach with headers, body, and footer sections"], answer: 1 },
+      { q: "What does the Anthropic API's `system` parameter accept?", options: ["Only a single string", "A string or list of content blocks, providing instructions that apply across all conversation turns", "A Python dictionary of settings", "A JSON Schema for expected output"], answer: 1 },
+      { q: "What is 'output anchoring' in prompt engineering?", options: ["Fixing the model's output seed for reproducibility", "Starting the assistant's turn with a partial response to steer the model's format — e.g. 'Output:' or '{\"result\":' to force JSON", "Anchoring output to a database record", "Setting a baseline output for comparison"], answer: 1 },
+      { q: "What does `n=5` do in an OpenAI API call?", options: ["Runs 5 parallel API calls", "Returns 5 independent completions for the same prompt, useful for self-consistency sampling", "Sets the top-n tokens to sample from", "Limits output to 5 tokens"], answer: 1 },
+      { q: "What is 'prompt leakage' and why is it a concern?", options: ["Prompt text consuming too many tokens", "When the model reveals the contents of its system prompt in its response — a security concern for proprietary instructions", "Sensitive data leaking into prompts from user input", "Latency caused by long prompts"], answer: 1 },
+      { q: "What does 'delimiters' mean in prompt engineering?", options: ["Token count boundaries", "Special markers (XML tags, triple quotes, dashes) that visually and semantically separate sections of a prompt", "The start and end tokens of the prompt", "JSON schema delimiters for structured output"], answer: 1 },
+      { q: "What is 'instruction hierarchy' in system prompt design?", options: ["Ordering instructions by complexity", "The principle that system prompt instructions should outweigh user instructions, which outweigh few-shot examples when they conflict", "A hierarchical classification of prompting techniques", "Ordering instructions from most to least important"], answer: 1 },
+      { q: "What does 'chain-of-density' prompting do?", options: ["A variant of CoT with densely packed reasoning", "An iterative summarization technique that progressively makes summaries more information-dense while keeping length constant", "Chaining together multiple dense retrievers", "A technique for compressing chain-of-thought traces"], answer: 1 },
+      { q: "What is the purpose of 'negative prompting'?", options: ["Using negative sentiment in prompts", "Explicitly specifying what the model should NOT do, alongside what it should — often more effective than only positive instructions", "Prompting for negative sentiment analysis", "A regularization technique for prompt optimization"], answer: 1 },
+      { q: "What does Anthropic's 'extended thinking' feature enable?", options: ["Longer context windows", "The model to produce an internal reasoning chain before its final response, improving accuracy on complex analytical tasks", "Multi-turn memory across sessions", "Longer system prompts"], answer: 1 },
+      {
+        q: "What does this ReAct-style prompt accomplish?",
+        code: `REACT_PROMPT = """Solve the task using this format:
+Thought: [your reasoning about what to do next]
+Action: [tool_name](arguments)
+Observation: [tool result]
+... (repeat Thought/Action/Observation as needed)
+Final Answer: [your answer]
+
+Task: {task}
+Thought:"""`,
+        options: ["Creates a fixed decision tree for tool calls", "Structures the model to interleave explicit reasoning steps with tool actions, making the decision process transparent and correctable", "Forces the model to always use exactly 3 tools", "Replaces the system prompt with a reasoning scaffold"],
+        answer: 1
+      },
+      {
+        q: "What does this output anchoring technique enforce?",
+        code: `messages = [
+    {"role": "user", "content": "Extract the price from: 'The laptop costs $1,299'"},
+    {"role": "assistant", "content": "{\"price\":"}  # partial pre-fill
+]
+response = client.messages.create(model="claude-sonnet-4-6", messages=messages)`,
+        options: ["Injects a fake assistant message for testing", "Pre-fills the start of the assistant response to force JSON output format, preventing the model from starting with prose", "Sets the price to a default value", "Bypasses the model's safety filters"],
+        answer: 1
+      },
+      {
+        q: "What does this prompt chain accomplish?",
+        code: `# Step 1: Extract key claims
+claims = llm.invoke(f"List all factual claims in: {text}")
+
+# Step 2: Verify each claim
+verified = llm.invoke(f"For each claim, mark as SUPPORTED/UNSUPPORTED: {claims}")
+
+# Step 3: Generate grounded summary
+summary = llm.invoke(f"Write a summary using only SUPPORTED claims: {verified}")`,
+        options: ["Runs three unrelated LLM calls", "Chains three steps to extract claims, verify them, and produce a hallucination-reduced summary — each step's output is the next step's input", "Deduplicates claims across three passes", "A cost-reduction technique using smaller models at each step"],
+        answer: 1
+      },
+      {
+        q: "What is the risk in this few-shot selection approach?",
+        code: `# Few-shot examples selected for the demo:
+examples = [
+    ("What is 2+2?", "4"),
+    ("What is 3+3?", "6"),
+    ("What is 10+10?", "20"),
+]`,
+        options: ["Too few examples", "All examples are simple addition — the model will generalize poorly to subtraction, multiplication, or word problems because the examples don't cover edge cases", "The examples are too short", "Examples should use letters not numbers"],
+        answer: 1
+      },
+      {
+        q: "What does this streaming handler enable?",
+        code: `with client.messages.stream(
+    model="claude-sonnet-4-6",
+    max_tokens=1024,
+    messages=[{"role": "user", "content": prompt}]
+) as stream:
+    for text in stream.text_stream:
+        print(text, end="", flush=True)`,
+        options: ["Downloads the full response then prints it", "Prints each token as it is generated, enabling real-time display with sub-100ms first-token latency visible to the user", "Streams audio output", "Buffers tokens and prints in batches of 1024"],
         answer: 1
       },
     ],
@@ -1799,7 +2236,7 @@ export default function LessonPage({ params }: { params: Promise<{ slug: string 
                 <span className="text-[10px] font-extrabold uppercase tracking-widest text-accent block mb-1">Noviqe Assessment</span>
                 <h2 className="text-lg font-display font-extrabold text-white">Test Your Knowledge</h2>
                 <p className="text-xs text-textSecondary mt-1">
-                  {QUIZ_SIZE} questions randomly selected per attempt · Pass with {Math.round(PASS_THRESHOLD * 100)}%+ · {lesson.questionBank.length} questions in bank
+                  Pass with {Math.round(PASS_THRESHOLD * 100)}%+ to earn your certificate
                 </p>
               </div>
               {quizState === "idle" && (
