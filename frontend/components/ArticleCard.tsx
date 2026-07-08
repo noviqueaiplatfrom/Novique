@@ -1,5 +1,6 @@
 import type { Article } from "@/lib/types";
 import { useState } from "react";
+import { shareArticleAsImage } from "@/lib/shareCard";
 
 function timeAgo(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
@@ -80,14 +81,21 @@ export function ArticleCard({
   followed,
   onToggleFollow,
 }: Props) {
-  const [copied, setCopied] = useState(false);
+  const [shareState, setShareState] = useState<"idle" | "generating" | "done">("idle");
   const actions = getRecommendedActions(article);
 
-  const handleShare = (e: React.MouseEvent) => {
+  const handleShare = async (e: React.MouseEvent) => {
     e.preventDefault();
-    navigator.clipboard.writeText(article.url);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    if (shareState !== "idle") return;
+    setShareState("generating");
+    try {
+      await shareArticleAsImage(article);
+    } catch {
+      // User cancelled share or browser blocked it — silent fail
+    } finally {
+      setShareState("done");
+      setTimeout(() => setShareState("idle"), 2000);
+    }
   };
 
   // Determine category badge icon & color
@@ -183,11 +191,17 @@ export function ArticleCard({
 
           <button
             onClick={handleShare}
-            title="Share Brief URL"
-            className="p-2 rounded-xl transition-all border text-zinc-400 border-transparent hover:border-white/[0.08] hover:bg-white/[0.04] flex items-center gap-1"
+            title="Share as image"
+            disabled={shareState === "generating"}
+            className="p-2 rounded-xl transition-all border text-zinc-400 border-transparent hover:border-white/[0.08] hover:bg-white/[0.04] flex items-center gap-1.5 disabled:opacity-60"
           >
-            {copied ? (
-              <span className="text-[10px] text-tealAccent font-bold px-1">Copied!</span>
+            {shareState === "generating" ? (
+              <svg className="w-4 h-4 animate-spin text-accent" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+              </svg>
+            ) : shareState === "done" ? (
+              <span className="text-[10px] text-tealAccent font-bold px-1">Shared!</span>
             ) : (
               <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186l5.57 3.285m-5.57-3.285l5.57-3.285m0 0a2.25 2.25 0 103.935-2.186 2.25 2.25 0 00-3.935 2.186zm0-2.186L12 14.83m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186z" />

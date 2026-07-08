@@ -1,0 +1,135 @@
+NOVIQUE - DESIGN ASSETS TO-DO LIST
+====================================
+Complete these once your logo is finalized.
+
+
+1. FAVICON
+----------
+File: frontend/public/favicon.ico
+Specs: Multi-resolution ICO file containing 16x16, 32x32, and 48x48 px versions.
+Tool: https://realfavicongenerator.net (upload your logo SVG, it generates all sizes)
+Notes:
+  - Use the purple dot from the Novique logo as the favicon mark
+  - Dark background (#07111F) or transparent works well at small sizes
+  - Test at 16x16 - simplify if the logo is too complex
+
+
+2. APPLE TOUCH ICON
+-------------------
+File: frontend/public/apple-touch-icon.png
+Specs: 180x180 px PNG (no transparency - iOS adds its own rounded corners)
+Notes:
+  - Solid dark background #07111F
+  - Logo centered with generous padding (~20px on each side)
+  - This shows on iOS "Add to Home Screen"
+
+
+3. OPEN GRAPH IMAGE (most important for sharing)
+-------------------------------------------------
+File: frontend/public/og-image.png
+Specs: 1200x630 px PNG
+Notes:
+  - This is the image that shows when someone shares novique.ai on WhatsApp,
+    Twitter/X, LinkedIn, Slack, iMessage, etc.
+  - Design suggestion:
+      Background: #07111F (dark navy)
+      Left: Novique wordmark + tagline ("AI Intelligence Platform")
+      Right: Decorative element (your logo mark, glowing orb, signal lines)
+      Bottom bar: subtle purple gradient line
+  - Keep all important content within the center 900x500 px safe zone
+    (outer edges may be cropped on some platforms)
+  - Test with: https://opengraph.xyz
+
+
+4. PWA ICONS (for Android "Add to Home Screen" and install prompts)
+--------------------------------------------------------------------
+Files:
+  frontend/public/icon-192.png  (192x192 px)
+  frontend/public/icon-512.png  (512x512 px)
+After adding these, update frontend/public/manifest.json:
+  Replace the "favicon.ico" entry with:
+  {
+    "src": "/icon-192.png",
+    "sizes": "192x192",
+    "type": "image/png",
+    "purpose": "any maskable"
+  },
+  {
+    "src": "/icon-512.png",
+    "sizes": "512x512",
+    "type": "image/png",
+    "purpose": "any maskable"
+  }
+Notes:
+  - Use "maskable" purpose so Android can apply adaptive icon shapes
+  - Keep logo within the center 80% circle ("safe zone") for maskable icons
+  - Tool: https://maskable.app to test maskable icon appearance
+
+
+5. SHARE CARD WATERMARK IMAGE (optional upgrade)
+-------------------------------------------------
+Currently the share card watermark draws "Novique" as plain canvas text.
+Once you have the logo, consider:
+  - Export a white/transparent version of the wordmark as a PNG
+  - Place it at: frontend/public/novique-watermark.png (300x60 px)
+  - The shareCard.ts utility (frontend/lib/shareCard.ts) already has a
+    placeholder comment for this - update it to load the image via
+    new Image() and ctx.drawImage()
+
+
+6. TWITTER / X PROFILE IMAGE
+------------------------------
+Specs: 400x400 px PNG
+Notes:
+  - Square crop of your logo
+  - Will appear circular on the platform
+  - Register @novique_ai on Twitter/X before someone else does
+  - Also register on LinkedIn, Instagram, and ProductHunt
+
+
+7. EMAIL TEMPLATE HEADER
+--------------------------
+If you send weekly report digest emails in the future:
+  Specs: 600x120 px PNG
+  Logo on dark or white background depending on email template theme
+
+
+8. LOGO DESIGN NOTES (recommendations)
+---------------------------------------
+The existing brand elements already in code:
+  Primary color:   #6C63FF  (accent purple)
+  Secondary color: #16C79A  (teal)
+  Highlight:       #F6C453  (gold)
+  Background:      #07111F  (ink navy)
+  Dot element:     w-2.5 h-2.5 rounded-full bg-accent (the pulsing dot in Navbar)
+
+The Novique "logo" currently is just the pulsing purple dot + wordmark.
+For a proper logo mark, consider:
+  - A stylized "N" in a hexagon or shield shape
+  - A signal/waveform icon in purple
+  - The dot evolved into a larger icon with radiating lines (signal metaphor)
+  - Keep it simple enough to work at 16x16 (favicon) and 512x512 (PWA)
+
+
+9. AFTER ADDING ALL ASSETS
+---------------------------
+Run this to verify everything is in place:
+  ls frontend/public/
+
+Expected files:
+  favicon.ico
+  apple-touch-icon.png
+  og-image.png
+  icon-192.png
+  icon-512.png
+  manifest.json  (already exists, update icons array)
+  novique-watermark.png  (optional)
+
+Then test SEO tags with:
+  https://opengraph.xyz          (Open Graph preview)
+  https://metatags.io            (all meta tag preview)
+  https://realfavicongenerator.net/favicon_checker  (favicon checker)
+  https://search.google.com/search-console          (Google Search Console)
+
+====================================
+END OF TO-DO LIST
