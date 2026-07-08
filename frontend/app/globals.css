@@ -114,6 +114,82 @@
   animation: logoPulse 4s infinite ease-in-out;
 }
 
+/* Scroll-reveal: elements start invisible, slide up when .in-view is added */
+[data-animate] {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+[data-animate].in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+[data-animate][data-delay="1"] { transition-delay: 0.07s; }
+[data-animate][data-delay="2"] { transition-delay: 0.14s; }
+[data-animate][data-delay="3"] { transition-delay: 0.21s; }
+[data-animate][data-delay="4"] { transition-delay: 0.28s; }
+[data-animate][data-delay="5"] { transition-delay: 0.35s; }
+[data-animate][data-delay="6"] { transition-delay: 0.42s; }
+
+/* Skeleton shimmer for loading states */
+@keyframes shimmer {
+  0%   { background-position: -800px 0; }
+  100% { background-position:  800px 0; }
+}
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(16, 27, 45, 1) 0%,
+    rgba(23, 37, 58, 0.8) 50%,
+    rgba(16, 27, 45, 1) 100%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+/* Gentle float for hero card */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-7px); }
+}
+.animate-float {
+  animation: float 5s ease-in-out infinite;
+}
+
+/* Animated gradient for gradient-border elements */
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50%       { background-position: 100% 50%; }
+}
+.animate-gradient-bg {
+  background-size: 300% 300%;
+  animation: gradient-shift 5s ease infinite;
+}
+
+/* SVG confidence dial — runs when .animate-dash-in class is toggled on */
+@keyframes dash-in {
+  from { stroke-dashoffset: 263.89; }
+  to   { stroke-dashoffset: 10.55;  }
+}
+.animate-dash-in {
+  animation: dash-in 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: 0.2s;
+}
+
+/* Auto-scrolling momentum ticker */
+@keyframes ticker-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-ticker {
+  animation: ticker-scroll 30s linear infinite;
+}
+.animate-ticker:hover {
+  animation-play-state: paused;
+}
+
 /* Smooth Horizontal Scroll hide bar */
 .no-scrollbar::-webkit-scrollbar {
   display: none;

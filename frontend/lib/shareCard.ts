@@ -1,10 +1,10 @@
 interface ShareArticle {
   title: string;
-  summary_30s?: string;
+  summary_30s?: string | null;
   source: string;
   impact_score: number;
   trend_score: number;
-  topics?: string[];
+  topics?: string[] | null;
   url: string;
 }
 

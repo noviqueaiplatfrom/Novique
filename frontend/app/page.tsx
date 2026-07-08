@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { fetchFeed } from "@/lib/api";
 import * as authApi from "@/lib/auth";
@@ -26,6 +26,13 @@ export default function Home() {
   const [sort, setSort] = useState<"impact" | "trend" | "recent">("recent");
   const [kind, setKind] = useState<"all" | "news" | "paper">("all");
 
+  // Animated snapshot counters
+  const SNAP_TARGETS = [6, 2, 1, 3, 4, 94];
+  const [snapCounts, setSnapCounts] = useState([0, 0, 0, 0, 0, 0]);
+  const [dialVisible, setDialVisible] = useState(false);
+  const snapshotRef = useRef<HTMLDivElement>(null);
+  const dialRef = useRef<HTMLDivElement>(null);
+
   // Brief Countdown Timer State (60 seconds loop)
   const [secondsLeft, setSecondsLeft] = useState(60);
 
@@ -41,6 +48,40 @@ export default function Home() {
     const s = secs % 60;
     return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   };
+
+  // Counter animation when snapshot section enters viewport
+  useEffect(() => {
+    if (!snapshotRef.current) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        obs.disconnect();
+        const duration = 1000;
+        const steps = 45;
+        let step = 0;
+        const timer = setInterval(() => {
+          step++;
+          const ease = 1 - Math.pow(1 - step / steps, 3);
+          setSnapCounts(SNAP_TARGETS.map((t) => Math.round(t * ease)));
+          if (step >= steps) clearInterval(timer);
+        }, duration / steps);
+      },
+      { threshold: 0.3 }
+    );
+    obs.observe(snapshotRef.current);
+    return () => obs.disconnect();
+  }, []);
+
+  // Confidence dial SVG animation when insight section enters viewport
+  useEffect(() => {
+    if (!dialRef.current) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setDialVisible(true); obs.disconnect(); } },
+      { threshold: 0.3 }
+    );
+    obs.observe(dialRef.current);
+    return () => obs.disconnect();
+  }, []);
 
   // Fetch Signals — auto-refresh every 60 seconds
   const { data, isLoading, isError } = useQuery({
@@ -85,6 +126,17 @@ export default function Home() {
     onSuccess: refresh,
   });
 
+  // Scroll-reveal: add .in-view to every [data-animate] when it enters viewport
+  // Runs after data loads so dynamically added ArticleCard wrappers are picked up
+  useEffect(() => {
+    const reveal = new IntersectionObserver(
+      (entries) => entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add("in-view"); }),
+      { threshold: 0.1 }
+    );
+    document.querySelectorAll("[data-animate]").forEach((el) => reveal.observe(el));
+    return () => reveal.disconnect();
+  }, [data]);
+
   // Filter and show top 5 only for the homepage signals
   const topFiveArticles = data
     ?.filter((a) => {
@@ -112,9 +164,9 @@ export default function Home() {
       <main className="max-w-6xl mx-auto px-6 py-12 md:py-20 flex flex-col gap-20 md:gap-28 relative z-10">
         
         {/* 1. HERO SECTION */}
-        <section className="flex flex-col lg:flex-row items-stretch gap-10 md:gap-14 animate-fade-in">
+        <section className="flex flex-col lg:flex-row items-stretch gap-10 md:gap-14">
           {/* Left Column */}
-          <div className="flex-1 flex flex-col justify-center">
+          <div data-animate className="flex-1 flex flex-col justify-center">
             <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#16C79A] mb-4 bg-[#16C79A]/10 px-3.5 py-1 rounded-full w-max">
               The AI Intelligence Platform
             </span>
@@ -145,7 +197,7 @@ export default function Home() {
           </div>
 
           {/* Right Column: Brief Indicator */}
-          <div className="flex-1 bg-[#17253A] border border-white/[0.05] rounded-3xl p-7 md:p-8 relative overflow-hidden flex flex-col justify-between shadow-[0_24px_55px_rgba(0,0,0,0.4)]">
+          <div data-animate data-delay="2" className="flex-1 bg-[#17253A] border border-white/[0.05] rounded-3xl p-7 md:p-8 relative overflow-hidden flex flex-col justify-between shadow-[0_24px_55px_rgba(0,0,0,0.4)] animate-float">
             <div className="absolute top-0 right-0 w-40 h-40 bg-[#6C63FF]/5 rounded-full blur-3xl pointer-events-none" />
             
             <div className="mb-6 flex items-center justify-between">
@@ -173,24 +225,29 @@ export default function Home() {
         </section>
 
         {/* 2. TODAY'S AI SNAPSHOT */}
-        <section className="flex flex-col gap-6">
-          <div className="flex items-center justify-between">
+        <div ref={snapshotRef} className="flex flex-col gap-6">
+          <div data-animate className="flex items-center justify-between">
             <h3 className="text-xs font-bold uppercase tracking-widest text-[#9AA8BD]">Today's AI Snapshot</h3>
             <div className="h-[1px] bg-white/[0.06] flex-1 ml-4"></div>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
             {[
-              { count: "6", label: "Major Updates" },
-              { count: "2", label: "Model Launches" },
-              { count: "1", label: "Breakthroughs" },
-              { count: "3", label: "Funding Rounds" },
-              { count: "4", label: "OS Launches" },
-              { count: "94%", label: "Momentum Index", highlight: true },
+              { label: "Major Updates",  highlight: false },
+              { label: "Model Launches", highlight: false },
+              { label: "Breakthroughs",  highlight: false },
+              { label: "Funding Rounds", highlight: false },
+              { label: "OS Launches",    highlight: false },
+              { label: "Momentum Index", highlight: true  },
             ].map((item, idx) => (
-              <div key={idx} className="bg-[#101B2D] border border-white/[0.05] p-5 rounded-2xl transition-all hover:border-[#6C63FF]/30">
-                <span className={`block text-3xl font-display font-black ${item.highlight ? "text-[#16C79A]" : "text-white"}`}>
-                  {item.count}
+              <div
+                key={idx}
+                data-animate
+                data-delay={String(idx + 1) as "1" | "2" | "3" | "4" | "5" | "6"}
+                className="bg-[#101B2D] border border-white/[0.05] p-5 rounded-2xl transition-all hover:border-[#6C63FF]/30 hover:-translate-y-1"
+              >
+                <span className={`block text-3xl font-display font-black tabular-nums ${item.highlight ? "text-[#16C79A]" : "text-white"}`}>
+                  {idx === 5 ? `${snapCounts[5]}%` : snapCounts[idx]}
                 </span>
                 <span className="text-[10px] font-bold text-[#9AA8BD] uppercase tracking-wider mt-1 block">
                   {item.label}
@@ -198,16 +255,16 @@ export default function Home() {
               </div>
             ))}
           </div>
-        </section>
+        </div>
 
         {/* 3. AI INSIGHT OF THE DAY (Gold Highlighted) */}
         <section className="flex flex-col gap-5">
-          <div className="flex items-center justify-between">
+          <div data-animate className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-widest text-[#9AA8BD]">AI Insight of the Day</span>
             <div className="h-[1px] bg-white/[0.06] flex-1 ml-4"></div>
           </div>
 
-          <div className="bg-[#17253A] border-2 border-[#F6C453]/40 rounded-3xl p-6 md:p-8 relative overflow-hidden flex flex-col lg:flex-row gap-8 shadow-[0_20px_50px_rgba(246,196,83,0.05)]">
+          <div data-animate data-delay="1" className="bg-[#17253A] border-2 border-[#F6C453]/40 rounded-3xl p-6 md:p-8 relative overflow-hidden flex flex-col lg:flex-row gap-8 shadow-[0_20px_50px_rgba(246,196,83,0.05)]">
             <div className="absolute top-0 right-0 w-64 h-64 bg-[#F6C453]/2 rounded-full blur-3xl pointer-events-none" />
             
             {/* Left Content */}
@@ -256,9 +313,9 @@ export default function Home() {
             </div>
 
             {/* Right Confidence Score Dial */}
-            <div className="w-full lg:w-[240px] flex flex-col items-center justify-center border-l lg:border-l border-white/[0.06] pl-0 lg:pl-8 pt-6 lg:pt-0">
+            <div ref={dialRef} className="w-full lg:w-[240px] flex flex-col items-center justify-center border-l lg:border-l border-white/[0.06] pl-0 lg:pl-8 pt-6 lg:pt-0">
               <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#F6C453] mb-4 block">Confidence Rating</span>
-              
+
               <div className="relative w-36 h-36 flex items-center justify-center">
                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                   <circle cx="50" cy="50" r="42" stroke="rgba(255,255,255,0.03)" strokeWidth="6" fill="transparent" />
@@ -270,9 +327,9 @@ export default function Home() {
                     strokeWidth="6"
                     fill="transparent"
                     strokeDasharray="263.89"
-                    strokeDashoffset="10.55" // 96% confidence
+                    strokeDashoffset={dialVisible ? undefined : "263.89"}
                     strokeLinecap="round"
-                    className="transition-all duration-1000 ease-out"
+                    className={dialVisible ? "animate-dash-in" : ""}
                   />
                 </svg>
                 <div className="absolute flex flex-col items-center">
@@ -291,7 +348,7 @@ export default function Home() {
 
         {/* 4. TODAY'S SIGNALS (TOP 5) */}
         <section className="flex flex-col gap-6">
-          <div className="flex items-center justify-between pb-3 border-b border-white/[0.05]">
+          <div data-animate className="flex items-center justify-between pb-3 border-b border-white/[0.05]">
             <div>
               <h2 className="text-2xl font-bold tracking-tight text-white font-plus-jakarta">Today's Signals</h2>
               <p className="text-xs text-textSecondary mt-0.5 font-normal">Top five executive analysis logs</p>
@@ -348,7 +405,34 @@ export default function Home() {
             </div>
           </div>
 
-          {isLoading && <p className="text-zinc-500 text-sm">Querying signals...</p>}
+          {isLoading && (
+            <div className="flex flex-col gap-6">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="rounded-3xl border border-white/[0.05] bg-[#17253A] p-7 md:p-8 flex flex-col gap-5">
+                  <div className="flex items-center gap-3">
+                    <div className="skeleton h-6 w-32 rounded-full" />
+                    <div className="skeleton h-4 w-20 rounded-full" />
+                    <div className="skeleton h-4 w-16 rounded-full" />
+                  </div>
+                  <div className="skeleton h-7 w-3/4" />
+                  <div className="flex flex-col gap-2">
+                    <div className="skeleton h-4 w-full" />
+                    <div className="skeleton h-4 w-5/6" />
+                    <div className="skeleton h-4 w-4/6" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="skeleton h-20 rounded-2xl" />
+                    <div className="skeleton h-20 rounded-2xl" />
+                  </div>
+                  <div className="grid grid-cols-3 gap-3 mt-2">
+                    <div className="skeleton h-16 rounded-2xl" />
+                    <div className="skeleton h-16 rounded-2xl" />
+                    <div className="skeleton h-16 rounded-2xl" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
           {isError && (
             <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-xl text-sm">
               Error connecting to the Novique pipeline engine.
@@ -356,16 +440,17 @@ export default function Home() {
           )}
 
           <div className="flex flex-col gap-6">
-            {topFiveArticles?.map((article) => (
-              <ArticleCard
-                key={article.id}
-                article={article}
-                authed={!!token}
-                bookmarked={bookmarkedIds.has(article.id)}
-                onToggleBookmark={(id) => bookmarkMut.mutate(id)}
-                followed={followed}
-                onToggleFollow={(topic) => followMut.mutate(topic)}
-              />
+            {topFiveArticles?.map((article, idx) => (
+              <div key={article.id} data-animate data-delay={String(Math.min(idx + 1, 5)) as "1" | "2" | "3" | "4" | "5"}>
+                <ArticleCard
+                  article={article}
+                  authed={!!token}
+                  bookmarked={bookmarkedIds.has(article.id)}
+                  onToggleBookmark={(id) => bookmarkMut.mutate(id)}
+                  followed={followed}
+                  onToggleFollow={(topic) => followMut.mutate(topic)}
+                />
+              </div>
             ))}
 
             {topFiveArticles?.length === 0 && (
@@ -376,44 +461,63 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 5. MARKET MOMENTUM (Capsules) */}
+        {/* 5. MARKET MOMENTUM (Auto-scrolling ticker) */}
         <section className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
+          <div data-animate className="flex items-center justify-between">
             <h3 className="text-xs font-bold uppercase tracking-widest text-[#9AA8BD]">Market Momentum</h3>
             <div className="h-[1px] bg-white/[0.06] flex-1 ml-4"></div>
           </div>
-          
-          <div className="flex items-center gap-2.5 overflow-x-auto no-scrollbar py-2 -my-2">
-            {[
-              { icon: "🤖", label: "AI Agents", trend: "+14.2%" },
-              { icon: "⚡", label: "MCP", trend: "+32.6%", highlight: true },
-              { icon: "💻", label: "Coding Models", trend: "+8.4%" },
-              { icon: "🎙", label: "Voice AI", trend: "+5.9%" },
-              { icon: "🦾", label: "Robotics", trend: "+18.7%" },
-              { icon: "🧠", label: "Reasoning Models", trend: "+24.1%" },
-              { icon: "🏢", label: "Enterprise AI", trend: "+9.3%" },
-            ].map((topic) => (
-              <button
-                key={topic.label}
-                onClick={() => setSearchQuery(topic.label)}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-full border text-xs font-bold transition-all shrink-0 hover:scale-[1.02] ${
-                  topic.highlight
-                    ? "bg-[#6C63FF]/10 border-[#6C63FF]/30 text-[#C084FC]"
-                    : "bg-[#17253A] border-white/[0.05] text-zinc-300 hover:border-zinc-700 hover:text-white"
-                }`}
-              >
-                <span>{topic.icon} {topic.label}</span>
-                <span className={`text-[10px] font-semibold ${topic.highlight ? "text-[#C084FC]" : "text-zinc-500"}`}>
-                  {topic.trend}
-                </span>
-              </button>
-            ))}
+
+          <div className="overflow-hidden py-2 -my-2 relative">
+            {/* Fade edges */}
+            <div className="pointer-events-none absolute left-0 top-0 h-full w-16 bg-gradient-to-r from-[#07111F] to-transparent z-10" />
+            <div className="pointer-events-none absolute right-0 top-0 h-full w-16 bg-gradient-to-l from-[#07111F] to-transparent z-10" />
+
+            {/* Duplicate the list so the loop is seamless */}
+            <div className="flex items-center gap-2.5 animate-ticker w-max">
+              {[
+                { icon: "🤖", label: "AI Agents",        trend: "+14.2%" },
+                { icon: "⚡", label: "MCP",              trend: "+32.6%", highlight: true },
+                { icon: "💻", label: "Coding Models",    trend: "+8.4%"  },
+                { icon: "🎙", label: "Voice AI",         trend: "+5.9%"  },
+                { icon: "🦾", label: "Robotics",         trend: "+18.7%" },
+                { icon: "🧠", label: "Reasoning Models", trend: "+24.1%" },
+                { icon: "🏢", label: "Enterprise AI",    trend: "+9.3%"  },
+                { icon: "🌐", label: "AI Infrastructure",trend: "+11.8%" },
+                { icon: "🔬", label: "AI Research",      trend: "+6.2%"  },
+                // duplicate for seamless loop
+                { icon: "🤖", label: "AI Agents",        trend: "+14.2%" },
+                { icon: "⚡", label: "MCP",              trend: "+32.6%", highlight: true },
+                { icon: "💻", label: "Coding Models",    trend: "+8.4%"  },
+                { icon: "🎙", label: "Voice AI",         trend: "+5.9%"  },
+                { icon: "🦾", label: "Robotics",         trend: "+18.7%" },
+                { icon: "🧠", label: "Reasoning Models", trend: "+24.1%" },
+                { icon: "🏢", label: "Enterprise AI",    trend: "+9.3%"  },
+                { icon: "🌐", label: "AI Infrastructure",trend: "+11.8%" },
+                { icon: "🔬", label: "AI Research",      trend: "+6.2%"  },
+              ].map((topic, i) => (
+                <button
+                  key={i}
+                  onClick={() => setSearchQuery(topic.label)}
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-full border text-xs font-bold transition-all shrink-0 hover:scale-[1.03] ${
+                    (topic as any).highlight
+                      ? "bg-[#6C63FF]/10 border-[#6C63FF]/30 text-[#C084FC]"
+                      : "bg-[#17253A] border-white/[0.05] text-zinc-300 hover:border-zinc-700 hover:text-white"
+                  }`}
+                >
+                  <span>{topic.icon} {topic.label}</span>
+                  <span className={`text-[10px] font-semibold ${(topic as any).highlight ? "text-[#C084FC]" : "text-zinc-500"}`}>
+                    {topic.trend}
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
         </section>
 
         {/* 6. COMPANY WATCHLIST (TOP 6) */}
         <section className="flex flex-col gap-6">
-          <div className="flex items-center justify-between pb-3 border-b border-white/[0.05]">
+          <div data-animate className="flex items-center justify-between pb-3 border-b border-white/[0.05]">
             <div>
               <h2 className="text-2xl font-bold tracking-tight text-white font-plus-jakarta">Company Watchlist</h2>
               <p className="text-xs text-textSecondary mt-0.5">Top six firms tracking momentum indices</p>
@@ -425,17 +529,19 @@ export default function Home() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {[
-              { name: "OpenAI", momentum: "9.8/10", launch: "GPT-4o realtime API", hiring: "Accelerating", funding: "$6.6B raised", focus: "General Cognitive Intelligence Platforms" },
-              { name: "Anthropic", momentum: "9.9/10", launch: "Claude 3.5 Sonnet & MCP", hiring: "High demand", funding: "$4B Amazon backing", focus: "Safety & Agentic Developer Environments" },
-              { name: "Google DeepMind", momentum: "9.4/10", launch: "AlphaFold 3 code release", hiring: "Selective", funding: "Alphabet backed", focus: "Scientific & Foundational Models" },
-              { name: "Meta AI", momentum: "9.5/10", launch: "Llama 3.1 405B base", hiring: "Steady", funding: "Meta backed", focus: "Open Weights & Decentralized Systems" },
-              { name: "Mistral", momentum: "8.9/10", launch: "Codestral 22B coder", hiring: "Moderate", funding: "$640M raised", focus: "Efficient Edge Models" },
-              { name: "Cursor (Anysphere)", momentum: "9.7/10", launch: "Composer tab & loops", hiring: "Rapid", funding: "$30M Series A", focus: "AI Developer Tooling" },
-            ].map((company) => (
+              { name: "OpenAI",           momentum: "9.8/10", launch: "GPT-4o realtime API",       funding: "$6.6B raised",      focus: "General Cognitive Intelligence Platforms"    },
+              { name: "Anthropic",        momentum: "9.9/10", launch: "Claude 3.5 Sonnet & MCP",   funding: "$4B Amazon backing", focus: "Safety & Agentic Developer Environments"    },
+              { name: "Google DeepMind",  momentum: "9.4/10", launch: "AlphaFold 3 code release",  funding: "Alphabet backed",   focus: "Scientific & Foundational Models"           },
+              { name: "Meta AI",          momentum: "9.5/10", launch: "Llama 3.1 405B base",       funding: "Meta backed",       focus: "Open Weights & Decentralized Systems"       },
+              { name: "Mistral",          momentum: "8.9/10", launch: "Codestral 22B coder",        funding: "$640M raised",      focus: "Efficient Edge Models"                      },
+              { name: "Cursor (Anysphere)",momentum:"9.7/10", launch: "Composer tab & loops",       funding: "$30M Series A",     focus: "AI Developer Tooling"                       },
+            ].map((company, idx) => (
               <Link
                 key={company.name}
                 href={`/companies/${company.name.toLowerCase().split(" ")[0].replace(/[()]/g, "")}`}
-                className="bg-[#17253A] border border-white/[0.05] p-5 rounded-3xl hover:border-[#6C63FF]/30 transition-all flex flex-col justify-between gap-4 group text-left"
+                data-animate
+                data-delay={String(idx + 1) as "1" | "2" | "3" | "4" | "5" | "6"}
+                className="bg-[#17253A] border border-white/[0.05] p-5 rounded-3xl hover:border-[#6C63FF]/30 hover:-translate-y-1 transition-all flex flex-col justify-between gap-4 group text-left"
               >
                 <div>
                   <h4 className="text-sm font-bold text-white group-hover:text-accent transition-colors">{company.name}</h4>
@@ -455,7 +561,7 @@ export default function Home() {
 
         {/* 7. RESEARCH INTELLIGENCE (TOP 3) */}
         <section className="flex flex-col gap-6">
-          <div className="flex items-center justify-between pb-3 border-b border-white/[0.05]">
+          <div data-animate className="flex items-center justify-between pb-3 border-b border-white/[0.05]">
             <div>
               <h2 className="text-2xl font-bold tracking-tight text-white font-plus-jakarta">Research Intelligence</h2>
               <p className="text-xs text-textSecondary mt-0.5">Top three academic paper reviews</p>
@@ -471,7 +577,6 @@ export default function Home() {
                 title: "KAN: Kolmogorov-Arnold Networks",
                 explanation: "An alternative to Multi-Layer Perceptrons (MLPs). Uses spline-based activation functions on edges rather than nodes, improving interpretability.",
                 citations: "1,240 citations",
-                impact: "High — Successor candidate for MLPs in scientific models.",
                 confidence: "98% Confidence",
                 url: "https://arxiv.org/abs/2404.19756"
               },
@@ -479,7 +584,6 @@ export default function Home() {
                 title: "Model Context Protocol (MCP)",
                 explanation: "Anthropic's open-source architecture connecting AI agents to environments. Standardizes data query formatting to streamline workflows.",
                 citations: "128 citations",
-                impact: "Critical — The backbone of developer workbench orchestration.",
                 confidence: "96% Confidence",
                 url: "https://github.com/modelcontextprotocol"
               },
@@ -487,12 +591,11 @@ export default function Home() {
                 title: "Attention Is All You Need",
                 explanation: "The foundational paper replacing sequential architectures (RNNs) with self-attention networks, forming the basis of modern generative models.",
                 citations: "112,490 citations",
-                impact: "Revolutionary — Groundwork for all modern generative Large Language Models.",
                 confidence: "100% Confidence",
                 url: "https://arxiv.org/abs/1706.03762"
               }
             ].map((paper, idx) => (
-              <div key={idx} className="bg-[#17253A] border border-white/[0.05] p-6 rounded-3xl hover:border-[#6C63FF]/30 transition-all flex flex-col justify-between group">
+              <div key={idx} data-animate data-delay={String(idx + 1) as "1" | "2" | "3"} className="bg-[#17253A] border border-white/[0.05] p-6 rounded-3xl hover:border-[#6C63FF]/30 hover:-translate-y-1 transition-all flex flex-col justify-between group">
                 <div>
                   <div className="flex items-center justify-between text-[10px] font-bold text-[#16C79A] uppercase tracking-widest mb-4">
                     <span>{paper.confidence}</span>
@@ -500,6 +603,7 @@ export default function Home() {
                   </div>
                   <h4 className="text-base font-display font-extrabold text-white mb-2 group-hover:text-accent transition-colors leading-snug">{paper.title}</h4>
                   <p className="text-xs text-[#9AA8BD] leading-relaxed mb-4">{paper.explanation}</p>
+
                 </div>
                 <div className="border-t border-white/[0.04] pt-4 mt-auto">
                   <a
@@ -518,7 +622,7 @@ export default function Home() {
 
         {/* 8. LEARN WHAT'S NEXT */}
         <section className="flex flex-col gap-6">
-          <div className="flex items-center justify-between pb-3 border-b border-white/[0.05]">
+          <div data-animate className="flex items-center justify-between pb-3 border-b border-white/[0.05]">
             <div>
               <h2 className="text-2xl font-bold tracking-tight text-white font-plus-jakarta">Learn What's Next</h2>
               <p className="text-xs text-textSecondary mt-0.5 font-normal">Modular guides for active technical concepts</p>
@@ -530,32 +634,35 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {[
-              { title: "Introduction to MCP", desc: "Model Context Protocol communication APIs developed by Anthropic.", time: "5 min", diff: "Intermediate" },
-              { title: "Standard RAG Pipelines", desc: "Retrieval-augmented generation architectures for vector data loading.", time: "10 min", diff: "Beginner" },
-              { title: "Fine-tuning with LoRA", desc: "Parameter-efficient adaptation weights injected into foundational layers.", time: "8 min", diff: "Advanced" }
+              { slug: "mcp-server-development",      title: "Introduction to MCP",      desc: "Model Context Protocol communication APIs developed by Anthropic.", time: "5 min",  diff: "Intermediate" },
+              { slug: "agentic-rag-pipelines",       title: "Agentic RAG Pipelines",    desc: "Retrieval-augmented generation architectures for vector data loading.", time: "10 min", diff: "Beginner"     },
+              { slug: "prompt-engineering-production",title: "Prompt Engineering",       desc: "Production-grade prompt patterns and chain-of-thought optimisation.", time: "8 min",  diff: "Advanced"     },
             ].map((lesson, idx) => (
-              <div key={idx} className="bg-[#17253A] border border-white/[0.05] p-5 rounded-3xl hover:border-[#6C63FF]/30 transition-all flex flex-col justify-between gap-4">
+              <Link
+                key={idx}
+                href={`/learning/${lesson.slug}`}
+                data-animate
+                data-delay={String(idx + 1) as "1" | "2" | "3"}
+                className="bg-[#17253A] border border-white/[0.05] p-5 rounded-3xl hover:border-[#6C63FF]/30 hover:-translate-y-1 transition-all flex flex-col justify-between gap-4 group"
+              >
                 <div>
                   <div className="flex items-center justify-between text-[9px] font-bold text-[#16C79A] uppercase tracking-wider mb-2">
                     <span>{lesson.diff}</span>
                     <span className="text-zinc-500">{lesson.time} read</span>
                   </div>
-                  <h4 className="text-base font-bold text-white mb-1">{lesson.title}</h4>
+                  <h4 className="text-base font-bold text-white mb-1 group-hover:text-accent transition-colors">{lesson.title}</h4>
                   <p className="text-xs text-[#9AA8BD] leading-relaxed">{lesson.desc}</p>
                 </div>
-                <button
-                  onClick={() => alert(`Starting: ${lesson.title}`)}
-                  className="py-2 px-3 bg-[#101B2D]/60 hover:bg-[#101B2D] border border-white/[0.05] hover:border-accent/30 rounded-xl text-xs font-bold text-zinc-300 hover:text-white transition-all text-center"
-                >
-                  Start Lesson
-                </button>
-              </div>
+                <span className="py-2 px-3 bg-[#101B2D]/60 group-hover:bg-[#101B2D] border border-white/[0.05] group-hover:border-accent/30 rounded-xl text-xs font-bold text-zinc-300 group-hover:text-white transition-all text-center block">
+                  Start Lesson &rarr;
+                </span>
+              </Link>
             ))}
           </div>
         </section>
 
         {/* 9. AI OPPORTUNITY OF THE DAY (Gold Highlighted) */}
-        <section className="relative rounded-3xl p-0.5 overflow-hidden bg-gradient-to-r from-[#F6C453] via-[#6C63FF] to-[#16C79A] shadow-[0_20px_50px_rgba(246,196,83,0.08)] animate-fade-in">
+        <section data-animate className="relative rounded-3xl p-0.5 overflow-hidden animate-gradient-bg bg-gradient-to-r from-[#F6C453] via-[#6C63FF] to-[#16C79A] shadow-[0_20px_50px_rgba(246,196,83,0.08)]">
           <div className="bg-[#101B2D] p-6 md:p-8 rounded-[22px] flex flex-col md:flex-row gap-8 justify-between">
             {/* Left */}
             <div className="md:w-1/3 flex flex-col justify-between">
@@ -614,7 +721,7 @@ export default function Home() {
         </section>
 
         {/* 10. WEEKLY INTELLIGENCE REPORT (Gold Highlighted) */}
-        <section className="bg-[#17253A] border-2 border-[#F6C453]/30 rounded-3xl p-7 md:p-8 flex flex-col md:flex-row justify-between items-center gap-8 shadow-xl">
+        <section data-animate className="bg-[#17253A] border-2 border-[#F6C453]/30 rounded-3xl p-7 md:p-8 flex flex-col md:flex-row justify-between items-center gap-8 shadow-xl">
           <div className="flex-1">
             <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#F6C453] block mb-2">Weekly Synthesis</span>
             <h3 className="text-2xl font-display font-extrabold text-white mb-2">Weekly Intelligence Report</h3>
