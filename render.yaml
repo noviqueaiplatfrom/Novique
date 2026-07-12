@@ -25,13 +25,13 @@ services:
       - key: SMTP_PORT
         value: "587"
       - key: SMTP_USER
-        sync: true
+        value: b1c234001@smtp-brevo.com
       - key: SMTP_PASSWORD
-        sync: true
+        value: OnsZUd9pP8qCA5BX
       - key: SMTP_FROM
         value: no-reply@novique.ai
       - key: ANTHROPIC_API_KEY
-        sync: true
+        value: ""
 
   # 2. Celery Background Worker
   - type: worker
@@ -56,13 +56,13 @@ services:
       - key: SMTP_PORT
         value: "587"
       - key: SMTP_USER
-        sync: true
+        value: b1c234001@smtp-brevo.com
       - key: SMTP_PASSWORD
-        sync: true
+        value: OnsZUd9pP8qCA5BX
       - key: SMTP_FROM
         value: no-reply@novique.ai
       - key: ANTHROPIC_API_KEY
-        sync: true
+        value: ""
 
   # 3. Redis Instance
   - type: redis
@@ -79,10 +79,7 @@ services:
     plan: free
     envVars:
       - key: NEXT_PUBLIC_API_URL
-        fromService:
-          type: web
-          name: novique-backend
-          property: url
+        value: https://novique-backend.onrender.com
       - key: NEXT_PUBLIC_GOOGLE_CLIENT_ID
         value: 338636590792-t166pujl1hpuroea7p7idnn4em4tpht4.apps.googleusercontent.com
 
