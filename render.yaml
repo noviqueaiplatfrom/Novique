@@ -1,0 +1,92 @@
+services:
+  # 1. FastAPI Backend API
+  - type: web
+    name: novique-backend
+    env: docker
+    dockerfilePath: backend/Dockerfile
+    dockerContext: backend
+    plan: free
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: novique-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: novique-redis
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: SMTP_HOST
+        value: smtp-relay.brevo.com
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER
+        sync: true
+      - key: SMTP_PASSWORD
+        sync: true
+      - key: SMTP_FROM
+        value: no-reply@novique.ai
+      - key: ANTHROPIC_API_KEY
+        sync: true
+
+  # 2. Celery Background Worker
+  - type: worker
+    name: novique-worker
+    env: docker
+    dockerfilePath: backend/Dockerfile
+    dockerContext: backend
+    plan: free
+    dockerCommand: python -m app.bootstrap && celery -A app.celery_app worker --beat --loglevel=info
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: novique-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: novique-redis
+          property: connectionString
+      - key: SMTP_HOST
+        value: smtp-relay.brevo.com
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER
+        sync: true
+      - key: SMTP_PASSWORD
+        sync: true
+      - key: SMTP_FROM
+        value: no-reply@novique.ai
+      - key: ANTHROPIC_API_KEY
+        sync: true
+
+  # 3. Redis Instance
+  - type: redis
+    name: novique-redis
+    plan: free
+    ipAllowList: []
+
+  # 4. Next.js Frontend
+  - type: web
+    name: novique-frontend
+    env: docker
+    dockerfilePath: frontend/Dockerfile
+    dockerContext: frontend
+    plan: free
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          type: web
+          name: novique-backend
+          property: url
+      - key: NEXT_PUBLIC_GOOGLE_CLIENT_ID
+        value: 338636590792-t166pujl1hpuroea7p7idnn4em4tpht4.apps.googleusercontent.com
+
+databases:
+  # 5. PostgreSQL Database
+  - name: novique-db
+    plan: free
