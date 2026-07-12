@@ -6,7 +6,7 @@ services:
     dockerfilePath: backend/Dockerfile
     dockerContext: backend
     plan: free
-    dockerCommand: sh -c "python -m app.bootstrap && (celery -A app.celery_app worker --beat --loglevel=info &) && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    dockerCommand: sh -c "python -m app.bootstrap && (celery -A app.celery_app worker --beat --loglevel=info &) && uvicorn app.main:app --host 0.0.0.0 --port 10000"
     envVars:
       - key: DATABASE_URL
         fromDatabase:
