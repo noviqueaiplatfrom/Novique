@@ -16,6 +16,8 @@ from app import models  # noqa: F401  (register models on Base before create_all
 async def lifespan(app: FastAPI):
     # Slice: create tables on startup. Replaced by Alembic migrations later.
     Base.metadata.create_all(bind=engine)
+    from app.database import run_migrations
+    run_migrations()
     yield
 
 

@@ -7,8 +7,10 @@ interface AuthState {
   token: string | null;
   user: authApi.User | null;
   ready: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<authApi.LoginResponse>;
+  register: (email: string, password: string) => Promise<authApi.LoginResponse>;
+  verify2fa: (email: string, code: string) => Promise<void>;
+  loginWithGoogle: (idToken: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -45,11 +47,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = useCallback(
-    async (email: string, password: string) => finish(await authApi.login(email, password)),
+    async (email: string, password: string) => {
+      const res = await authApi.login(email, password);
+      if (res.status !== "mfa_required") {
+        await finish(res as authApi.TokenPair);
+      }
+      return res;
+    },
     [finish],
   );
   const register = useCallback(
-    async (email: string, password: string) => finish(await authApi.register(email, password)),
+    async (email: string, password: string) => {
+      const res = await authApi.register(email, password);
+      if (res.status !== "mfa_required") {
+        await finish(res as authApi.TokenPair);
+      }
+      return res;
+    },
+    [finish],
+  );
+  const verify2fa = useCallback(
+    async (email: string, code: string) => {
+      const res = await authApi.verify2fa(email, code);
+      await finish(res);
+    },
+    [finish],
+  );
+  const loginWithGoogle = useCallback(
+    async (idToken: string) => finish(await authApi.loginWithGoogle(idToken)),
     [finish],
   );
   const logout = useCallback(() => {
@@ -59,7 +84,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <AuthCtx.Provider value={{ token, user, ready, login, register, logout }}>
+    <AuthCtx.Provider value={{ token, user, ready, login, register, verify2fa, loginWithGoogle, logout }}>
       {children}
     </AuthCtx.Provider>
   );

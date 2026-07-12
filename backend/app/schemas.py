@@ -50,12 +50,27 @@ class UserOut(BaseModel):
     id: int
     email: str
     role: str
+    name: str | None = None
+    picture: str | None = None
 
 
 class TokenPair(BaseModel):
     access_token: str
     refresh_token: str
     token_type: str = "bearer"
+
+
+class LoginResponse(BaseModel):
+    access_token: str | None = None
+    refresh_token: str | None = None
+    token_type: str = "bearer"
+    status: str = "success"  # "success" or "mfa_required"
+    email: str | None = None
+
+
+class Verify2FaRequest(BaseModel):
+    email: str
+    code: str
 
 
 class RefreshIn(BaseModel):

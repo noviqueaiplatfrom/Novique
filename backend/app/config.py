@@ -27,6 +27,13 @@ class Settings(BaseSettings):
     access_token_ttl_min: int = 30
     refresh_token_ttl_days: int = 7
 
+    # SMTP
+    smtp_host: str = "smtp-relay.brevo.com"
+    smtp_port: int = 587
+    smtp_user: str | None = None
+    smtp_password: str | None = None
+    smtp_from: str = "no-reply@novique.ai"
+
     # API
     cors_origins: str = "http://localhost:3000"
 
