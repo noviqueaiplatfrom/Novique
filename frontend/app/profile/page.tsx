@@ -43,9 +43,23 @@ export default function ProfilePage() {
             
             {/* Account Details */}
             <div className="bg-panel border border-white/[0.05] p-6 rounded-3xl flex items-center justify-between gap-6">
-              <div>
-                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block">Registered Email</span>
-                <span className="text-sm font-bold text-white mt-1 block">{user.email}</span>
+              <div className="flex items-center gap-4">
+                {user.picture && (
+                  <img
+                    src={user.picture}
+                    alt={user.name || "Profile"}
+                    className="w-12 h-12 rounded-2xl object-cover border border-white/[0.05]"
+                    referrerPolicy="no-referrer"
+                  />
+                )}
+                <div>
+                  <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block">
+                    {user.name ? "User Profile" : "Registered Email"}
+                  </span>
+                  <span className="text-sm font-bold text-white mt-1 block">
+                    {user.name ? `${user.name} (${user.email})` : user.email}
+                  </span>
+                </div>
               </div>
               <span className="text-[10px] text-tealAccent bg-tealAccent/10 border border-tealAccent/20 px-3 py-0.5 rounded-full uppercase tracking-wider font-bold">Active Account</span>
             </div>

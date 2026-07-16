@@ -6,6 +6,8 @@ export interface User {
   id: number;
   email: string;
   role: string;
+  name?: string | null;
+  picture?: string | null;
 }
 
 export interface TokenPair {
@@ -32,12 +34,26 @@ async function request<T>(
   return res.status === 204 ? (undefined as T) : res.json();
 }
 
+export interface LoginResponse {
+  access_token?: string;
+  refresh_token?: string;
+  token_type?: string;
+  status: string;
+  email?: string;
+}
+
 // --- Auth ---
 export const register = (email: string, password: string) =>
-  request<TokenPair>("/api/auth/register", { method: "POST", body: { email, password } });
+  request<LoginResponse>("/api/auth/register", { method: "POST", body: { email, password } });
 
 export const login = (email: string, password: string) =>
-  request<TokenPair>("/api/auth/login", { method: "POST", body: { email, password } });
+  request<LoginResponse>("/api/auth/login", { method: "POST", body: { email, password } });
+
+export const verify2fa = (email: string, code: string) =>
+  request<TokenPair>("/api/auth/verify-2fa", { method: "POST", body: { email, code } });
+
+export const loginWithGoogle = (idToken: string) =>
+  request<TokenPair>("/api/auth/google", { method: "POST", body: { id_token: idToken } });
 
 export const getMe = (token: string) => request<User>("/api/me", { token });
 

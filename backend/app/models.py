@@ -67,7 +67,10 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     email: Mapped[str] = mapped_column(String(256), unique=True, nullable=False, index=True)
-    hashed_password: Mapped[str] = mapped_column(String(256), nullable=False)
+    hashed_password: Mapped[str | None] = mapped_column(String(256), nullable=True)
+    google_sub: Mapped[str | None] = mapped_column(String(256), unique=True, nullable=True)
+    name: Mapped[str | None] = mapped_column(String(256), nullable=True)
+    picture: Mapped[str | None] = mapped_column(String(512), nullable=True)
     role: Mapped[str] = mapped_column(String(32), nullable=False, default="user")  # RBAC stub
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now()

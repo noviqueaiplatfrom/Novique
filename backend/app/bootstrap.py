@@ -15,6 +15,8 @@ def ensure_tables(retries: int = 15, delay: float = 2.0) -> None:
     for attempt in range(retries):
         try:
             Base.metadata.create_all(bind=engine)
+            from app.database import run_migrations
+            run_migrations()
             print("[bootstrap] tables ready")
             return
         except OperationalError:
@@ -22,6 +24,8 @@ def ensure_tables(retries: int = 15, delay: float = 2.0) -> None:
             time.sleep(delay)
     # Final attempt — let the error surface if the DB is genuinely unreachable.
     Base.metadata.create_all(bind=engine)
+    from app.database import run_migrations
+    run_migrations()
 
 
 if __name__ == "__main__":
