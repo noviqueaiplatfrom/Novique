@@ -174,7 +174,7 @@ export default function Home() {
               {greeting} 👋
             </h1>
             <p className="text-lg md:text-xl text-[#9AA8BD] font-light mb-4">
-              Understand today's AI landscape in under 5 minutes.
+              Know what matters. Choose what's best. Stay ahead.
             </p>
             <p className="text-sm text-[#9AA8BD] font-normal leading-relaxed mb-8 max-w-md">
               The fastest way for engineers, founders, investors, and AI professionals to understand what happened, why it matters, and what action to take next.
@@ -185,13 +185,13 @@ export default function Home() {
                 href="/signals"
                 className="px-6 py-3 rounded-xl font-bold bg-[#6C63FF] hover:bg-[#5a54e5] text-white transition-all hover:scale-[1.02] shadow-lg shadow-[#6C63FF]/20"
               >
-                Read Today's Brief
+                Explore Intelligence
               </Link>
               <Link
-                href="/signals"
+                href="/profile"
                 className="px-6 py-3 rounded-xl font-bold border border-white/[0.08] bg-white/[0.02] text-[#9AA8BD] hover:text-white hover:bg-white/[0.05] transition-all"
               >
-                Explore Signals
+                Personalize My Feed
               </Link>
             </div>
           </div>
@@ -559,6 +559,41 @@ export default function Home() {
           </div>
         </section>
 
+        {/* 6b. FEATURED MODELS */}
+        <section className="flex flex-col gap-6">
+          <div data-animate className="flex items-center justify-between pb-3 border-b border-white/[0.05]">
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight text-white font-plus-jakarta">🤖 Featured Models</h2>
+              <p className="text-xs text-textSecondary mt-0.5">The models everyone's building with right now</p>
+            </div>
+            <Link href="/models" className="text-xs font-semibold text-[#6C63FF] hover:text-[#5a54e5] flex items-center gap-1.5">
+              Compare Models &rarr;
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {[
+              { slug: "gpt-4o", name: "GPT-4o", maker: "OpenAI" },
+              { slug: "claude-3-5-sonnet", name: "Claude 3.5 Sonnet", maker: "Anthropic" },
+              { slug: "gemini-1-5-pro", name: "Gemini 1.5 Pro", maker: "Google" },
+              { slug: "deepseek-v3", name: "DeepSeek V3", maker: "DeepSeek" },
+              { slug: "llama-3-1-405b", name: "Llama 3.1 405B", maker: "Meta AI" },
+              { slug: "perplexity-sonar", name: "Perplexity Sonar", maker: "Perplexity" },
+            ].map((model, idx) => (
+              <Link
+                key={model.slug}
+                href={`/models/${model.slug}`}
+                data-animate
+                data-delay={String(Math.min(idx + 1, 6)) as "1" | "2" | "3" | "4" | "5" | "6"}
+                className="bg-[#17253A] border border-white/[0.05] p-4 rounded-2xl hover:border-[#6C63FF]/30 hover:-translate-y-1 transition-all flex flex-col gap-2 group text-center items-center"
+              >
+                <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider">{model.maker}</span>
+                <span className="text-xs font-bold text-white group-hover:text-accent transition-colors leading-tight">{model.name}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
         {/* 7. RESEARCH INTELLIGENCE (TOP 3) */}
         <section className="flex flex-col gap-6">
           <div data-animate className="flex items-center justify-between pb-3 border-b border-white/[0.05]">
@@ -717,6 +752,34 @@ export default function Home() {
               </Link>
             </div>
 
+          </div>
+        </section>
+
+        {/* 9b. WEEKLY AI TIMELINE */}
+        <section className="flex flex-col gap-6">
+          <div data-animate className="flex items-center justify-between">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-[#9AA8BD]">Weekly AI Timeline</h3>
+            <div className="h-[1px] bg-white/[0.06] flex-1 ml-4"></div>
+          </div>
+
+          <div data-animate className="flex flex-col md:flex-row items-stretch gap-3">
+            {[
+              { day: "Monday", note: "GPT-5 Enterprise launch dominates the cycle." },
+              { day: "Tuesday", note: "Anthropic ships MCP tooling updates." },
+              { day: "Wednesday", note: "Google DeepMind research drop on reasoning." },
+              { day: "Thursday", note: "Funding round announced in agentic infra." },
+              { day: "Friday", note: "Weekly momentum synthesis and what's next." },
+            ].map((step, idx, arr) => (
+              <div key={step.day} className="flex-1 flex flex-col md:flex-row items-center gap-3 md:gap-2">
+                <div className="flex-1 bg-[#17253A] border border-white/[0.05] rounded-2xl p-4 hover:border-[#6C63FF]/30 transition-all">
+                  <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#6C63FF] block mb-1.5">{step.day}</span>
+                  <p className="text-xs text-[#9AA8BD] leading-relaxed">{step.note}</p>
+                </div>
+                {idx < arr.length - 1 && (
+                  <span className="text-zinc-600 shrink-0 md:-rotate-90">&darr;</span>
+                )}
+              </div>
+            ))}
           </div>
         </section>
 
