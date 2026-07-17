@@ -10,6 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Ping backend
-        run: curl -fsS --max-time 30 https://novique-backend.onrender.com/health || true
+        run: curl -fsS --max-time 110 https://novique-backend.onrender.com/health || true
       - name: Ping frontend
-        run: curl -fsS --max-time 30 https://novique-frontend.onrender.com/ || true
+        run: curl -fsS --max-time 110 https://novique-frontend.onrender.com/ || true
