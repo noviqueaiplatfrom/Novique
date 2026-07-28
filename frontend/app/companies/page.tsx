@@ -7,6 +7,9 @@ import Link from "next/link";
 type ResearchLevel = "High" | "Moderate" | "Low";
 type HiringLevel = "High" | "Stable" | "Low";
 type Trend = "up" | "flat" | "down";
+type CompanySize = "Startup" | "Scale-up" | "Enterprise";
+type Region = "North America" | "Europe" | "Asia Pacific";
+type GithubLevel = "Very High" | "High" | "Moderate" | "Low";
 
 interface CompanySummary {
   slug: string;
@@ -24,6 +27,14 @@ interface CompanySummary {
   fundingHeadline: string;
   fundingDate: string;
   foundedYear: number;
+  industry: string;
+  hqRegion: Region;
+  companySize: CompanySize;
+  modelsReleasedCount: number;
+  githubActivityLevel: GithubLevel;
+  isOpenSource: boolean;
+  fundingAmountUSD: number;
+  enterpriseAdoptionScore: number;
 }
 
 const COMPANIES: CompanySummary[] = [
@@ -43,6 +54,14 @@ const COMPANIES: CompanySummary[] = [
     fundingHeadline: "$6.6B raised",
     fundingDate: "Oct 2024 round",
     foundedYear: 2015,
+    industry: "General-Purpose AI / LLMs",
+    hqRegion: "North America",
+    companySize: "Enterprise",
+    modelsReleasedCount: 6,
+    githubActivityLevel: "High",
+    isOpenSource: false,
+    fundingAmountUSD: 6_600_000_000,
+    enterpriseAdoptionScore: 92,
   },
   {
     slug: "anthropic",
@@ -60,6 +79,14 @@ const COMPANIES: CompanySummary[] = [
     fundingHeadline: "$4B Amazon + $2B Google backing",
     fundingDate: "2024 rounds",
     foundedYear: 2021,
+    industry: "AI Safety & Agentic Developer Platforms",
+    hqRegion: "North America",
+    companySize: "Enterprise",
+    modelsReleasedCount: 6,
+    githubActivityLevel: "Moderate",
+    isOpenSource: false,
+    fundingAmountUSD: 6_000_000_000,
+    enterpriseAdoptionScore: 89,
   },
   {
     slug: "google-deepmind",
@@ -77,6 +104,14 @@ const COMPANIES: CompanySummary[] = [
     fundingHeadline: "Parent-Alphabet backed",
     fundingDate: "Ongoing",
     foundedYear: 2010,
+    industry: "AI Research & Scientific Discovery",
+    hqRegion: "Europe",
+    companySize: "Enterprise",
+    modelsReleasedCount: 5,
+    githubActivityLevel: "High",
+    isOpenSource: false,
+    fundingAmountUSD: 75_000_000_000,
+    enterpriseAdoptionScore: 88,
   },
   {
     slug: "meta-ai",
@@ -94,6 +129,14 @@ const COMPANIES: CompanySummary[] = [
     fundingHeadline: "Parent-Meta backed",
     fundingDate: "Ongoing",
     foundedYear: 2013,
+    industry: "Open-Source AI & Consumer Platforms",
+    hqRegion: "North America",
+    companySize: "Enterprise",
+    modelsReleasedCount: 5,
+    githubActivityLevel: "Very High",
+    isOpenSource: true,
+    fundingAmountUSD: 65_000_000_000,
+    enterpriseAdoptionScore: 78,
   },
   {
     slug: "mistral",
@@ -111,6 +154,14 @@ const COMPANIES: CompanySummary[] = [
     fundingHeadline: "$640M raised",
     fundingDate: "Series B",
     foundedYear: 2023,
+    industry: "Efficient LLMs & European Enterprise AI",
+    hqRegion: "Europe",
+    companySize: "Scale-up",
+    modelsReleasedCount: 5,
+    githubActivityLevel: "High",
+    isOpenSource: true,
+    fundingAmountUSD: 640_000_000,
+    enterpriseAdoptionScore: 64,
   },
   {
     slug: "cursor",
@@ -128,6 +179,14 @@ const COMPANIES: CompanySummary[] = [
     fundingHeadline: "$60M raised",
     fundingDate: "Series B",
     foundedYear: 2022,
+    industry: "AI-Native Developer Tools",
+    hqRegion: "North America",
+    companySize: "Startup",
+    modelsReleasedCount: 2,
+    githubActivityLevel: "Low",
+    isOpenSource: false,
+    fundingAmountUSD: 60_000_000,
+    enterpriseAdoptionScore: 76,
   },
   {
     slug: "perplexity",
@@ -145,6 +204,14 @@ const COMPANIES: CompanySummary[] = [
     fundingHeadline: "$500M raised, $9B valuation",
     fundingDate: "2025 round",
     foundedYear: 2022,
+    industry: "AI Search & Answer Engines",
+    hqRegion: "North America",
+    companySize: "Scale-up",
+    modelsReleasedCount: 2,
+    githubActivityLevel: "Low",
+    isOpenSource: false,
+    fundingAmountUSD: 500_000_000,
+    enterpriseAdoptionScore: 55,
   },
   {
     slug: "microsoft-ai",
@@ -162,6 +229,14 @@ const COMPANIES: CompanySummary[] = [
     fundingHeadline: "Parent-Microsoft backed, $13B OpenAI stake",
     fundingDate: "Ongoing",
     foundedYear: 2023,
+    industry: "Enterprise AI & Cloud Platforms",
+    hqRegion: "North America",
+    companySize: "Enterprise",
+    modelsReleasedCount: 3,
+    githubActivityLevel: "Very High",
+    isOpenSource: false,
+    fundingAmountUSD: 13_000_000_000,
+    enterpriseAdoptionScore: 96,
   },
   {
     slug: "xai",
@@ -179,6 +254,14 @@ const COMPANIES: CompanySummary[] = [
     fundingHeadline: "$12B raised",
     fundingDate: "2025 round",
     foundedYear: 2023,
+    industry: "Conversational AI & Real-Time Data",
+    hqRegion: "North America",
+    companySize: "Scale-up",
+    modelsReleasedCount: 5,
+    githubActivityLevel: "Moderate",
+    isOpenSource: false,
+    fundingAmountUSD: 12_000_000_000,
+    enterpriseAdoptionScore: 42,
   },
   {
     slug: "deepseek",
@@ -196,6 +279,14 @@ const COMPANIES: CompanySummary[] = [
     fundingHeadline: "Backed by High-Flyer Capital",
     fundingDate: "Self-funded",
     foundedYear: 2023,
+    industry: "Open-Source Frontier Models",
+    hqRegion: "Asia Pacific",
+    companySize: "Startup",
+    modelsReleasedCount: 4,
+    githubActivityLevel: "Very High",
+    isOpenSource: true,
+    fundingAmountUSD: 0,
+    enterpriseAdoptionScore: 60,
   },
   {
     slug: "cohere",
@@ -213,6 +304,14 @@ const COMPANIES: CompanySummary[] = [
     fundingHeadline: "$500M raised",
     fundingDate: "Series D",
     foundedYear: 2019,
+    industry: "Enterprise NLP & Retrieval",
+    hqRegion: "North America",
+    companySize: "Scale-up",
+    modelsReleasedCount: 4,
+    githubActivityLevel: "Moderate",
+    isOpenSource: false,
+    fundingAmountUSD: 500_000_000,
+    enterpriseAdoptionScore: 74,
   },
   {
     slug: "hugging-face",
@@ -230,6 +329,14 @@ const COMPANIES: CompanySummary[] = [
     fundingHeadline: "$235M raised",
     fundingDate: "Series D",
     foundedYear: 2016,
+    industry: "Open-Source AI Infrastructure",
+    hqRegion: "North America",
+    companySize: "Scale-up",
+    modelsReleasedCount: 3,
+    githubActivityLevel: "Very High",
+    isOpenSource: true,
+    fundingAmountUSD: 235_000_000,
+    enterpriseAdoptionScore: 66,
   },
 ];
 
@@ -324,17 +431,27 @@ function DiscoveryRow({ emoji, title, children }: { emoji: string; title: string
   );
 }
 
+const ALL_INDUSTRIES = Array.from(new Set(COMPANIES.map((c) => c.industry))).sort();
+const ALL_SIZES: CompanySize[] = ["Startup", "Scale-up", "Enterprise"];
+const ALL_REGIONS: Region[] = ["North America", "Europe", "Asia Pacific"];
+
 export default function CompaniesPage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [industryFilter, setIndustryFilter] = useState("All");
+  const [sizeFilter, setSizeFilter] = useState("All");
+  const [regionFilter, setRegionFilter] = useState("All");
 
   const filteredCompanies = COMPANIES.filter((c) => {
     const q = searchQuery.toLowerCase();
-    if (!q) return true;
-    return (
+    const matchesQuery =
+      !q ||
       c.name.toLowerCase().includes(q) ||
       c.tagline.toLowerCase().includes(q) ||
-      c.techFocus.some((t) => t.toLowerCase().includes(q))
-    );
+      c.techFocus.some((t) => t.toLowerCase().includes(q));
+    const matchesIndustry = industryFilter === "All" || c.industry === industryFilter;
+    const matchesSize = sizeFilter === "All" || c.companySize === sizeFilter;
+    const matchesRegion = regionFilter === "All" || c.hqRegion === regionFilter;
+    return matchesQuery && matchesIndustry && matchesSize && matchesRegion;
   });
 
   useEffect(() => {
@@ -353,11 +470,20 @@ export default function CompaniesPage() {
     (a, b) => b.momentumScore - a.momentumScore
   );
   const mostActive = [...COMPANIES].sort((a, b) => b.signalsThisWeek - a.signalsThisWeek).slice(0, 6);
-  const fundingActivity = [...COMPANIES].sort((a, b) => b.momentumScore - a.momentumScore).slice(0, 6);
+  const fundingLeaders = [...COMPANIES].sort((a, b) => b.fundingAmountUSD - a.fundingAmountUSD).slice(0, 6);
   const hiringMomentum = [...COMPANIES].sort((a, b) => {
     const rank = { High: 2, Stable: 1, Low: 0 };
     return rank[b.hiringMomentum] - rank[a.hiringMomentum];
   });
+  const mostModelsReleased = [...COMPANIES].sort((a, b) => b.modelsReleasedCount - a.modelsReleasedCount).slice(0, 6);
+  const enterpriseLeaders = [...COMPANIES].sort((a, b) => b.enterpriseAdoptionScore - a.enterpriseAdoptionScore).slice(0, 6);
+  const openSourceLeaders = COMPANIES.filter((c) => c.isOpenSource).sort(
+    (a, b) => b.momentumScore - a.momentumScore
+  );
+  const startupSpotlight = COMPANIES.filter((c) => c.companySize === "Startup").sort(
+    (a, b) => b.growthRate - a.growthRate
+  );
+  const featuredCompany = [...COMPANIES].sort((a, b) => b.momentumScore - a.momentumScore)[0];
 
   return (
     <div className="min-h-screen bg-ink text-textPrimary relative font-sans selection:bg-accent/30 selection:text-white">
@@ -460,8 +586,8 @@ export default function CompaniesPage() {
             ))}
           </DiscoveryRow>
 
-          <DiscoveryRow emoji="💰" title="Funding Activity">
-            {fundingActivity.map((c) => (
+          <DiscoveryRow emoji="💰" title="Funding Leaders">
+            {fundingLeaders.map((c) => (
               <Link
                 key={c.slug}
                 href={`/companies/${c.slug}`}
@@ -492,6 +618,105 @@ export default function CompaniesPage() {
               );
             })}
           </DiscoveryRow>
+
+          <DiscoveryRow emoji="🧩" title="Most Models Released">
+            {mostModelsReleased.map((c) => (
+              <Link
+                key={c.slug}
+                href={`/companies/${c.slug}`}
+                className="shrink-0 w-44 bg-panel border border-white/[0.05] rounded-2xl p-4 hover:border-accent/30 transition-all flex flex-col gap-1.5"
+              >
+                <span className="text-xs font-bold text-white truncate">{c.name}</span>
+                <span className="text-lg font-display font-extrabold text-white">
+                  <AnimatedNumber value={c.modelsReleasedCount} />
+                </span>
+                <span className="text-[10px] text-textSecondary">models released</span>
+              </Link>
+            ))}
+          </DiscoveryRow>
+
+          <DiscoveryRow emoji="🏢" title="Enterprise Leaders">
+            {enterpriseLeaders.map((c) => (
+              <Link
+                key={c.slug}
+                href={`/companies/${c.slug}`}
+                className="shrink-0 w-48 bg-panel border border-white/[0.05] rounded-2xl p-4 hover:border-accent/30 transition-all flex flex-col gap-2"
+              >
+                <span className="text-xs font-bold text-white truncate">{c.name}</span>
+                <span className="text-[10px] font-extrabold text-positive bg-positive/10 border border-positive/20 px-2.5 py-0.5 rounded-full uppercase tracking-wider w-fit">
+                  <AnimatedNumber value={c.enterpriseAdoptionScore} />/100
+                </span>
+                <span className="text-[10px] text-textSecondary">enterprise adoption score</span>
+              </Link>
+            ))}
+          </DiscoveryRow>
+
+          <DiscoveryRow emoji="🌐" title="Open Source Leaders">
+            {openSourceLeaders.map((c) => (
+              <Link
+                key={c.slug}
+                href={`/companies/${c.slug}`}
+                className="shrink-0 w-48 bg-panel border border-white/[0.05] rounded-2xl p-4 hover:border-accent/30 transition-all flex flex-col gap-2"
+              >
+                <span className="text-xs font-bold text-white truncate">{c.name}</span>
+                <span className="text-[10px] font-extrabold text-tealAccent bg-tealAccent/10 border border-tealAccent/20 px-2.5 py-0.5 rounded-full uppercase tracking-wider w-fit">
+                  {c.githubActivityLevel} GitHub Activity
+                </span>
+                <span className="text-[10px] text-textSecondary">Open weights &amp; tooling</span>
+              </Link>
+            ))}
+          </DiscoveryRow>
+
+          <DiscoveryRow emoji="🌱" title="Startup Spotlight">
+            {startupSpotlight.map((c) => (
+              <Link
+                key={c.slug}
+                href={`/companies/${c.slug}`}
+                className="shrink-0 w-52 bg-panel border border-white/[0.05] rounded-2xl p-4 hover:border-accent/30 transition-all flex flex-col gap-2"
+              >
+                <span className="text-xs font-bold text-white truncate">{c.name}</span>
+                <p className="text-[11px] text-textSecondary leading-snug">{c.tagline}</p>
+                <span className="text-xs font-extrabold text-positive">
+                  +<AnimatedNumber value={c.growthRate} suffix="%" /> momentum growth
+                </span>
+              </Link>
+            ))}
+          </DiscoveryRow>
+
+          <div data-animate className="flex flex-col gap-3">
+            <h3 className="text-sm font-bold text-white flex items-center gap-2">
+              <span>⭐</span> Featured Company
+            </h3>
+            <Link
+              href={`/companies/${featuredCompany.slug}`}
+              className="bg-gradient-to-br from-accent/10 to-tealAccent/5 border border-accent/20 rounded-3xl p-6 hover:border-accent/40 transition-all flex flex-col md:flex-row md:items-center gap-5"
+            >
+              <CompanyLogo letter={featuredCompany.logoLetter} />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h4 className="text-lg font-display font-extrabold text-white">{featuredCompany.name}</h4>
+                  <span className="text-[10px] font-extrabold text-accent bg-accent/10 border border-accent/20 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                    {featuredCompany.industry}
+                  </span>
+                </div>
+                <p className="text-xs text-textSecondary mt-1 max-w-xl">{featuredCompany.tagline}</p>
+                <div className="flex flex-wrap gap-1.5 mt-3">
+                  {featuredCompany.techFocus.map((t) => (
+                    <span key={t} className="text-[10px] font-semibold px-2.5 py-1 rounded-full border border-white/[0.08] bg-white/[0.02] text-zinc-300">
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <div className="text-right shrink-0">
+                <span className="text-[10px] text-textSecondary uppercase tracking-wider font-bold block">AI Momentum Score</span>
+                <span className="text-2xl font-display font-extrabold text-goldAccent">
+                  <AnimatedNumber value={featuredCompany.momentumScore} />/100
+                </span>
+                <span className="text-[10px] text-accent font-bold block mt-1">View Intelligence &rarr;</span>
+              </div>
+            </Link>
+          </div>
         </div>
 
         {/* Browse All Companies */}
@@ -501,6 +726,52 @@ export default function CompaniesPage() {
             <p className="text-sm text-textSecondary mt-1">
               Full roster of tracked AI companies, updated with every signal, release, and hire.
             </p>
+          </div>
+
+          {/* Filters */}
+          <div className="flex flex-wrap gap-3">
+            <select
+              value={industryFilter}
+              onChange={(e) => setIndustryFilter(e.target.value)}
+              className="h-9 px-3.5 rounded-xl border border-white/[0.08] bg-panel text-xs font-semibold text-textPrimary outline-none focus:border-accent/50 transition-all"
+            >
+              <option value="All">All Industries</option>
+              {ALL_INDUSTRIES.map((ind) => (
+                <option key={ind} value={ind}>{ind}</option>
+              ))}
+            </select>
+            <select
+              value={sizeFilter}
+              onChange={(e) => setSizeFilter(e.target.value)}
+              className="h-9 px-3.5 rounded-xl border border-white/[0.08] bg-panel text-xs font-semibold text-textPrimary outline-none focus:border-accent/50 transition-all"
+            >
+              <option value="All">All Company Sizes</option>
+              {ALL_SIZES.map((size) => (
+                <option key={size} value={size}>{size}</option>
+              ))}
+            </select>
+            <select
+              value={regionFilter}
+              onChange={(e) => setRegionFilter(e.target.value)}
+              className="h-9 px-3.5 rounded-xl border border-white/[0.08] bg-panel text-xs font-semibold text-textPrimary outline-none focus:border-accent/50 transition-all"
+            >
+              <option value="All">All Regions</option>
+              {ALL_REGIONS.map((region) => (
+                <option key={region} value={region}>{region}</option>
+              ))}
+            </select>
+            {(industryFilter !== "All" || sizeFilter !== "All" || regionFilter !== "All") && (
+              <button
+                onClick={() => {
+                  setIndustryFilter("All");
+                  setSizeFilter("All");
+                  setRegionFilter("All");
+                }}
+                className="h-9 px-3.5 rounded-xl border border-white/[0.08] text-xs font-bold text-zinc-400 hover:text-white hover:border-zinc-700 transition-all"
+              >
+                Clear Filters
+              </button>
+            )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -572,7 +843,9 @@ export default function CompaniesPage() {
 
           {filteredCompanies.length === 0 && (
             <div className="text-center py-16 text-sm text-textSecondary">
-              No companies match &quot;{searchQuery}&quot;. Try OpenAI, Anthropic, or Mistral.
+              {searchQuery
+                ? <>No companies match &quot;{searchQuery}&quot; with the current filters. Try OpenAI, Anthropic, or Mistral.</>
+                : "No companies match the current filters. Try clearing one or more of them."}
             </div>
           )}
         </div>

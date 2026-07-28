@@ -68,6 +68,20 @@ interface CompanyDetail {
   strategicFocus: Metric[];
   relatedLearning: string[];
   relatedCompanies: string[];
+  // Intelligence Metrics
+  industry: string;
+  trendScore: number;
+  popularityScore: number;
+  innovationScore: number;
+  // Company Activity
+  githubActivity: { level: "Very High" | "High" | "Moderate" | "Low"; detail: string };
+  recentLaunches: string[];
+  // Workforce Insights (LinkedIn-style, directional estimate, not verified data)
+  workforce: Metric[];
+  // Strategic Analysis
+  strengths: string[];
+  weaknesses: string[];
+  recommendedUseCases: string[];
 }
 
 const COMPANY_DATABASE: Record<string, CompanyDetail> = {
@@ -148,6 +162,7 @@ const COMPANY_DATABASE: Record<string, CompanyDetail> = {
       { date: "2022", event: "ChatGPT launches, igniting the global generative AI wave." },
       { date: "2023", event: "GPT-4 released with multimodal input and stronger reasoning." },
       { date: "2024", event: "GPT-4o ships with native real-time voice and vision." },
+      { date: "2024", event: "Closes a $6.6B funding round led by Thrive Capital, valuing OpenAI at $157B." },
       { date: "2026", event: "GPT-5 launches with expanded agentic tool-use across the API." },
     ],
     competitors: ["anthropic", "google-deepmind", "xai"],
@@ -185,6 +200,38 @@ const COMPANY_DATABASE: Record<string, CompanyDetail> = {
       { label: "Consumer AI", value: 38 },
       { label: "Developer APIs", value: 20 },
       { label: "Research", value: 7 },
+    ],
+    industry: "General-Purpose AI / LLMs",
+    trendScore: 90,
+    popularityScore: 97,
+    innovationScore: 93,
+    githubActivity: { level: "High", detail: "Active on Whisper, Evals, and Triton repos; frontier models remain closed-weight." },
+    recentLaunches: ["GPT-5 agentic tool-use expansion to all API tiers", "Sora 2 with synchronized audio generation", "EU enterprise data residency options"],
+    workforce: [
+      { label: "Software Engineering", value: 30 },
+      { label: "Machine Learning", value: 28 },
+      { label: "Research", value: 18 },
+      { label: "Sales", value: 6 },
+      { label: "Product Management", value: 6 },
+      { label: "Marketing", value: 4 },
+      { label: "Operations", value: 4 },
+      { label: "Customer Success", value: 2 },
+      { label: "Leadership", value: 2 },
+    ],
+    strengths: [
+      "Fastest model iteration cycle among frontier labs",
+      "Largest developer ecosystem and consumer brand recognition",
+      "Deep enterprise distribution through the Microsoft/Azure partnership",
+    ],
+    weaknesses: [
+      "High inference cost relative to efficiency-focused rivals",
+      "Mounting safety and regulatory scrutiny as capability scales",
+      "Less open-source goodwill than Meta or Hugging Face",
+    ],
+    recommendedUseCases: [
+      "General-purpose chat and reasoning assistants",
+      "Agentic developer tooling and multi-step automation",
+      "Multimodal content generation (text, image, video, audio)",
     ],
     relatedLearning: ["Intro to Large Language Models", "Prompt Engineering Fundamentals", "Understanding Reasoning Models"],
     relatedCompanies: ["microsoft-ai", "perplexity", "hugging-face"],
@@ -258,6 +305,7 @@ const COMPANY_DATABASE: Record<string, CompanyDetail> = {
       { date: "2021", event: "Founded by former OpenAI researchers to focus on AI safety." },
       { date: "2023", event: "Claude chatbot launches publicly alongside an AWS partnership." },
       { date: "2024", event: "Claude 3.5 Sonnet and the Computer Use API set new agent benchmarks." },
+      { date: "2024", event: "Amazon and Google commit a combined $6B in strategic funding to expand compute capacity." },
       { date: "2025", event: "Model Context Protocol becomes an industry-wide standard." },
       { date: "2026", event: "Claude 5 ships with materially stronger long-horizon agent reliability." },
     ],
@@ -296,6 +344,38 @@ const COMPANY_DATABASE: Record<string, CompanyDetail> = {
       { label: "Consumer AI", value: 20 },
       { label: "Developer APIs", value: 26 },
       { label: "Research", value: 12 },
+    ],
+    industry: "AI Safety & Agentic Developer Platforms",
+    trendScore: 94,
+    popularityScore: 90,
+    innovationScore: 95,
+    githubActivity: { level: "Moderate", detail: "Maintains the open Model Context Protocol spec and SDKs; core Claude models remain closed-weight." },
+    recentLaunches: ["Claude 5 long-horizon agent release", "MCP crossing 10,000 public integrations", "Extended Amazon Trainium compute partnership"],
+    workforce: [
+      { label: "Software Engineering", value: 28 },
+      { label: "Machine Learning", value: 26 },
+      { label: "Research", value: 22 },
+      { label: "Sales", value: 5 },
+      { label: "Product Management", value: 6 },
+      { label: "Marketing", value: 3 },
+      { label: "Operations", value: 5 },
+      { label: "Customer Success", value: 3 },
+      { label: "Leadership", value: 2 },
+    ],
+    strengths: [
+      "Deepest alignment and interpretability research bench",
+      "Set the industry standard for agent tooling with MCP",
+      "Strong developer trust for reliability-critical use cases",
+    ],
+    weaknesses: [
+      "Smaller compute footprint than OpenAI or Google",
+      "Narrower consumer brand recognition than ChatGPT",
+      "Smaller model lineup than larger rivals",
+    ],
+    recommendedUseCases: [
+      "Long-horizon coding and operations agents",
+      "Safety-sensitive enterprise deployments",
+      "Tool-using agent architectures built on MCP",
     ],
     relatedLearning: ["Constitutional AI Explained", "Building Agents with MCP", "Understanding AI Alignment"],
     relatedCompanies: ["openai", "cursor", "hugging-face"],
@@ -370,6 +450,7 @@ const COMPANY_DATABASE: Record<string, CompanyDetail> = {
       { date: "2020", event: "AlphaFold solves the 50-year protein folding challenge." },
       { date: "2023", event: "Google Brain and DeepMind merge into Google DeepMind." },
       { date: "2024", event: "Gemini 1.5 Pro ships with a 2-million token context window." },
+      { date: "2025", event: "Alphabet's expanded AI infrastructure capex secures long-term compute funding for Gemini training runs." },
       { date: "2026", event: "Gemini 3 launches with a 5-million token context window and native agent tooling." },
     ],
     competitors: ["openai", "anthropic", "meta-ai"],
@@ -407,6 +488,38 @@ const COMPANY_DATABASE: Record<string, CompanyDetail> = {
       { label: "Consumer AI", value: 40 },
       { label: "Developer APIs", value: 15 },
       { label: "Research", value: 15 },
+    ],
+    industry: "AI Research & Scientific Discovery",
+    trendScore: 85,
+    popularityScore: 88,
+    innovationScore: 94,
+    githubActivity: { level: "High", detail: "Publishes extensively across AlphaFold, Gemma, and JAX-based research repos." },
+    recentLaunches: ["Gemini 3 with 5-million token context window", "AlphaFold successor for protein-drug binding dynamics", "Gemini integrated into Chrome's agent sidebar"],
+    workforce: [
+      { label: "Software Engineering", value: 24 },
+      { label: "Machine Learning", value: 26 },
+      { label: "Research", value: 28 },
+      { label: "Sales", value: 4 },
+      { label: "Product Management", value: 5 },
+      { label: "Marketing", value: 3 },
+      { label: "Operations", value: 5 },
+      { label: "Customer Success", value: 2 },
+      { label: "Leadership", value: 3 },
+    ],
+    strengths: [
+      "Unmatched scientific research depth",
+      "Broadest default distribution through Google's own products",
+      "World-class AI-for-science credibility (AlphaFold, materials science)",
+    ],
+    weaknesses: [
+      "Historically slower shipping velocity on developer-facing tooling",
+      "Less agile than smaller, more focused labs",
+      "Enterprise offering less unified than Microsoft's Copilot stack",
+    ],
+    recommendedUseCases: [
+      "Scientific research and drug discovery workflows",
+      "Long-context document and codebase analysis",
+      "Consumer-scale multimodal assistants",
     ],
     relatedLearning: ["Foundations of Reinforcement Learning", "Multimodal Models Explained", "AI for Scientific Discovery"],
     relatedCompanies: ["openai", "meta-ai", "microsoft-ai"],
@@ -480,6 +593,7 @@ const COMPANY_DATABASE: Record<string, CompanyDetail> = {
       { date: "2013", event: "FAIR founded by Yann LeCun to pursue open AI research." },
       { date: "2023", event: "Original Llama weights leak, catalyzing the open-source LLM community." },
       { date: "2024", event: "Llama 3.1 405B ships, rivaling proprietary frontier models." },
+      { date: "2024", event: "Meta commits over $35B in annual capex toward AI infrastructure, funding Llama training and Reality Labs hardware." },
       { date: "2025", event: "Ray-Ban Meta glasses add on-device vision-language capability." },
       { date: "2026", event: "Llama 4 closes most of the coding benchmark gap with closed models." },
     ],
@@ -518,6 +632,38 @@ const COMPANY_DATABASE: Record<string, CompanyDetail> = {
       { label: "Consumer AI", value: 48 },
       { label: "Developer APIs", value: 12 },
       { label: "Research", value: 22 },
+    ],
+    industry: "Open-Source AI & Consumer Platforms",
+    trendScore: 87,
+    popularityScore: 84,
+    innovationScore: 82,
+    githubActivity: { level: "Very High", detail: "Among the most active AI organizations on GitHub via Llama, PyTorch, and Segment Anything repos." },
+    recentLaunches: ["Llama 4 open-weights release", "Meta AI assistant crossing 800 million monthly users", "Ray-Ban Meta glasses with on-device vision model"],
+    workforce: [
+      { label: "Software Engineering", value: 26 },
+      { label: "Machine Learning", value: 24 },
+      { label: "Research", value: 20 },
+      { label: "Sales", value: 5 },
+      { label: "Product Management", value: 7 },
+      { label: "Marketing", value: 6 },
+      { label: "Operations", value: 6 },
+      { label: "Customer Success", value: 3 },
+      { label: "Leadership", value: 3 },
+    ],
+    strengths: [
+      "Largest open-source developer community of any major lab",
+      "Massive default distribution via WhatsApp, Instagram, and Facebook",
+      "A credible free alternative caps closed-lab pricing power",
+    ],
+    weaknesses: [
+      "No dedicated high-margin API business",
+      "Reality Labs hardware bets remain unproven at scale",
+      "Open release cadence exposes IP to fast-following competitors",
+    ],
+    recommendedUseCases: [
+      "Self-hosted enterprise deployments",
+      "Research and fine-tuning on open weights",
+      "Consumer AI assistants embedded in social apps",
     ],
     relatedLearning: ["Open Source LLMs 101", "Fine-tuning Llama Models", "Vision-Language Models Explained"],
     relatedCompanies: ["hugging-face", "mistral", "deepseek"],
@@ -584,6 +730,7 @@ const COMPANY_DATABASE: Record<string, CompanyDetail> = {
     timeline: [
       { date: "2023", event: "Founded in Paris by researchers from Meta and Google DeepMind." },
       { date: "2023", event: "Mixtral 8x7B proves mixture-of-experts efficiency on commodity GPUs." },
+      { date: "2023", event: "Raises a $640M Series B round led by a16z and Nvidia, valuing Mistral at over $6B." },
       { date: "2024", event: "Microsoft Azure partnership brings Mistral Large 2 to enterprise customers." },
       { date: "2026", event: "Mistral Large 3 ships with stronger multilingual reasoning." },
     ],
@@ -622,6 +769,38 @@ const COMPANY_DATABASE: Record<string, CompanyDetail> = {
       { label: "Consumer AI", value: 15 },
       { label: "Developer APIs", value: 30 },
       { label: "Research", value: 10 },
+    ],
+    industry: "Efficient LLMs & European Enterprise AI",
+    trendScore: 74,
+    popularityScore: 68,
+    innovationScore: 78,
+    githubActivity: { level: "High", detail: "Regularly ships open weights for the Mistral and Mixtral model families." },
+    recentLaunches: ["Mistral Large 3 with improved multilingual reasoning", "Expanded Azure hosting across EU regions", "Codestral update for multi-file refactoring"],
+    workforce: [
+      { label: "Software Engineering", value: 32 },
+      { label: "Machine Learning", value: 28 },
+      { label: "Research", value: 16 },
+      { label: "Sales", value: 6 },
+      { label: "Product Management", value: 5 },
+      { label: "Marketing", value: 3 },
+      { label: "Operations", value: 6 },
+      { label: "Customer Success", value: 2 },
+      { label: "Leadership", value: 2 },
+    ],
+    strengths: [
+      "Best efficiency-per-parameter in its class",
+      "Strong EU data sovereignty positioning",
+      "Lean, fast-moving research team",
+    ],
+    weaknesses: [
+      "Far smaller compute budget than top US labs",
+      "Limited enterprise support infrastructure",
+      "Smaller research paper output than larger rivals",
+    ],
+    recommendedUseCases: [
+      "Sovereign, EU-hosted enterprise AI",
+      "Edge and on-premise deployment",
+      "Cost-efficient coding assistants",
     ],
     relatedLearning: ["Mixture-of-Experts Explained", "Efficient Model Architectures", "AI Sovereignty & Regulation"],
     relatedCompanies: ["cohere", "hugging-face", "deepseek"],
@@ -687,6 +866,7 @@ const COMPANY_DATABASE: Record<string, CompanyDetail> = {
       { date: "2022", event: "Founded by MIT graduates focused on IDE-level AI integration." },
       { date: "2023", event: "Cursor editor launches, gaining rapid traction with developers." },
       { date: "2024", event: "Composer mode ships alongside a Series A from Andreessen Horowitz." },
+      { date: "2025", event: "Closes a $60M Series B round backing continued Composer agent development." },
       { date: "2026", event: "Composer 2 enables longer autonomous coding sessions with less supervision." },
     ],
     competitors: ["hugging-face", "openai", "anthropic"],
@@ -724,6 +904,38 @@ const COMPANY_DATABASE: Record<string, CompanyDetail> = {
       { label: "Consumer AI", value: 10 },
       { label: "Developer APIs", value: 50 },
       { label: "Research", value: 10 },
+    ],
+    industry: "AI-Native Developer Tools",
+    trendScore: 89,
+    popularityScore: 80,
+    innovationScore: 84,
+    githubActivity: { level: "Low", detail: "Core editor and agent engine remain closed-source, with limited public repo activity." },
+    recentLaunches: ["Composer 2 autonomous multi-file refactors", "Surpassing 1 million paying developer seats", "Local MCP server support for private codebases"],
+    workforce: [
+      { label: "Software Engineering", value: 46 },
+      { label: "Machine Learning", value: 18 },
+      { label: "Research", value: 8 },
+      { label: "Sales", value: 8 },
+      { label: "Product Management", value: 8 },
+      { label: "Marketing", value: 5 },
+      { label: "Operations", value: 4 },
+      { label: "Customer Success", value: 2 },
+      { label: "Leadership", value: 1 },
+    ],
+    strengths: [
+      "Best-in-class tab-completion latency",
+      "Fastest-growing developer user base among AI coding tools",
+      "Tight IDE-level workflow integration",
+    ],
+    weaknesses: [
+      "Depends on third-party foundation models rather than owning one",
+      "Smaller research footprint than model-owning rivals",
+      "Vulnerable if foundation labs launch competing first-party IDEs",
+    ],
+    recommendedUseCases: [
+      "AI pair-programming for professional developers",
+      "Large multi-file refactors and codebase migrations",
+      "Enterprise developer productivity tooling",
     ],
     relatedLearning: ["AI Pair Programming Basics", "Understanding Coding Agents", "Model Context Protocol for IDEs"],
     relatedCompanies: ["anthropic", "hugging-face", "microsoft-ai"],
@@ -788,7 +1000,7 @@ const COMPANY_DATABASE: Record<string, CompanyDetail> = {
     timeline: [
       { date: "2022", event: "Founded by researchers from OpenAI and UC Berkeley." },
       { date: "2023", event: "Core cited-answer search product launches publicly." },
-      { date: "2024", event: "Publisher revenue-share program launches alongside a $9B valuation round." },
+      { date: "2024", event: "Publisher revenue-share program launches alongside a $500M funding round at a $9B valuation." },
       { date: "2026", event: "Sonar 2 ships with materially improved citation precision." },
     ],
     competitors: ["openai", "google-deepmind", "xai"],
@@ -826,6 +1038,38 @@ const COMPANY_DATABASE: Record<string, CompanyDetail> = {
       { label: "Consumer AI", value: 55 },
       { label: "Developer APIs", value: 15 },
       { label: "Research", value: 10 },
+    ],
+    industry: "AI Search & Answer Engines",
+    trendScore: 79,
+    popularityScore: 76,
+    innovationScore: 75,
+    githubActivity: { level: "Low", detail: "The Sonar search stack is largely closed-source, with a minimal public repo footprint." },
+    recentLaunches: ["Sonar 2 with improved citation precision", "Perplexity Finance real-time earnings summaries", "Publisher revenue-share program expansion"],
+    workforce: [
+      { label: "Software Engineering", value: 34 },
+      { label: "Machine Learning", value: 22 },
+      { label: "Research", value: 10 },
+      { label: "Sales", value: 8 },
+      { label: "Product Management", value: 8 },
+      { label: "Marketing", value: 8 },
+      { label: "Operations", value: 6 },
+      { label: "Customer Success", value: 3 },
+      { label: "Leadership", value: 1 },
+    ],
+    strengths: [
+      "Answer trustworthiness through source citations",
+      "Rapidly growing consumer base pulling share from traditional search",
+      "Credible early wedge into high-value verticals like finance",
+    ],
+    weaknesses: [
+      "Depends on third-party foundation models",
+      "Smaller enterprise footprint than incumbents",
+      "Ongoing publisher-relations friction",
+    ],
+    recommendedUseCases: [
+      "Cited, trustworthy conversational search",
+      "Financial research and earnings summarization",
+      "Consumer research and fact-checking workflows",
     ],
     relatedLearning: ["Retrieval-Augmented Generation Basics", "How AI Search Engines Rank Sources", "Building Cited Answer Systems"],
     relatedCompanies: ["xai", "google-deepmind", "hugging-face"],
@@ -890,6 +1134,7 @@ const COMPANY_DATABASE: Record<string, CompanyDetail> = {
     productEcosystem: ["Microsoft 365 Copilot", "GitHub Copilot", "Azure AI Foundry", "Windows Copilot", "Copilot Actions"],
     timeline: [
       { date: "2019", event: "Initial $1B investment in OpenAI begins the strategic partnership." },
+      { date: "2023", event: "Expands total investment in OpenAI to $13B, deepening the strategic partnership." },
       { date: "2023", event: "Microsoft 365 Copilot launches across Word, Excel, and Teams." },
       { date: "2024", event: "GitHub Copilot Workspace adds agentic multi-file editing." },
       { date: "2026", event: "Copilot Actions enables autonomous cross-app task completion." },
@@ -929,6 +1174,38 @@ const COMPANY_DATABASE: Record<string, CompanyDetail> = {
       { label: "Consumer AI", value: 12 },
       { label: "Developer APIs", value: 22 },
       { label: "Research", value: 8 },
+    ],
+    industry: "Enterprise AI & Cloud Platforms",
+    trendScore: 82,
+    popularityScore: 86,
+    innovationScore: 80,
+    githubActivity: { level: "Very High", detail: "Extensive open-source activity via Phi models, VS Code, and the broader GitHub ecosystem." },
+    recentLaunches: ["Copilot Actions cross-app autonomous workflows", "Azure AI Foundry multi-model orchestration", "GitHub Copilot repository-level agent mode"],
+    workforce: [
+      { label: "Software Engineering", value: 28 },
+      { label: "Machine Learning", value: 20 },
+      { label: "Research", value: 14 },
+      { label: "Sales", value: 12 },
+      { label: "Product Management", value: 8 },
+      { label: "Marketing", value: 6 },
+      { label: "Operations", value: 7 },
+      { label: "Customer Success", value: 3 },
+      { label: "Leadership", value: 2 },
+    ],
+    strengths: [
+      "Unmatched enterprise distribution via Microsoft 365 and Azure",
+      "Deepest exclusive access to OpenAI's frontier models",
+      "Multi-model routing hedges single-vendor dependence",
+    ],
+    weaknesses: [
+      "Own research identity partly dependent on the OpenAI partnership",
+      "Slower-moving than smaller, more focused labs",
+      "Complex multi-brand product surface across Copilot, Azure, and GitHub",
+    ],
+    recommendedUseCases: [
+      "Enterprise productivity copilots",
+      "Cross-application agentic workflows",
+      "Multi-model enterprise AI orchestration",
     ],
     relatedLearning: ["Enterprise Copilots 101", "Multi-Model Orchestration Patterns", "Small Language Models Explained"],
     relatedCompanies: ["openai", "google-deepmind", "cursor"],
@@ -996,6 +1273,7 @@ const COMPANY_DATABASE: Record<string, CompanyDetail> = {
       { date: "2023", event: "xAI founded with a mission focused on truth-seeking AI." },
       { date: "2023", event: "Grok launches exclusively to X Premium subscribers." },
       { date: "2024", event: "Colossus supercomputer cluster comes online in Memphis." },
+      { date: "2025", event: "Closes a $12B funding round to fund Colossus compute expansion and researcher hiring." },
       { date: "2026", event: "Grok 5 ships with default real-time X data grounding." },
     ],
     competitors: ["openai", "perplexity", "google-deepmind"],
@@ -1033,6 +1311,38 @@ const COMPANY_DATABASE: Record<string, CompanyDetail> = {
       { label: "Consumer AI", value: 55 },
       { label: "Developer APIs", value: 20 },
       { label: "Research", value: 10 },
+    ],
+    industry: "Conversational AI & Real-Time Data",
+    trendScore: 84,
+    popularityScore: 72,
+    innovationScore: 76,
+    githubActivity: { level: "Moderate", detail: "Some open tooling around Grok infrastructure; core models remain closed-weight." },
+    recentLaunches: ["Grok 5 with default real-time X data grounding", "Colossus supercomputer cluster GPU doubling", "$12B funding round at elevated valuation"],
+    workforce: [
+      { label: "Software Engineering", value: 30 },
+      { label: "Machine Learning", value: 26 },
+      { label: "Research", value: 16 },
+      { label: "Sales", value: 5 },
+      { label: "Product Management", value: 6 },
+      { label: "Marketing", value: 6 },
+      { label: "Operations", value: 7 },
+      { label: "Customer Success", value: 2 },
+      { label: "Leadership", value: 2 },
+    ],
+    strengths: [
+      "Unique real-time data access via X",
+      "Rapid capital raising and compute scale-up",
+      "Fast iteration cycle for a comparatively young lab",
+    ],
+    weaknesses: [
+      "Shorter research track record than rivals",
+      "Smaller enterprise footprint",
+      "Heavier reliance on a single founder's capital-raising ability",
+    ],
+    recommendedUseCases: [
+      "Real-time trend and social data grounding",
+      "Consumer conversational assistants",
+      "Truth-seeking research and fact-checking tools",
     ],
     relatedLearning: ["Real-Time Data Grounding for LLMs", "Understanding Large-Scale GPU Training", "AI Truthfulness & Bias"],
     relatedCompanies: ["perplexity", "openai", "deepseek"],
@@ -1138,6 +1448,38 @@ const COMPANY_DATABASE: Record<string, CompanyDetail> = {
       { label: "Developer APIs", value: 25 },
       { label: "Research", value: 30 },
     ],
+    industry: "Open-Source Frontier Models",
+    trendScore: 91,
+    popularityScore: 70,
+    innovationScore: 89,
+    githubActivity: { level: "Very High", detail: "Publishes open weights and full training methodology for every major model release." },
+    recentLaunches: ["DeepSeek V4 matching frontier coding benchmarks", "Open-sourced reinforcement-learning reasoning recipe", "Growing enterprise self-hosting adoption"],
+    workforce: [
+      { label: "Software Engineering", value: 30 },
+      { label: "Machine Learning", value: 32 },
+      { label: "Research", value: 20 },
+      { label: "Sales", value: 3 },
+      { label: "Product Management", value: 4 },
+      { label: "Marketing", value: 2 },
+      { label: "Operations", value: 6 },
+      { label: "Customer Success", value: 1 },
+      { label: "Leadership", value: 2 },
+    ],
+    strengths: [
+      "Exceptional cost-per-capability training efficiency",
+      "Fully open-weights release model",
+      "Favorite among researchers and cost-conscious enterprises",
+    ],
+    weaknesses: [
+      "Geopolitical scrutiny around data handling and export controls",
+      "Smaller team and compute base than top US labs",
+      "Limited enterprise support infrastructure outside self-hosting",
+    ],
+    recommendedUseCases: [
+      "Cost-efficient self-hosted frontier-adjacent models",
+      "Research on efficient training methods",
+      "Open reasoning and coding model deployments",
+    ],
     relatedLearning: ["Efficient Training Techniques", "Reinforcement Learning for Reasoning Models", "Open Weights vs Closed Models"],
     relatedCompanies: ["hugging-face", "mistral", "meta-ai"],
   },
@@ -1195,6 +1537,7 @@ const COMPANY_DATABASE: Record<string, CompanyDetail> = {
     timeline: [
       { date: "2019", event: "Founded by a former Google Brain researcher and co-authors of the Transformer paper." },
       { date: "2023", event: "Command model family launches, targeting enterprise retrieval use cases." },
+      { date: "2023", event: "Raises a $500M Series D round led by strategic enterprise investors including Nvidia and Salesforce Ventures." },
       { date: "2024", event: "Cohere North agent platform launches for enterprise workflow automation." },
       { date: "2026", event: "Command R3 ships with improved retrieval accuracy for regulated industries." },
     ],
@@ -1233,6 +1576,38 @@ const COMPANY_DATABASE: Record<string, CompanyDetail> = {
       { label: "Consumer AI", value: 2 },
       { label: "Developer APIs", value: 20 },
       { label: "Research", value: 8 },
+    ],
+    industry: "Enterprise NLP & Retrieval",
+    trendScore: 60,
+    popularityScore: 52,
+    innovationScore: 62,
+    githubActivity: { level: "Moderate", detail: "Maintains open tooling around embeddings and reranking; core Command models are closed." },
+    recentLaunches: ["Command R3 retrieval accuracy improvements", "New air-gapped private-cloud deployment for financial services"],
+    workforce: [
+      { label: "Software Engineering", value: 30 },
+      { label: "Machine Learning", value: 22 },
+      { label: "Research", value: 14 },
+      { label: "Sales", value: 12 },
+      { label: "Product Management", value: 7 },
+      { label: "Marketing", value: 5 },
+      { label: "Operations", value: 6 },
+      { label: "Customer Success", value: 3 },
+      { label: "Leadership", value: 1 },
+    ],
+    strengths: [
+      "Deep enterprise security and deployment credentials",
+      "Deployment flexibility across any cloud, including air-gapped",
+      "Narrow, technically defensible enterprise niche",
+    ],
+    weaknesses: [
+      "Lacks consumer brand recognition",
+      "Smaller compute scale than frontier labs",
+      "Narrower model lineup limits reach beyond retrieval use cases",
+    ],
+    recommendedUseCases: [
+      "Regulated-industry document search and retrieval",
+      "Private or air-gapped enterprise deployments",
+      "Multilingual enterprise search",
     ],
     relatedLearning: ["Retrieval-Augmented Generation for Enterprise", "Embeddings & Reranking Explained", "AI Data Residency Basics"],
     relatedCompanies: ["mistral", "hugging-face", "microsoft-ai"],
@@ -1299,6 +1674,7 @@ const COMPANY_DATABASE: Record<string, CompanyDetail> = {
       { date: "2016", event: "Founded initially as a consumer chatbot app before pivoting to open ML tooling." },
       { date: "2018", event: "Transformers library launches, becoming the standard for NLP model access." },
       { date: "2022", event: "Model Hub crosses 100,000 public models amid the open-source LLM boom." },
+      { date: "2023", event: "Raises a $235M Series D round valuing Hugging Face at $4.5B." },
       { date: "2026", event: "Model Hub surpasses 2 million public models and datasets." },
     ],
     competitors: ["meta-ai", "mistral", "deepseek"],
@@ -1336,6 +1712,38 @@ const COMPANY_DATABASE: Record<string, CompanyDetail> = {
       { label: "Consumer AI", value: 5 },
       { label: "Developer APIs", value: 55 },
       { label: "Research", value: 15 },
+    ],
+    industry: "Open-Source AI Infrastructure",
+    trendScore: 78,
+    popularityScore: 74,
+    innovationScore: 72,
+    githubActivity: { level: "Very High", detail: "Maintains Transformers, the Model Hub, and thousands of community-contributed repos." },
+    recentLaunches: ["Inference Endpoints 2.0 for faster open-model deployment", "Model Hub surpassing 2 million public models and datasets", "New standardized open-model evaluation leaderboard"],
+    workforce: [
+      { label: "Software Engineering", value: 34 },
+      { label: "Machine Learning", value: 20 },
+      { label: "Research", value: 14 },
+      { label: "Sales", value: 5 },
+      { label: "Product Management", value: 8 },
+      { label: "Marketing", value: 5 },
+      { label: "Operations", value: 8 },
+      { label: "Customer Success", value: 4 },
+      { label: "Leadership", value: 2 },
+    ],
+    strengths: [
+      "Unmatched community trust and neutral positioning",
+      "Largest open model and dataset catalog in the industry",
+      "Structurally aligned with the entire open-source ecosystem's success",
+    ],
+    weaknesses: [
+      "Smaller direct revenue base than labs owning frontier proprietary models",
+      "No frontier closed model of its own",
+      "Exposed if major labs build competing first-party hosting hubs",
+    ],
+    recommendedUseCases: [
+      "Open model discovery and deployment",
+      "Community fine-tuning and dataset hosting",
+      "Benchmarking and comparing open models",
     ],
     relatedLearning: ["Open Source ML Tooling", "Deploying Models with Inference Endpoints", "Benchmarking Open Models"],
     relatedCompanies: ["deepseek", "meta-ai", "mistral"],
@@ -1466,6 +1874,9 @@ export default function CompanyDetailPage() {
             <div>
               <h1 className="text-3xl md:text-4xl font-display font-extrabold text-white">{company.name}</h1>
               <p className="text-sm text-textSecondary mt-1.5 max-w-md">{company.tagline}</p>
+              <span className="inline-block mt-2.5 text-[10px] font-extrabold text-tealAccent bg-tealAccent/10 border border-tealAccent/20 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                {company.industry}
+              </span>
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2.5 text-[11px] text-zinc-500 font-semibold">
                 <span>{company.location}</span>
                 <span>Founded {company.founded}</span>
@@ -1508,6 +1919,31 @@ export default function CompanyDetailPage() {
           <div className="bg-panel border border-white/[0.05] rounded-2xl p-5 text-center">
             <p className="text-2xl font-display font-extrabold text-white">{company.quickStats.employees}</p>
             <p className="text-[10px] text-textSecondary uppercase tracking-wider font-bold mt-1">Employees</p>
+          </div>
+        </div>
+
+        {/* Intelligence Metrics */}
+        <div data-animate>
+          <h3 className="text-xs font-bold uppercase tracking-widest text-[#9AA8BD] mb-3">Intelligence Metrics</h3>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            {[
+              { label: "AI Score", value: company.momentumScore, color: "text-goldAccent" },
+              { label: "Trend Score", value: company.trendScore, color: "text-tealAccent" },
+              { label: "Popularity Score", value: company.popularityScore, color: "text-accent" },
+              {
+                label: "Enterprise Adoption",
+                value: company.health.find((m) => m.label === "Enterprise Adoption")?.value ?? 0,
+                color: "text-positive",
+              },
+              { label: "Innovation Score", value: company.innovationScore, color: "text-white" },
+            ].map((metric) => (
+              <div key={metric.label} className="bg-panel border border-white/[0.05] rounded-2xl p-5 text-center">
+                <p className={`text-2xl font-display font-extrabold ${metric.color}`}>
+                  <AnimatedNumber value={metric.value} />
+                </p>
+                <p className="text-[10px] text-textSecondary uppercase tracking-wider font-bold mt-1">{metric.label}</p>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -1639,6 +2075,33 @@ export default function CompanyDetailPage() {
               </div>
             </div>
 
+            {/* Company Activity */}
+            <div data-animate className="bg-panel border border-white/[0.05] p-6 rounded-3xl">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-[#9AA8BD] mb-4">Company Activity</h3>
+              <div className="flex flex-col gap-4">
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[11px] font-semibold text-zinc-400">GitHub Activity</span>
+                    <span className="text-[10px] font-extrabold text-tealAccent bg-tealAccent/10 border border-tealAccent/20 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                      {company.githubActivity.level}
+                    </span>
+                  </div>
+                  <p className="text-xs text-textSecondary leading-relaxed">{company.githubActivity.detail}</p>
+                </div>
+                <div>
+                  <span className="text-[11px] font-semibold text-zinc-400 block mb-2">Recent Product Launches</span>
+                  <ul className="flex flex-col gap-1.5">
+                    {company.recentLaunches.map((launch, idx) => (
+                      <li key={idx} className="text-xs text-textSecondary leading-relaxed flex gap-2">
+                        <span className="text-accent shrink-0">&bull;</span>
+                        <span>{launch}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+
             {/* Competitors */}
             <div data-animate className="bg-panel border border-white/[0.05] p-6 rounded-3xl">
               <h3 className="text-xs font-bold uppercase tracking-widest text-[#9AA8BD] mb-4">Competitors</h3>
@@ -1709,6 +2172,26 @@ export default function CompanyDetailPage() {
               </div>
             </div>
 
+            {/* Workforce Insights */}
+            <div data-animate className="bg-panel border border-white/[0.05] p-6 rounded-3xl">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-[#9AA8BD] mb-1">Workforce Insights</h3>
+              <p className="text-[11px] text-textSecondary mb-4">
+                Directional, estimated departmental split. No verified LinkedIn or HR data exists for this mock dataset;
+                treat these as illustrative signals only, not precise real figures.
+              </p>
+              <div className="flex flex-col gap-3.5">
+                {company.workforce.map((d) => (
+                  <div key={d.label}>
+                    <div className="flex justify-between text-[11px] font-semibold mb-1">
+                      <span className="text-zinc-400">{d.label}</span>
+                      <span className="text-white">~{d.value}%</span>
+                    </div>
+                    <MeterBar value={d.value} colorClass="bg-accent" />
+                  </div>
+                ))}
+              </div>
+            </div>
+
             {/* Related Learning */}
             <div data-animate className="bg-panel border border-white/[0.05] p-6 rounded-3xl">
               <h3 className="text-xs font-bold uppercase tracking-widest text-[#9AA8BD] mb-4">Related Learning</h3>
@@ -1748,6 +2231,68 @@ export default function CompanyDetailPage() {
 
           </div>
 
+        </div>
+
+        {/* Strategic Analysis */}
+        <div data-animate className="bg-panel border border-white/[0.05] p-6 rounded-3xl">
+          <h3 className="text-xs font-bold uppercase tracking-widest text-[#9AA8BD] mb-1">Strategic Analysis</h3>
+          <p className="text-[11px] text-textSecondary mb-5">
+            Novique&apos;s independent read on {company.name}&apos;s competitive position.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div>
+              <span className="text-[10px] font-extrabold text-positive uppercase tracking-wider block mb-2.5">Strengths</span>
+              <ul className="flex flex-col gap-2">
+                {company.strengths.map((s, idx) => (
+                  <li key={idx} className="text-xs text-textSecondary leading-relaxed flex gap-2">
+                    <span className="text-positive shrink-0">&bull;</span>
+                    <span>{s}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <span className="text-[10px] font-extrabold text-negative uppercase tracking-wider block mb-2.5">Weaknesses</span>
+              <ul className="flex flex-col gap-2">
+                {company.weaknesses.map((w, idx) => (
+                  <li key={idx} className="text-xs text-textSecondary leading-relaxed flex gap-2">
+                    <span className="text-negative shrink-0">&bull;</span>
+                    <span>{w}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <span className="text-[10px] font-extrabold text-tealAccent uppercase tracking-wider block mb-2.5">Recommended Use Cases</span>
+              <ul className="flex flex-col gap-2">
+                {company.recommendedUseCases.map((u, idx) => (
+                  <li key={idx} className="text-xs text-textSecondary leading-relaxed flex gap-2">
+                    <span className="text-tealAccent shrink-0">&bull;</span>
+                    <span>{u}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <span className="text-[10px] font-extrabold text-goldAccent uppercase tracking-wider block mb-2.5">Alternatives / Competitors</span>
+              <div className="flex flex-col gap-2">
+                {company.competitors.map((slug) => {
+                  const comp = COMPANY_DATABASE[slug];
+                  if (!comp) return null;
+                  return (
+                    <Link
+                      key={slug}
+                      href={`/companies/${slug}`}
+                      className="text-xs font-semibold p-2 rounded-xl border border-white/[0.06] hover:border-goldAccent bg-white/[0.02] transition-all flex items-center justify-between"
+                    >
+                      <span>{comp.name}</span>
+                      <span className="text-[9px] text-[#9AA8BD]">&rarr;</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
         </div>
       </main>
     </div>

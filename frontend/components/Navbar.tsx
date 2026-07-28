@@ -25,6 +25,11 @@ const SEARCH_CATALOG: SuggestionItem[] = [
   { title: "Mistral", category: "company", route: "/companies/mistral" },
   { title: "Cursor", category: "company", route: "/companies/cursor" },
   { title: "Perplexity", category: "company", route: "/companies/perplexity" },
+  { title: "Microsoft AI", category: "company", route: "/companies/microsoft-ai" },
+  { title: "xAI", category: "company", route: "/companies/xai" },
+  { title: "DeepSeek", category: "company", route: "/companies/deepseek" },
+  { title: "Cohere", category: "company", route: "/companies/cohere" },
+  { title: "Hugging Face", category: "company", route: "/companies/hugging-face" },
   // Models
   { title: "Claude 3.5 Sonnet", category: "model", route: "/models/claude-3-5-sonnet" },
   { title: "GPT-4o", category: "model", route: "/models/gpt-4o" },
@@ -369,7 +374,7 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
               )
             )}
 
-            {/* Hamburger — visible below xl */}
+            {/* Hamburger - visible below xl */}
             <button
               aria-label="Toggle navigation menu"
               onClick={() => setMobileOpen((v) => !v)}

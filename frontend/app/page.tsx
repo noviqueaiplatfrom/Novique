@@ -9,20 +9,10 @@ import { ArticleCard } from "@/components/ArticleCard";
 import { Navbar } from "@/components/Navbar";
 import { useAuth } from "./auth-context";
 
-function getGreeting() {
-  const hour = new Date().getHours();
-  if (hour < 12) return "Good Morning";
-  if (hour < 17) return "Good Afternoon";
-  if (hour < 21) return "Good Evening";
-  return "Good Night";
-}
-
 export default function Home() {
   const { token } = useAuth();
   const qc = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
-  const [greeting, setGreeting] = useState("Welcome");
-  useEffect(() => { setGreeting(getGreeting()); }, []);
   const [sort, setSort] = useState<"impact" | "trend" | "recent">("recent");
   const [kind, setKind] = useState<"all" | "news" | "paper">("all");
 
@@ -83,7 +73,7 @@ export default function Home() {
     return () => obs.disconnect();
   }, []);
 
-  // Fetch Signals — auto-refresh every 60 seconds
+  // Fetch Signals - auto-refresh every 60 seconds
   const { data, isLoading, isError } = useQuery({
     queryKey: ["feed", "discover", sort, kind, !!token],
     queryFn: () => fetchFeed(sort, kind),
@@ -171,13 +161,12 @@ export default function Home() {
               The AI Intelligence Platform
             </span>
             <h1 className="text-4xl md:text-5xl lg:text-6.5xl font-display font-extrabold text-white mb-4 leading-[1.1] tracking-tight">
-              {greeting} 👋
+              One Platform. Every Important AI Decision.
             </h1>
-            <p className="text-lg md:text-xl text-[#9AA8BD] font-light mb-4">
-              Know what matters. Choose what's best. Stay ahead.
-            </p>
-            <p className="text-sm text-[#9AA8BD] font-normal leading-relaxed mb-8 max-w-md">
-              The fastest way for engineers, founders, investors, and AI professionals to understand what happened, why it matters, and what action to take next.
+            <p className="text-sm md:text-base text-[#9AA8BD] font-normal leading-relaxed mb-8 max-w-lg">
+              Noviqe combines AI news, research, models, companies, funding, benchmarks, open-source projects, and industry intelligence into one intelligent platform.
+              <br /><br />
+              Instead of reading hundreds of updates every day, Noviqe tells you what matters, why it matters, and what you should do next.
             </p>
 
             <div className="flex flex-wrap items-center gap-4">
@@ -187,12 +176,12 @@ export default function Home() {
               >
                 Explore Intelligence
               </Link>
-              <Link
-                href="/profile"
+              <a
+                href="#todays-brief"
                 className="px-6 py-3 rounded-xl font-bold border border-white/[0.08] bg-white/[0.02] text-[#9AA8BD] hover:text-white hover:bg-white/[0.05] transition-all"
               >
-                Personalize My Feed
-              </Link>
+                Today's AI Brief
+              </a>
             </div>
           </div>
 
@@ -224,10 +213,144 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 2. TODAY'S AI SNAPSHOT */}
-        <div ref={snapshotRef} className="flex flex-col gap-6">
+        {/* 1b. TRUSTED BY SECTION */}
+        <section className="flex flex-col gap-8">
+          <div data-animate className="text-center max-w-2xl mx-auto">
+            <h2 className="text-2xl md:text-3xl font-display font-extrabold text-white tracking-tight mb-2">
+              Trusted by AI Professionals Worldwide
+            </h2>
+            <p className="text-sm text-[#9AA8BD] font-normal">
+              Built for everyone making decisions in Artificial Intelligence.
+            </p>
+          </div>
+
+          <div data-animate className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+            {[
+              { icon: "🛠️", label: "Engineers" },
+              { icon: "🔬", label: "Researchers" },
+              { icon: "🚀", label: "Founders" },
+              { icon: "💰", label: "Investors" },
+              { icon: "📦", label: "Product Teams" },
+              { icon: "🎓", label: "Students" },
+            ].map((role) => (
+              <div
+                key={role.label}
+                className="bg-[#101B2D] border border-white/[0.05] rounded-2xl py-4 px-3 flex flex-col items-center gap-1.5 text-center hover:border-[#6C63FF]/30 hover:-translate-y-0.5 transition-all"
+              >
+                <span className="text-xl">{role.icon}</span>
+                <span className="text-xs font-bold text-[#F7F9FC]">{role.label}</span>
+              </div>
+            ))}
+          </div>
+
+          <div data-animate className="grid grid-cols-2 md:grid-cols-5 gap-4 pt-2">
+            {[
+              { value: "50,000+", label: "AI Updates Analyzed" },
+              { value: "400+", label: "Companies Tracked" },
+              { value: "180+", label: "Models Monitored" },
+              { value: "15+", label: "AI Sources Connected" },
+              { value: "24/7", label: "Live Intelligence" },
+            ].map((stat) => (
+              <div key={stat.label} className="text-center">
+                <span className="block text-2xl md:text-3xl font-display font-black text-white tabular-nums">
+                  {stat.value}
+                </span>
+                <span className="text-[10px] font-bold text-[#9AA8BD] uppercase tracking-wider mt-1 block">
+                  {stat.label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* 1c. WHAT IS NOVIQE */}
+        <section className="flex flex-col gap-8">
+          <div data-animate className="max-w-2xl">
+            <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#6C63FF] mb-3 bg-[#6C63FF]/10 px-3.5 py-1 rounded-full w-max block">
+              What is Noviqe?
+            </span>
+            <h2 className="text-2xl md:text-3xl font-display font-extrabold text-white tracking-tight mb-4">
+              An AI Intelligence Platform, not a news feed.
+            </h2>
+            <p className="text-sm md:text-base text-[#9AA8BD] leading-relaxed">
+              Instead of simply collecting AI news, Noviqe connects companies, AI models, research papers, funding activity, hiring trends, open-source projects, benchmarks, and market signals into one intelligent ecosystem.
+              <br /><br />
+              Every update is summarized, scored, connected, and explained so you can understand not only what happened, but why it matters and what comes next.
+            </p>
+          </div>
+
+          <div data-animate className="flex flex-wrap items-center justify-center gap-3">
+            {["AI News", "Research", "Companies", "Models", "Funding", "Benchmarks", "GitHub"].map((node, idx, arr) => (
+              <div key={node} className="flex items-center gap-3">
+                <span className="px-4 py-2.5 rounded-xl bg-[#17253A] border border-white/[0.05] text-xs font-bold text-zinc-200">
+                  {node}
+                </span>
+                {idx < arr.length - 1 && <span className="text-zinc-600 text-sm">&rarr;</span>}
+              </div>
+            ))}
+          </div>
+          <div data-animate className="flex justify-center">
+            <span className="text-zinc-600 text-lg">&darr;</span>
+          </div>
+          <div data-animate className="flex justify-center">
+            <span className="px-6 py-3 rounded-2xl bg-gradient-to-r from-[#6C63FF]/20 via-[#16C79A]/20 to-[#F6C453]/20 border border-white/[0.08] text-sm font-extrabold text-white tracking-tight">
+              One Intelligence Platform
+            </span>
+          </div>
+        </section>
+
+        {/* 1d. WHY NOVIQE */}
+        <section className="flex flex-col gap-8">
+          <div data-animate className="max-w-2xl">
+            <h2 className="text-2xl md:text-3xl font-display font-extrabold text-white tracking-tight mb-2">
+              Why Noviqe?
+            </h2>
+            <p className="text-sm text-[#9AA8BD]">
+              Most AI sources give you information. Noviqe gives you intelligence.
+            </p>
+          </div>
+
+          <div data-animate className="overflow-x-auto rounded-3xl border border-white/[0.05]">
+            <table className="w-full text-left border-collapse min-w-[560px]">
+              <thead>
+                <tr className="bg-[#101B2D]">
+                  <th className="text-[10px] font-bold uppercase tracking-wider text-[#9AA8BD] py-4 px-5">Capability</th>
+                  <th className="text-[10px] font-bold uppercase tracking-wider text-white py-4 px-5 bg-[#6C63FF]/10">Noviqe</th>
+                  <th className="text-[10px] font-bold uppercase tracking-wider text-[#9AA8BD] py-4 px-5">News Aggregators</th>
+                  <th className="text-[10px] font-bold uppercase tracking-wider text-[#9AA8BD] py-4 px-5">Newsletters &amp; Blogs</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { row: "Connects news, research, models, companies & funding", noviqe: true, agg: false, news: false },
+                  { row: "Explains why it matters & what to do next", noviqe: true, agg: false, news: true },
+                  { row: "Company & model intelligence scoring", noviqe: true, agg: false, news: false },
+                  { row: "Live, continuously updated", noviqe: true, agg: true, news: false },
+                  { row: "Practical learning & skill building", noviqe: true, agg: false, news: false },
+                  { row: "Investment & opportunity signals", noviqe: true, agg: false, news: false },
+                ].map((r) => (
+                  <tr key={r.row} className="border-t border-white/[0.05]">
+                    <td className="text-xs md:text-sm text-zinc-200 py-4 px-5 font-medium">{r.row}</td>
+                    <td className="py-4 px-5 bg-[#6C63FF]/5 text-center">
+                      {r.noviqe ? <span className="text-[#16C79A] font-bold">&#10003;</span> : <span className="text-zinc-600">-</span>}
+                    </td>
+                    <td className="py-4 px-5 text-center">
+                      {r.agg ? <span className="text-[#16C79A] font-bold">&#10003;</span> : <span className="text-zinc-600">-</span>}
+                    </td>
+                    <td className="py-4 px-5 text-center">
+                      {r.news ? <span className="text-[#16C79A] font-bold">&#10003;</span> : <span className="text-zinc-600">-</span>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* 2. TODAY'S AI BRIEF */}
+        <div id="todays-brief" ref={snapshotRef} className="flex flex-col gap-6 scroll-mt-24">
           <div data-animate className="flex items-center justify-between">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-[#9AA8BD]">Today's AI Snapshot</h3>
+            <h3 className="text-xs font-bold uppercase tracking-widest text-[#9AA8BD]">Today's AI Brief</h3>
             <div className="h-[1px] bg-white/[0.06] flex-1 ml-4"></div>
           </div>
 
@@ -464,7 +587,7 @@ export default function Home() {
         {/* 5. MARKET MOMENTUM (Auto-scrolling ticker) */}
         <section className="flex flex-col gap-4">
           <div data-animate className="flex items-center justify-between">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-[#9AA8BD]">Market Momentum</h3>
+            <h3 className="text-xs font-bold uppercase tracking-widest text-[#9AA8BD]">Trending Intelligence</h3>
             <div className="h-[1px] bg-white/[0.06] flex-1 ml-4"></div>
           </div>
 
@@ -519,7 +642,7 @@ export default function Home() {
         <section className="flex flex-col gap-6">
           <div data-animate className="flex items-center justify-between pb-3 border-b border-white/[0.05]">
             <div>
-              <h2 className="text-2xl font-bold tracking-tight text-white font-plus-jakarta">Company Watchlist</h2>
+              <h2 className="text-2xl font-bold tracking-tight text-white font-plus-jakarta">Trending Companies</h2>
               <p className="text-xs text-textSecondary mt-0.5">Top six firms tracking momentum indices</p>
             </div>
             <Link href="/companies" className="text-xs font-semibold text-[#6C63FF] hover:text-[#5a54e5] flex items-center gap-1.5">
@@ -563,7 +686,7 @@ export default function Home() {
         <section className="flex flex-col gap-6">
           <div data-animate className="flex items-center justify-between pb-3 border-b border-white/[0.05]">
             <div>
-              <h2 className="text-2xl font-bold tracking-tight text-white font-plus-jakarta">🤖 Featured Models</h2>
+              <h2 className="text-2xl font-bold tracking-tight text-white font-plus-jakarta">🤖 Trending Models</h2>
               <p className="text-xs text-textSecondary mt-0.5">The models everyone's building with right now</p>
             </div>
             <Link href="/models" className="text-xs font-semibold text-[#6C63FF] hover:text-[#5a54e5] flex items-center gap-1.5">
@@ -598,7 +721,7 @@ export default function Home() {
         <section className="flex flex-col gap-6">
           <div data-animate className="flex items-center justify-between pb-3 border-b border-white/[0.05]">
             <div>
-              <h2 className="text-2xl font-bold tracking-tight text-white font-plus-jakarta">Research Intelligence</h2>
+              <h2 className="text-2xl font-bold tracking-tight text-white font-plus-jakarta">Research Highlights</h2>
               <p className="text-xs text-textSecondary mt-0.5">Top three academic paper reviews</p>
             </div>
             <Link href="/research" className="text-xs font-semibold text-[#6C63FF] hover:text-[#5a54e5] flex items-center gap-1.5">
@@ -659,7 +782,7 @@ export default function Home() {
         <section className="flex flex-col gap-6">
           <div data-animate className="flex items-center justify-between pb-3 border-b border-white/[0.05]">
             <div>
-              <h2 className="text-2xl font-bold tracking-tight text-white font-plus-jakarta">Learn What's Next</h2>
+              <h2 className="text-2xl font-bold tracking-tight text-white font-plus-jakarta">Learning Spotlight</h2>
               <p className="text-xs text-textSecondary mt-0.5 font-normal">Modular guides for active technical concepts</p>
             </div>
             <Link href="/learning" className="text-xs font-semibold text-[#6C63FF] hover:text-[#5a54e5] flex items-center gap-1.5">
@@ -755,11 +878,13 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 9b. WEEKLY AI TIMELINE */}
+        {/* 9b. AI ECOSYSTEM PREVIEW */}
         <section className="flex flex-col gap-6">
-          <div data-animate className="flex items-center justify-between">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-[#9AA8BD]">Weekly AI Timeline</h3>
-            <div className="h-[1px] bg-white/[0.06] flex-1 ml-4"></div>
+          <div data-animate className="flex items-center justify-between pb-3 border-b border-white/[0.05]">
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight text-white font-plus-jakarta">AI Ecosystem Preview</h2>
+              <p className="text-xs text-textSecondary mt-0.5 font-normal">This week's timeline and the full synthesis report</p>
+            </div>
           </div>
 
           <div data-animate className="flex flex-col md:flex-row items-stretch gap-3">
@@ -781,24 +906,23 @@ export default function Home() {
               </div>
             ))}
           </div>
-        </section>
 
-        {/* 10. WEEKLY INTELLIGENCE REPORT (Gold Highlighted) */}
-        <section data-animate className="bg-[#17253A] border-2 border-[#F6C453]/30 rounded-3xl p-7 md:p-8 flex flex-col md:flex-row justify-between items-center gap-8 shadow-xl">
-          <div className="flex-1">
-            <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#F6C453] block mb-2">Weekly Synthesis</span>
-            <h3 className="text-2xl font-display font-extrabold text-white mb-2">Weekly Intelligence Report</h3>
-            <p className="text-xs text-[#9AA8BD] max-w-xl leading-relaxed">
-              Consolidated executive intelligence report on rising stars, breakthroughs, and enterprise shifts across the entire AI landscape. Download the full PDF synthesis.
-            </p>
+          <div data-animate className="bg-[#17253A] border-2 border-[#F6C453]/30 rounded-3xl p-7 md:p-8 flex flex-col md:flex-row justify-between items-center gap-8 shadow-xl">
+            <div className="flex-1">
+              <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#F6C453] block mb-2">Weekly Synthesis</span>
+              <h3 className="text-2xl font-display font-extrabold text-white mb-2">Weekly Intelligence Report</h3>
+              <p className="text-xs text-[#9AA8BD] max-w-xl leading-relaxed">
+                Consolidated executive intelligence report on rising stars, breakthroughs, and enterprise shifts across the entire AI landscape. Download the full PDF synthesis.
+              </p>
+            </div>
+
+            <Link
+              href="/weekly-reports/july-week-1-2026"
+              className="py-3 px-6 bg-[#F6C453] hover:bg-[#e0b23f] text-black rounded-xl text-xs font-bold transition-all shrink-0 shadow-lg shadow-[#F6C453]/10"
+            >
+              Read This Week's Report
+            </Link>
           </div>
-
-          <Link
-            href="/weekly-reports/july-week-1-2026"
-            className="py-3 px-6 bg-[#F6C453] hover:bg-[#e0b23f] text-black rounded-xl text-xs font-bold transition-all shrink-0 shadow-lg shadow-[#F6C453]/10"
-          >
-            Read This Week's Report
-          </Link>
         </section>
 
       </main>
