@@ -1,7 +1,8 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { fetchFeed } from "@/lib/api";
 import * as authApi from "@/lib/auth";
 import type { Kind, Sort } from "@/lib/types";
@@ -182,12 +183,21 @@ function StarRow({ filled }: { filled: number }) {
 }
 
 export default function IntelligencePage() {
+  return (
+    <Suspense fallback={null}>
+      <IntelligencePageInner />
+    </Suspense>
+  );
+}
+
+function IntelligencePageInner() {
   const { token } = useAuth();
   const qc = useQueryClient();
+  const searchParams = useSearchParams();
   const [sort, setSort] = useState<Sort>("impact");
   const [kind, setKind] = useState<Kind>("all");
   const [mode, setMode] = useState<Mode>("discover");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(() => searchParams.get("q") ?? "");
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [selectedQuickFilters, setSelectedQuickFilters] = useState<string[]>([]);
   const [activeBreaking, setActiveBreaking] = useState<string | null>(null);

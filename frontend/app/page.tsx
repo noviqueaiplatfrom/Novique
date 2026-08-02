@@ -62,6 +62,46 @@ export default function Home() {
     return [majorUpdates, modelLaunches, breakthroughs, fundingRounds, osLaunches, momentumIndex];
   })();
 
+  // Trending Intelligence ticker: real topic frequency + momentum from the live feed batch
+  const TOPIC_ICONS: Record<string, string> = {
+    "ai agents": "🤖", agents: "🤖", agentic: "🤖",
+    mcp: "⚡", "model context protocol": "⚡",
+    coding: "💻", "coding models": "💻", code: "💻",
+    voice: "🎙", "voice ai": "🎙", audio: "🎙",
+    robotics: "🦾", robot: "🦾",
+    reasoning: "🧠", "reasoning models": "🧠",
+    enterprise: "🏢", "enterprise ai": "🏢",
+    infrastructure: "🌐", "ai infrastructure": "🌐", compute: "🌐",
+    research: "🔬", "ai research": "🔬",
+    funding: "💰", llms: "🧩", "open source": "📦", safety: "🛡️",
+  };
+  const trendingTopics = (() => {
+    const counts = new Map<string, { label: string; count: number; totalTrend: number }>();
+    (data ?? []).forEach((a) => {
+      (a.topics ?? []).forEach((raw) => {
+        const label = raw.trim();
+        if (!label) return;
+        const key = label.toLowerCase();
+        const existing = counts.get(key);
+        if (existing) {
+          existing.count += 1;
+          existing.totalTrend += a.trend_score;
+        } else {
+          counts.set(key, { label, count: 1, totalTrend: a.trend_score });
+        }
+      });
+    });
+    return Array.from(counts.entries())
+      .sort((a, b) => b[1].count - a[1].count)
+      .slice(0, 9)
+      .map(([key, v]) => ({
+        icon: TOPIC_ICONS[key] ?? "📊",
+        label: v.label,
+        count: v.count,
+        avgTrend: Math.round(v.totalTrend / v.count),
+      }));
+  })();
+
   // Animated snapshot counters
   const [snapCounts, setSnapCounts] = useState([0, 0, 0, 0, 0, 0]);
   const [snapshotVisible, setSnapshotVisible] = useState(false);
@@ -660,45 +700,29 @@ export default function Home() {
             <div className="pointer-events-none absolute left-0 top-0 h-full w-16 bg-gradient-to-r from-[#07111F] to-transparent z-10" />
             <div className="pointer-events-none absolute right-0 top-0 h-full w-16 bg-gradient-to-l from-[#07111F] to-transparent z-10" />
 
-            {/* Duplicate the list so the loop is seamless */}
-            <div className="flex items-center gap-2.5 animate-ticker w-max">
-              {[
-                { icon: "🤖", label: "AI Agents",        trend: "+14.2%" },
-                { icon: "⚡", label: "MCP",              trend: "+32.6%", highlight: true },
-                { icon: "💻", label: "Coding Models",    trend: "+8.4%"  },
-                { icon: "🎙", label: "Voice AI",         trend: "+5.9%"  },
-                { icon: "🦾", label: "Robotics",         trend: "+18.7%" },
-                { icon: "🧠", label: "Reasoning Models", trend: "+24.1%" },
-                { icon: "🏢", label: "Enterprise AI",    trend: "+9.3%"  },
-                { icon: "🌐", label: "AI Infrastructure",trend: "+11.8%" },
-                { icon: "🔬", label: "AI Research",      trend: "+6.2%"  },
-                // duplicate for seamless loop
-                { icon: "🤖", label: "AI Agents",        trend: "+14.2%" },
-                { icon: "⚡", label: "MCP",              trend: "+32.6%", highlight: true },
-                { icon: "💻", label: "Coding Models",    trend: "+8.4%"  },
-                { icon: "🎙", label: "Voice AI",         trend: "+5.9%"  },
-                { icon: "🦾", label: "Robotics",         trend: "+18.7%" },
-                { icon: "🧠", label: "Reasoning Models", trend: "+24.1%" },
-                { icon: "🏢", label: "Enterprise AI",    trend: "+9.3%"  },
-                { icon: "🌐", label: "AI Infrastructure",trend: "+11.8%" },
-                { icon: "🔬", label: "AI Research",      trend: "+6.2%"  },
-              ].map((topic, i) => (
-                <button
-                  key={i}
-                  onClick={() => setSearchQuery(topic.label)}
-                  className={`flex items-center gap-2 px-5 py-2.5 rounded-full border text-xs font-bold transition-all shrink-0 hover:scale-[1.03] ${
-                    (topic as any).highlight
-                      ? "bg-[#6C63FF]/10 border-[#6C63FF]/30 text-[#C084FC]"
-                      : "bg-[#17253A] border-white/[0.05] text-zinc-300 hover:border-zinc-700 hover:text-white"
-                  }`}
-                >
-                  <span>{topic.icon} {topic.label}</span>
-                  <span className={`text-[10px] font-semibold ${(topic as any).highlight ? "text-[#C084FC]" : "text-zinc-500"}`}>
-                    {topic.trend}
-                  </span>
-                </button>
-              ))}
-            </div>
+            {trendingTopics.length === 0 ? (
+              <p className="text-xs text-zinc-500 py-2.5">No trending topics in the current feed yet.</p>
+            ) : (
+              /* Duplicate the list so the loop is seamless */
+              <div className="flex items-center gap-2.5 animate-ticker w-max">
+                {[...trendingTopics, ...trendingTopics].map((topic, i) => (
+                  <Link
+                    key={i}
+                    href={`/intelligence?q=${encodeURIComponent(topic.label)}`}
+                    className={`relative z-20 flex items-center gap-2 px-5 py-2.5 rounded-full border text-xs font-bold transition-all shrink-0 hover:scale-[1.03] cursor-pointer ${
+                      i % trendingTopics.length === 0
+                        ? "bg-[#6C63FF]/10 border-[#6C63FF]/30 text-[#C084FC]"
+                        : "bg-[#17253A] border-white/[0.05] text-zinc-300 hover:border-zinc-700 hover:text-white"
+                    }`}
+                  >
+                    <span>{topic.icon} {topic.label}</span>
+                    <span className={`text-[10px] font-semibold ${i % trendingTopics.length === 0 ? "text-[#C084FC]" : "text-zinc-500"}`}>
+                      {topic.count} update{topic.count === 1 ? "" : "s"} &middot; {topic.avgTrend}% momentum
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 
