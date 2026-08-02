@@ -9,3 +9,15 @@ export async function fetchFeed(sort: Sort, kind: Kind): Promise<Article[]> {
   if (!res.ok) throw new Error(`Feed request failed: ${res.status}`);
   return res.json();
 }
+
+export interface Stats {
+  total_articles: number;
+  total_sources: number;
+  total_papers: number;
+}
+
+export async function fetchStats(): Promise<Stats> {
+  const res = await fetch(`${API_URL}/api/stats`);
+  if (!res.ok) throw new Error(`Stats request failed: ${res.status}`);
+  return res.json();
+}

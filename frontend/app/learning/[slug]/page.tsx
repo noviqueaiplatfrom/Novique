@@ -2407,8 +2407,8 @@ export default function LessonPage({ params }: { params: Promise<{ slug: string 
 
           <div className="border-t border-white/[0.05] pt-8 flex justify-between items-center">
             <Link href="/opportunities" className="text-xs font-semibold text-zinc-500 hover:text-zinc-300 transition-colors">View all opportunities</Link>
-            <Link href="/signals" className="inline-flex items-center gap-2 px-5 py-2.5 bg-accent hover:bg-accent/90 text-white rounded-xl text-xs font-bold transition-all">
-              Explore live signals
+            <Link href="/intelligence" className="inline-flex items-center gap-2 px-5 py-2.5 bg-accent hover:bg-accent/90 text-white rounded-xl text-xs font-bold transition-all">
+              Explore live intelligence
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" /></svg>
             </Link>
           </div>

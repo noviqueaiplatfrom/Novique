@@ -4,13 +4,13 @@ from __future__ import annotations
 from enum import Enum
 
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.ingestion.pipeline import run_pipeline
 from app.models import Article
-from app.schemas import ArticleOut, IngestResult
+from app.schemas import ArticleOut, IngestResult, StatsOut
 
 router = APIRouter(prefix="/api", tags=["feed"])
 
@@ -49,6 +49,19 @@ def get_feed(
         stmt = stmt.where(Article.kind == kind.value)
     rows = db.scalars(stmt.order_by(order).limit(limit)).all()
     return rows
+
+
+@router.get("/stats", response_model=StatsOut)
+def get_stats(db: Session = Depends(get_db)):
+    """Live corpus counters for homepage trust indicators."""
+    total_articles = db.scalar(select(func.count(Article.id))) or 0
+    total_sources = db.scalar(select(func.count(func.distinct(Article.source)))) or 0
+    total_papers = db.scalar(select(func.count(Article.id)).where(Article.kind == "paper")) or 0
+    return StatsOut(
+        total_articles=total_articles,
+        total_sources=total_sources,
+        total_papers=total_papers,
+    )
 
 
 @router.post("/ingest", response_model=IngestResult)

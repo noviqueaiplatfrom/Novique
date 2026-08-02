@@ -1906,7 +1906,7 @@ export default function CompanyDetailPage() {
         <div data-animate className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { label: "Models", value: company.quickStats.models },
-            { label: "Signals", value: company.quickStats.signals },
+            { label: "Intelligence", value: company.quickStats.signals },
             { label: "Research Papers", value: company.quickStats.papers },
           ].map((stat) => (
             <div key={stat.label} className="bg-panel border border-white/[0.05] rounded-2xl p-5 text-center">
@@ -1959,9 +1959,9 @@ export default function CompanyDetailPage() {
               <p className="text-sm text-textSecondary leading-relaxed font-normal">{company.overview}</p>
             </div>
 
-            {/* Latest Signals */}
+            {/* Latest Intelligence */}
             <div data-animate className="bg-panel border border-white/[0.05] p-6 rounded-3xl">
-              <h3 className="text-xs font-bold uppercase tracking-widest text-[#9AA8BD] mb-4">Latest Signals</h3>
+              <h3 className="text-xs font-bold uppercase tracking-widest text-[#9AA8BD] mb-4">Latest Intelligence</h3>
               <div className="flex flex-col gap-4">
                 {company.latestSignals.map((sig, idx) => (
                   <div key={idx} className="p-4 bg-white/[0.02] border border-white/[0.04] rounded-2xl flex flex-col gap-2">

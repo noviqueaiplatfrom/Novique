@@ -11,9 +11,9 @@ import Link from "next/link";
 export default function SavedPage() {
   const { token, user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState<"signals" | "research" | "companies" | "models">("signals");
+  const [activeTab, setActiveTab] = useState<"intelligence" | "research" | "companies" | "models">("intelligence");
 
-  // Signals bookmarks
+  // Intelligence bookmarks
   const { data: bookmarks, isLoading } = useQuery({
     queryKey: ["bookmarks", !!token],
     queryFn: () => authApi.getBookmarks(token!),
@@ -50,12 +50,12 @@ export default function SavedPage() {
         <div>
           <span className="text-[10px] font-extrabold uppercase tracking-widest text-accent mb-1.5 block">Personal Archives</span>
           <h1 className="text-3xl md:text-4xl font-display font-extrabold text-white">Saved Library</h1>
-          <p className="text-sm text-textSecondary mt-1">Review your bookmarked signals, tracked companies, model profiles, and research documents.</p>
+          <p className="text-sm text-textSecondary mt-1">Review your bookmarked intelligence, tracked companies, model profiles, and research documents.</p>
         </div>
 
         {/* Tab Selection */}
         <div className="flex border-b border-white/[0.05] gap-6 text-sm font-bold text-textSecondary">
-          {(["signals", "research", "companies", "models"] as const).map((tab) => (
+          {(["intelligence", "research", "companies", "models"] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -81,10 +81,10 @@ export default function SavedPage() {
         {/* Tab Panels */}
         {user && (
           <div className="flex flex-col gap-6">
-            {activeTab === "signals" && (
+            {activeTab === "intelligence" && (
               <div className="flex flex-col gap-6">
-                {isLoading && <p className="text-zinc-500 text-xs">Querying bookmarked signals...</p>}
-                
+                {isLoading && <p className="text-zinc-500 text-xs">Querying bookmarked intelligence...</p>}
+
                 {savedSignals.map((article) => (
                   <ArticleCard
                     key={article.id}
@@ -95,7 +95,7 @@ export default function SavedPage() {
                 ))}
 
                 {savedSignals.length === 0 && (
-                  <p className="text-zinc-500 text-xs text-center py-10 bg-panel border border-white/[0.05] rounded-3xl">No signals bookmarked on this account.</p>
+                  <p className="text-zinc-500 text-xs text-center py-10 bg-panel border border-white/[0.05] rounded-3xl">No intelligence bookmarked on this account.</p>
                 )}
               </div>
             )}

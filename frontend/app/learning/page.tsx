@@ -205,7 +205,7 @@ const SKILL_RADAR: { label: string; emoji: string; textClass: string; borderClas
 ];
 
 const CROSS_LINKS: { from: string; href: string; text: string }[] = [
-  { from: "Intelligence", href: "/signals", text: "New Skill Recommended: Learn MCP (Est. 4 hours)" },
+  { from: "Intelligence", href: "/intelligence", text: "New Skill Recommended: Learn MCP (Est. 4 hours)" },
   { from: "Companies", href: "/companies", text: "Viewing Anthropic? Recommended: Claude API, MCP, Tool Use, Constitutional AI" },
   { from: "Models", href: "/models", text: "Viewing Claude Opus? Recommended: Prompt Engineering, Tool Calling, Agent Design" },
   { from: "Research", href: "/research", text: "Reading Mixture of Experts? Suggested prerequisites: Transformers, Sparse Models, Distributed Training" },

@@ -29,11 +29,11 @@ export const metadata: Metadata = {
     template: "%s | Novique",
   },
   description:
-    "Novique is your real-time AI intelligence platform. Track signals, research, company moves, weekly reports, and earn certificates through structured learning assessments.",
+    "Novique is your real-time AI intelligence platform. Track intelligence, research, company moves, weekly reports, and earn certificates through structured learning assessments.",
   keywords: [
     "AI intelligence",
     "artificial intelligence news",
-    "AI signals",
+    "AI updates",
     "LLM research",
     "AI learning platform",
     "AI weekly reports",
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
     siteName: "Novique",
     title: "Novique — AI Intelligence Platform",
     description:
-      "Real-time AI signals, weekly synthesis reports, company intelligence, and certified learning assessments for AI practitioners.",
+      "Real-time AI intelligence, weekly synthesis reports, company intelligence, and certified learning assessments for AI practitioners.",
     images: [
       {
         url: "/og-image.png",
@@ -70,7 +70,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Novique — AI Intelligence Platform",
     description:
-      "Real-time AI signals, weekly synthesis reports, company intelligence, and certified learning assessments.",
+      "Real-time AI intelligence, weekly synthesis reports, company intelligence, and certified learning assessments.",
     images: ["/og-image.png"],
     creator: "@novique_ai",
   },

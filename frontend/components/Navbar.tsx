@@ -41,12 +41,12 @@ const SEARCH_CATALOG: SuggestionItem[] = [
   { title: "Attention Is All You Need", category: "research", route: "/research" },
   { title: "Direct Preference Optimization", category: "research", route: "/research" },
   // Technologies / Topics
-  { title: "AI Agents", category: "technology", route: "/signals" },
-  { title: "Model Context Protocol (MCP)", category: "technology", route: "/signals" },
-  { title: "Reasoning Models", category: "technology", route: "/signals" },
-  { title: "Robotics", category: "technology", route: "/signals" },
-  { title: "Voice AI", category: "technology", route: "/signals" },
-  { title: "Fine-tuning", category: "technology", route: "/signals" },
+  { title: "AI Agents", category: "technology", route: "/intelligence" },
+  { title: "Model Context Protocol (MCP)", category: "technology", route: "/intelligence" },
+  { title: "Reasoning Models", category: "technology", route: "/intelligence" },
+  { title: "Robotics", category: "technology", route: "/intelligence" },
+  { title: "Voice AI", category: "technology", route: "/intelligence" },
+  { title: "Fine-tuning", category: "technology", route: "/intelligence" },
 ];
 
 export function Navbar({ searchQuery, setSearchQuery }: Props) {
@@ -194,13 +194,13 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
 
   const navLinks = [
     { label: "Morning Brief", path: "/" },
-    { label: "Signals", path: "/signals" },
-    { label: "Research", path: "/research" },
-    { label: "Companies", path: "/companies" },
-    { label: "Models", path: "/models" },
-    { label: "Learning", path: "/learning" },
-    { label: "Opportunities", path: "/opportunities" },
+    { label: "Intelligence", path: "/intelligence" },
     { label: "Reports", path: "/weekly-reports" },
+    { label: "Models", path: "/models" },
+    { label: "Companies", path: "/companies" },
+    { label: "Research", path: "/research" },
+    { label: "Opportunities", path: "/opportunities" },
+    { label: "Learning", path: "/learning" },
   ];
 
   // Suggestions filtering

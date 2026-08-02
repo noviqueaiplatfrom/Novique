@@ -3,11 +3,21 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { fetchFeed } from "@/lib/api";
+import { fetchFeed, fetchStats } from "@/lib/api";
 import * as authApi from "@/lib/auth";
 import { ArticleCard } from "@/components/ArticleCard";
 import { Navbar } from "@/components/Navbar";
 import { useAuth } from "./auth-context";
+import { COMPANIES } from "@/lib/companiesData";
+import { MODELS } from "@/lib/modelsData";
+
+function getGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good Morning";
+  if (hour < 17) return "Good Afternoon";
+  if (hour < 21) return "Good Evening";
+  return "Good Night";
+}
 
 export default function Home() {
   const { token } = useAuth();
@@ -16,9 +26,45 @@ export default function Home() {
   const [sort, setSort] = useState<"impact" | "trend" | "recent">("recent");
   const [kind, setKind] = useState<"all" | "news" | "paper">("all");
 
+  // Time-based greeting (device local time), set client-side to avoid hydration mismatch
+  const [greeting, setGreeting] = useState("Welcome");
+  useEffect(() => {
+    setGreeting(getGreeting());
+  }, []);
+
+  // Fetch live intelligence feed - auto-refresh every 60 seconds
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["feed", "discover", sort, kind, !!token],
+    queryFn: () => fetchFeed(sort, kind),
+    refetchInterval: 60000,
+  });
+
+  // Live corpus counters (real totals from the database, not just this page's batch)
+  const { data: stats } = useQuery({
+    queryKey: ["stats"],
+    queryFn: fetchStats,
+    refetchInterval: 60000,
+  });
+
+  // Today's AI Brief: derive real counts from the live feed batch instead of fake numbers
+  const briefTargets = (() => {
+    const items = data ?? [];
+    const dayMs = 24 * 3600 * 1000;
+    const hasTopic = (a: (typeof items)[number], re: RegExp) => (a.topics ?? []).some((t) => re.test(t));
+    const majorUpdates = items.filter((a) => Date.now() - new Date(a.published_at).getTime() < dayMs).length;
+    const modelLaunches = items.filter((a) => hasTopic(a, /model/i)).length;
+    const breakthroughs = items.filter((a) => a.kind === "paper" || hasTopic(a, /research|breakthrough/i)).length;
+    const fundingRounds = items.filter((a) => hasTopic(a, /fund/i)).length;
+    const osLaunches = items.filter((a) => hasTopic(a, /open.?source/i)).length;
+    const momentumIndex = items.length
+      ? Math.round(items.reduce((sum, a) => sum + a.trend_score, 0) / items.length)
+      : 0;
+    return [majorUpdates, modelLaunches, breakthroughs, fundingRounds, osLaunches, momentumIndex];
+  })();
+
   // Animated snapshot counters
-  const SNAP_TARGETS = [6, 2, 1, 3, 4, 94];
   const [snapCounts, setSnapCounts] = useState([0, 0, 0, 0, 0, 0]);
+  const [snapshotVisible, setSnapshotVisible] = useState(false);
   const [dialVisible, setDialVisible] = useState(false);
   const snapshotRef = useRef<HTMLDivElement>(null);
   const dialRef = useRef<HTMLDivElement>(null);
@@ -39,28 +85,41 @@ export default function Home() {
     return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   };
 
-  // Counter animation when snapshot section enters viewport
+  const timeAgo = (iso: string) => {
+    const diffMs = Date.now() - new Date(iso).getTime();
+    const mins = Math.floor(diffMs / 60000);
+    if (mins < 1) return "just now";
+    if (mins < 60) return `${mins}m ago`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `${hours}h ago`;
+    return `${Math.floor(hours / 24)}d ago`;
+  };
+
+  // Reveal the snapshot section once, then keep its animated counters in sync with live data
   useEffect(() => {
     if (!snapshotRef.current) return;
     const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) return;
-        obs.disconnect();
-        const duration = 1000;
-        const steps = 45;
-        let step = 0;
-        const timer = setInterval(() => {
-          step++;
-          const ease = 1 - Math.pow(1 - step / steps, 3);
-          setSnapCounts(SNAP_TARGETS.map((t) => Math.round(t * ease)));
-          if (step >= steps) clearInterval(timer);
-        }, duration / steps);
-      },
+      ([entry]) => { if (entry.isIntersecting) { setSnapshotVisible(true); obs.disconnect(); } },
       { threshold: 0.3 }
     );
     obs.observe(snapshotRef.current);
     return () => obs.disconnect();
   }, []);
+
+  useEffect(() => {
+    if (!snapshotVisible) return;
+    const duration = 1000;
+    const steps = 45;
+    let step = 0;
+    const timer = setInterval(() => {
+      step++;
+      const ease = 1 - Math.pow(1 - step / steps, 3);
+      setSnapCounts(briefTargets.map((t) => Math.round(t * ease)));
+      if (step >= steps) clearInterval(timer);
+    }, duration / steps);
+    return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [snapshotVisible, data]);
 
   // Confidence dial SVG animation when insight section enters viewport
   useEffect(() => {
@@ -72,13 +131,6 @@ export default function Home() {
     obs.observe(dialRef.current);
     return () => obs.disconnect();
   }, []);
-
-  // Fetch Signals - auto-refresh every 60 seconds
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["feed", "discover", sort, kind, !!token],
-    queryFn: () => fetchFeed(sort, kind),
-    refetchInterval: 60000,
-  });
 
   // Bookmark & interest states for cards
   const { data: bookmarks } = useQuery({
@@ -160,6 +212,9 @@ export default function Home() {
             <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#16C79A] mb-4 bg-[#16C79A]/10 px-3.5 py-1 rounded-full w-max">
               The AI Intelligence Platform
             </span>
+            <p className="text-sm md:text-base font-bold text-[#9AA8BD] mb-2">
+              {greeting} 👋
+            </p>
             <h1 className="text-4xl md:text-5xl lg:text-6.5xl font-display font-extrabold text-white mb-4 leading-[1.1] tracking-tight">
               One Platform. Every Important AI Decision.
             </h1>
@@ -171,7 +226,7 @@ export default function Home() {
 
             <div className="flex flex-wrap items-center gap-4">
               <Link
-                href="/signals"
+                href="/intelligence"
                 className="px-6 py-3 rounded-xl font-bold bg-[#6C63FF] hover:bg-[#5a54e5] text-white transition-all hover:scale-[1.02] shadow-lg shadow-[#6C63FF]/20"
               >
                 Explore Intelligence
@@ -188,17 +243,26 @@ export default function Home() {
           {/* Right Column: Brief Indicator */}
           <div data-animate data-delay="2" className="flex-1 bg-[#17253A] border border-white/[0.05] rounded-3xl p-7 md:p-8 relative overflow-hidden flex flex-col justify-between shadow-[0_24px_55px_rgba(0,0,0,0.4)] animate-float">
             <div className="absolute top-0 right-0 w-40 h-40 bg-[#6C63FF]/5 rounded-full blur-3xl pointer-events-none" />
-            
+
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-base font-bold tracking-tight text-[#F7F9FC] flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#16C79A] shadow-[0_0_8px_#16c79a] animate-pulse"></span>
+                <span className={`w-2 h-2 rounded-full shadow-[0_0_8px_currentColor] ${isError ? "bg-red-400 text-red-400" : "bg-[#16C79A] text-[#16C79A] animate-pulse"}`}></span>
                 Active briefing status
               </h2>
-              <span className="text-[10px] font-bold text-[#9AA8BD] bg-white/[0.03] border border-white/[0.05] px-2 py-0.5 rounded uppercase tracking-wider">Live</span>
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider border ${isError ? "text-red-400 bg-red-500/5 border-red-500/20" : "text-[#9AA8BD] bg-white/[0.03] border-white/[0.05]"}`}>
+                {isError ? "Offline" : "Live"}
+              </span>
             </div>
 
             <p className="text-sm text-textSecondary leading-relaxed mb-6 font-normal">
-              Novique engines are aggregating reference nodes. Read the snapshot or skip directly to active signals.
+              {isLoading && "Novique engines are aggregating reference nodes..."}
+              {isError && "Unable to reach the Novique pipeline right now. Retrying shortly."}
+              {!isLoading && !isError && (
+                <>
+                  <strong className="text-white font-bold">{data?.length ?? 0}</strong> live updates ingested and ranked this cycle
+                  {data?.[0] ? `, most recent ${timeAgo(data[0].published_at)}` : ""}.
+                </>
+              )}
             </p>
 
             <div className="text-[11px] text-[#9AA8BD] border-t border-white/[0.05] pt-4 flex items-center justify-between">
@@ -208,7 +272,7 @@ export default function Home() {
                 </svg>
                 Next refresh in <strong className="text-white font-mono">{formatTime(secondsLeft)}</strong>
               </span>
-              <Link href="/signals" className="text-[#6C63FF] font-bold hover:underline">Review signals &rarr;</Link>
+              <Link href="/intelligence" className="text-[#6C63FF] font-bold hover:underline">Review Intelligence &rarr;</Link>
             </div>
           </div>
         </section>
@@ -245,10 +309,10 @@ export default function Home() {
 
           <div data-animate className="grid grid-cols-2 md:grid-cols-5 gap-4 pt-2">
             {[
-              { value: "50,000+", label: "AI Updates Analyzed" },
-              { value: "400+", label: "Companies Tracked" },
-              { value: "180+", label: "Models Monitored" },
-              { value: "15+", label: "AI Sources Connected" },
+              { value: stats ? stats.total_articles.toLocaleString() : "—", label: "AI Updates Analyzed" },
+              { value: String(COMPANIES.length), label: "Companies Tracked" },
+              { value: String(MODELS.length), label: "Models Monitored" },
+              { value: stats ? String(stats.total_sources) : "—", label: "AI Sources Connected" },
               { value: "24/7", label: "Live Intelligence" },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
@@ -469,15 +533,15 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 4. TODAY'S SIGNALS (TOP 5) */}
+        {/* 4. TODAY'S INTELLIGENCE (TOP 5) */}
         <section className="flex flex-col gap-6">
           <div data-animate className="flex items-center justify-between pb-3 border-b border-white/[0.05]">
             <div>
-              <h2 className="text-2xl font-bold tracking-tight text-white font-plus-jakarta">Today's Signals</h2>
+              <h2 className="text-2xl font-bold tracking-tight text-white font-plus-jakarta">Today's Intelligence</h2>
               <p className="text-xs text-textSecondary mt-0.5 font-normal">Top five executive analysis logs</p>
             </div>
-            <Link href="/signals" className="text-xs font-semibold text-[#6C63FF] hover:text-[#5a54e5] flex items-center gap-1.5">
-              View All Signals &rarr;
+            <Link href="/intelligence" className="text-xs font-semibold text-[#6C63FF] hover:text-[#5a54e5] flex items-center gap-1.5">
+              View All Intelligence &rarr;
             </Link>
           </div>
 

@@ -181,7 +181,7 @@ function StarRow({ filled }: { filled: number }) {
   );
 }
 
-export default function SignalsPage() {
+export default function IntelligencePage() {
   const { token } = useAuth();
   const qc = useQueryClient();
   const [sort, setSort] = useState<Sort>("impact");
@@ -1023,11 +1023,11 @@ export default function SignalsPage() {
           </div>
         </section>
 
-        {/* SECTION 4: AI OPPORTUNITY SIGNALS */}
+        {/* SECTION 4: AI OPPORTUNITY INTELLIGENCE */}
         <section className="flex flex-col gap-6">
           <SectionHeader
             eyebrow="Section 04"
-            title="AI Opportunity Signals"
+            title="AI Opportunity Intelligence"
             subtitle="Startup whitespace, commercialization-ready research, hiring surges, and live investment activity."
           />
 

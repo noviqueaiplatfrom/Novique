@@ -39,6 +39,12 @@ class IngestResult(BaseModel):
     updated: int
 
 
+class StatsOut(BaseModel):
+    total_articles: int
+    total_sources: int
+    total_papers: int
+
+
 # --- Auth / personalization ------------------------------------------------
 class UserCreate(BaseModel):
     email: str
