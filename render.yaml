@@ -20,15 +20,19 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: CORS_ORIGINS
-        value: "*"
+        value: "https://novique-frontend.onrender.com,https://novique.ai"
+      - key: GOOGLE_CLIENT_ID
+        value: 338636590792-t166pujl1hpuroea7p7idnn4em4tpht4.apps.googleusercontent.com
+      - key: INGEST_SECRET
+        generateValue: true
       - key: SMTP_HOST
         value: smtp-relay.brevo.com
       - key: SMTP_PORT
         value: "587"
       - key: SMTP_USER
-        value: b1c234001@smtp-brevo.com
+        sync: false
       - key: SMTP_PASSWORD
-        value: OnsZUd9pP8qCA5BX
+        sync: false
       - key: SMTP_FROM
         value: no-reply@novique.ai
       - key: ANTHROPIC_API_KEY

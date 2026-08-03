@@ -27,6 +27,16 @@ class Settings(BaseSettings):
     access_token_ttl_min: int = 30
     refresh_token_ttl_days: int = 7
 
+    # Google Sign-In: the OAuth client ID this backend accepts tokens for. Must
+    # match the frontend's NEXT_PUBLIC_GOOGLE_CLIENT_ID, or tokens meant for a
+    # completely different site could be replayed against this API.
+    google_client_id: str | None = None
+
+    # Shared secret required in the `x-ingest-secret` header to trigger
+    # POST /api/ingest on demand (the scheduled Celery beat job does not use
+    # this endpoint, so locking it down doesn't affect the real pipeline).
+    ingest_secret: str | None = None
+
     # SMTP
     smtp_host: str = "smtp-relay.brevo.com"
     smtp_port: int = 587
@@ -36,6 +46,10 @@ class Settings(BaseSettings):
 
     # API
     cors_origins: str = "http://localhost:3000"
+
+    # Set DEBUG=true only for local development. Gates behavior that must
+    # never run in production (e.g. logging OTP codes as a fallback).
+    debug: bool = False
 
 
 settings = Settings()

@@ -3,10 +3,11 @@ from __future__ import annotations
 
 from enum import Enum
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from app.config import settings
 from app.database import get_db
 from app.ingestion.pipeline import run_pipeline
 from app.models import Article
@@ -65,6 +66,16 @@ def get_stats(db: Session = Depends(get_db)):
 
 
 @router.post("/ingest", response_model=IngestResult)
-def ingest(db: Session = Depends(get_db)):
-    """Trigger one ingestion cycle on demand (stand-in for the Celery beat job)."""
+def ingest(
+    db: Session = Depends(get_db),
+    x_ingest_secret: str | None = Header(default=None),
+):
+    """Trigger one ingestion cycle on demand.
+
+    Not used by the scheduled Celery beat job (see app/tasks.py, which calls
+    run_pipeline directly) — this is purely a manual/admin trigger, so it must
+    not be reachable by the public. Requires INGEST_SECRET to be configured.
+    """
+    if not settings.ingest_secret or x_ingest_secret != settings.ingest_secret:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return run_pipeline(db)

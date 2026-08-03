@@ -33,6 +33,14 @@ services:
       CORS_ORIGINS: "http://localhost:3000,http://localhost:3001,http://localhost:3002,http://localhost:3003,http://localhost:3004,http://localhost:3005"
       # Override in any real deployment (≥32 chars). Has a dev default otherwise.
       JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me-in-production-please-32b}
+      # Local-only: allows the dev-default JWT_SECRET and prints OTP fallbacks
+      # to the console. Never set this in a real deployment.
+      DEBUG: ${DEBUG:-true}
+      # Must match the frontend's NEXT_PUBLIC_GOOGLE_CLIENT_ID or Google Sign-In
+      # token verification will reject every login.
+      GOOGLE_CLIENT_ID: ${NEXT_PUBLIC_GOOGLE_CLIENT_ID:-}
+      # Shared secret required to call POST /api/ingest manually.
+      INGEST_SECRET: ${INGEST_SECRET:-}
       # Set ANTHROPIC_API_KEY here (or in .env) for AI-generated summaries.
       # Without it the pipeline uses the deterministic heuristic fallback.
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}

@@ -12,8 +12,17 @@ from app.database import Base, engine
 from app import models  # noqa: F401  (register models on Base before create_all)
 
 
+_DEFAULT_JWT_SECRET = "dev-secret-change-me-in-production-please-32b"
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    if not settings.debug and settings.jwt_secret == _DEFAULT_JWT_SECRET:
+        raise RuntimeError(
+            "JWT_SECRET is unset and DEBUG is not enabled — refusing to start with the "
+            "public default secret, which would let anyone forge valid tokens. Set a real "
+            "JWT_SECRET env var, or set DEBUG=true for local development only."
+        )
     # Slice: create tables on startup. Replaced by Alembic migrations later.
     Base.metadata.create_all(bind=engine)
     from app.database import run_migrations

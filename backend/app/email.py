@@ -38,5 +38,6 @@ def send_otp_email(to_email: str, otp: str) -> None:
         print(f"[email] Successfully sent OTP to {to_email}")
     except Exception as e:
         print(f"[email] Failed to send OTP email: {e}")
-        # In development, let's print the OTP to the console so they can still log in if SMTP fails
-        print(f"[email] FALLBACK - OTP for {to_email} is: {otp}")
+        if settings.debug:
+            # Local development only — never leak OTPs into production logs.
+            print(f"[email] FALLBACK - OTP for {to_email} is: {otp}")
