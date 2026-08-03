@@ -21,18 +21,18 @@ function topBy(models: ModelSummary[], keyFn: (m: ModelSummary) => number, n: nu
   return models.slice().sort((a, b) => keyFn(b) - keyFn(a)).slice(0, n);
 }
 
-const FEATURED_SECTIONS: { emoji: string; title: string; desc: string; models: ModelSummary[] }[] = [
-  { emoji: "⭐", title: "Editor's Picks", desc: "Novique recommends these models based on overall capability.", models: topBy(MODELS, (m) => m.aiScore, 3) },
-  { emoji: "💻", title: "Best for Coding", desc: "Highest-scoring models for software development and code generation.", models: topBy(MODELS, (m) => m.scores.coding, 3) },
-  { emoji: "🧠", title: "Best for Reasoning", desc: "Strongest logical and multi-step reasoning performance.", models: topBy(MODELS, (m) => m.scores.reasoning, 3) },
-  { emoji: "🎨", title: "Best for Creativity", desc: "Top picks for writing, ideation, and creative generation.", models: topBy(MODELS, (m) => m.scores.creativity, 3) },
-  { emoji: "🎥", title: "Best Multimodal", desc: "Leading models across vision, audio, and video understanding.", models: topBy(MODELS, (m) => m.scores.multimodal, 3) },
-  { emoji: "💰", title: "Best Value", desc: "The strongest capability-per-dollar across the field.", models: topBy(MODELS, (m) => m.scores.value, 3) },
-  { emoji: "⚡", title: "Fastest Models", desc: "Lowest latency and quickest token throughput.", models: topBy(MODELS, (m) => m.scores.speed, 3) },
-  { emoji: "📖", title: "Longest Context", desc: "Models built to process the largest documents and codebases.", models: topBy(MODELS, (m) => m.contextWindowTokens, 3) },
-  { emoji: "🌍", title: "Open Source Models", desc: "Openly licensed weights for self-hosting and fine-tuning.", models: MODELS.filter((m) => m.license === "Open Source") },
-  { emoji: "🚀", title: "Recently Released", desc: "The newest model releases and version updates.", models: topBy(MODELS, (m) => new Date(m.latestReleaseDate).getTime(), 3) },
-  { emoji: "📈", title: "Most Popular", desc: "The most widely adopted models by developers and enterprises.", models: topBy(MODELS, (m) => m.popularity, 3) },
+const FEATURED_SECTIONS: { title: string; desc: string; models: ModelSummary[] }[] = [
+  { title: "Editor's Picks", desc: "Novique recommends these models based on overall capability.", models: topBy(MODELS, (m) => m.aiScore, 3) },
+  { title: "Best for Coding", desc: "Highest-scoring models for software development and code generation.", models: topBy(MODELS, (m) => m.scores.coding, 3) },
+  { title: "Best for Reasoning", desc: "Strongest logical and multi-step reasoning performance.", models: topBy(MODELS, (m) => m.scores.reasoning, 3) },
+  { title: "Best for Creativity", desc: "Top picks for writing, ideation, and creative generation.", models: topBy(MODELS, (m) => m.scores.creativity, 3) },
+  { title: "Best Multimodal", desc: "Leading models across vision, audio, and video understanding.", models: topBy(MODELS, (m) => m.scores.multimodal, 3) },
+  { title: "Best Value", desc: "The strongest capability-per-dollar across the field.", models: topBy(MODELS, (m) => m.scores.value, 3) },
+  { title: "Fastest Models", desc: "Lowest latency and quickest token throughput.", models: topBy(MODELS, (m) => m.scores.speed, 3) },
+  { title: "Longest Context", desc: "Models built to process the largest documents and codebases.", models: topBy(MODELS, (m) => m.contextWindowTokens, 3) },
+  { title: "Open Source Models", desc: "Openly licensed weights for self-hosting and fine-tuning.", models: MODELS.filter((m) => m.license === "Open Source") },
+  { title: "Recently Released", desc: "The newest model releases and version updates.", models: topBy(MODELS, (m) => new Date(m.latestReleaseDate).getTime(), 3) },
+  { title: "Most Popular", desc: "The most widely adopted models by developers and enterprises.", models: topBy(MODELS, (m) => m.popularity, 3) },
 ];
 
 function ScoreRing({ score, size = 52 }: { score: number; size?: number }) {
@@ -159,8 +159,8 @@ export default function ModelsPage() {
           {FEATURED_SECTIONS.map((sec) => (
             <section key={sec.title} className="flex flex-col gap-4">
               <div>
-                <h3 className="text-lg font-display font-extrabold text-white flex items-center gap-2">
-                  <span>{sec.emoji}</span> {sec.title}
+                <h3 className="text-lg font-display font-extrabold text-white">
+                  {sec.title}
                 </h3>
                 <p className="text-xs text-textSecondary mt-1">{sec.desc}</p>
               </div>

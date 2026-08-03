@@ -178,18 +178,6 @@
   animation-delay: 0.2s;
 }
 
-/* Auto-scrolling momentum ticker */
-@keyframes ticker-scroll {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-.animate-ticker {
-  animation: ticker-scroll 30s linear infinite;
-}
-.animate-ticker:hover {
-  animation-play-state: paused;
-}
-
 /* Smooth Horizontal Scroll hide bar */
 .no-scrollbar::-webkit-scrollbar {
   display: none;

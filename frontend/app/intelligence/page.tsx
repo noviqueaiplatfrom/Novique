@@ -11,9 +11,9 @@ import { Navbar } from "@/components/Navbar";
 import { useAuth } from "../auth-context";
 
 const SORTS: { key: Sort; label: string }[] = [
-  { key: "impact", label: "🔥 Top Impact" },
-  { key: "trend", label: "📈 Trending" },
-  { key: "recent", label: "⏱️ Latest" },
+  { key: "impact", label: "Top Impact" },
+  { key: "trend", label: "Trending" },
+  { key: "recent", label: "Latest" },
 ];
 
 const KINDS: { key: Kind; label: string }[] = [
@@ -76,12 +76,12 @@ const PREDICTION = {
 
 // Breaking Intelligence categorization: keyword buckets applied to the live feed's
 // title/topics/summary text, using the same keyword-match approach the quick filters use.
-const BREAKING_CATEGORIES: { key: string; label: string; icon: string; keywords: string[] }[] = [
-  { key: "launches", label: "Launches", icon: "🚀", keywords: ["launch", "release", "unveil", "debut", "introduc"] },
-  { key: "acquisitions", label: "Acquisitions", icon: "🤝", keywords: ["acqui", "merger", "buys ", "bought"] },
-  { key: "funding", label: "Funding", icon: "💰", keywords: ["funding", "raises", "raised", "series ", "investment", "valuation"] },
-  { key: "regulations", label: "Regulations", icon: "⚖️", keywords: ["regulat", "policy", "compliance", "legislat", "lawsuit", "antitrust"] },
-  { key: "opensource", label: "Open Source", icon: "🧩", keywords: ["open source", "open-source", "open weight", "github"] },
+const BREAKING_CATEGORIES: { key: string; label: string; keywords: string[] }[] = [
+  { key: "launches", label: "Launches", keywords: ["launch", "release", "unveil", "debut", "introduc"] },
+  { key: "acquisitions", label: "Acquisitions", keywords: ["acqui", "merger", "buys ", "bought"] },
+  { key: "funding", label: "Funding", keywords: ["funding", "raises", "raised", "series ", "investment", "valuation"] },
+  { key: "regulations", label: "Regulations", keywords: ["regulat", "policy", "compliance", "legislat", "lawsuit", "antitrust"] },
+  { key: "opensource", label: "Open Source", keywords: ["open source", "open-source", "open weight", "github"] },
 ];
 
 // Keywords used to identify model-focused coverage for the "Most Impactful Models" ranking
@@ -558,7 +558,7 @@ function IntelligencePageInner() {
                 onClick={() => setSearchQuery(t)}
                 className="rounded-full border border-white/[0.06] bg-white/[0.02] px-3 py-1 text-[11px] font-semibold text-zinc-300 hover:border-accent/40 hover:text-accent transition-all"
               >
-                🔥 {t}
+                {t}
               </button>
             ))}
           </div>
@@ -639,7 +639,7 @@ function IntelligencePageInner() {
                       : "border-white/[0.05] bg-panel text-zinc-300 hover:border-zinc-600"
                   }`}
                 >
-                  <span>{c.icon} {c.label}</span>
+                  <span>{c.label}</span>
                   <span className={activeBreaking === c.key ? "text-accent" : "text-zinc-500"}>{c.count}</span>
                 </button>
               ))}

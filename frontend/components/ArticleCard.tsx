@@ -101,14 +101,14 @@ export function ArticleCard({
   // Determine category badge icon & color
   const getCategoryBadge = () => {
     const topics = (article.topics ?? []).map((t) => t.toLowerCase());
-    if (article.kind === "paper") return "📚 Research Intelligence";
-    if (topics.some((t) => t.includes("agent"))) return "🤖 AI Agents";
-    if (topics.some((t) => t.includes("mcp"))) return "⚡ MCP Signals";
-    if (topics.some((t) => t.includes("model"))) return "🧠 Reasoning Models";
-    if (topics.some((t) => t.includes("robot"))) return "🦾 Robotics";
-    if (topics.some((t) => t.includes("voice") || t.includes("audio"))) return "🎙️ Voice AI";
-    if (topics.some((t) => t.includes("funding") || t.includes("startup"))) return "🚀 Startups / Funding";
-    return "💡 General AI";
+    if (article.kind === "paper") return "Research Intelligence";
+    if (topics.some((t) => t.includes("agent"))) return "AI Agents";
+    if (topics.some((t) => t.includes("mcp"))) return "MCP Signals";
+    if (topics.some((t) => t.includes("model"))) return "Reasoning Models";
+    if (topics.some((t) => t.includes("robot"))) return "Robotics";
+    if (topics.some((t) => t.includes("voice") || t.includes("audio"))) return "Voice AI";
+    if (topics.some((t) => t.includes("funding") || t.includes("startup"))) return "Startups / Funding";
+    return "General AI";
   };
 
   const isResearch = article.kind === "paper";
@@ -325,8 +325,8 @@ export function ArticleCard({
           {/* Stats fallback */}
           <span className="text-xs text-zinc-500 font-medium">
             {article.kind === "paper"
-              ? `📑 ${article.citation_count} citations`
-              : `▲ ${article.points} · 💬 ${article.num_comments}`}
+              ? `${article.citation_count} citations`
+              : `${article.points} points · ${article.num_comments} comments`}
           </span>
         </div>
 

@@ -681,7 +681,7 @@ export default function ResearchPage() {
 
                   <div className={`grid gap-4 mb-5 ${isExpanded ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1 sm:grid-cols-2"}`}>
                     <ScoreBar label="Research Impact" value={paper.researchImpactScore} colorClass="bg-accent" textClass="text-accent" />
-                    <ScoreBar label="Future Impact ⭐" value={paper.futureImpactScore} colorClass="bg-goldAccent" textClass="text-goldAccent" />
+                    <ScoreBar label="Future Impact" value={paper.futureImpactScore} colorClass="bg-goldAccent" textClass="text-goldAccent" />
                   </div>
 
                   <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-[11px] mb-5">
@@ -743,7 +743,7 @@ export default function ResearchPage() {
                   <div className="border-t border-white/[0.05] mt-6 pt-6 flex flex-col gap-7">
                     {/* Explain For Different Audiences */}
                     <div>
-                      <span className="text-[10px] font-bold text-tealAccent uppercase tracking-widest block mb-2.5">Explain For Different Audiences ⭐</span>
+                      <span className="text-[10px] font-bold text-tealAccent uppercase tracking-widest block mb-2.5">Explain For Different Audiences</span>
                       <div className="flex flex-wrap gap-1.5 mb-3">
                         {audienceKeys.map((a) => (
                           <button
@@ -788,7 +788,7 @@ export default function ResearchPage() {
 
                     {paper.realityTracker && (
                       <div>
-                        <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-2.5">Research &rarr; Reality Tracker ⭐</span>
+                        <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-2.5">Research &rarr; Reality Tracker</span>
                         <div className="flex flex-col gap-2.5">
                           {paper.realityTracker.map((stage, i) => (
                             <div key={stage.label} className="flex items-center gap-3 text-xs">
@@ -802,7 +802,7 @@ export default function ResearchPage() {
                     )}
 
                     <div>
-                      <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-2">Startup Opportunities ⭐</span>
+                      <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-2">Startup Opportunities</span>
                       <div className="flex flex-wrap gap-1.5">
                         {paper.startupOpportunities.map((s) => (
                           <span key={s} className="text-[11px] font-semibold text-zinc-300 bg-white/[0.04] border border-white/[0.08] px-2.5 py-1 rounded-full">
@@ -832,7 +832,7 @@ export default function ResearchPage() {
                         </div>
                       </div>
                       <div>
-                        <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-2.5">Should You Read This? ⭐</span>
+                        <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-2.5">Should You Read This?</span>
                         <div className="flex flex-col gap-2">
                           {paper.shouldYouRead.map((item) => (
                             <div key={item.label} className="flex items-center justify-between text-xs">
@@ -861,7 +861,7 @@ export default function ResearchPage() {
 
                     {paper.aiPrediction && (
                       <div className="bg-goldAccent/5 border border-goldAccent/30 rounded-2xl p-5 flex flex-col gap-2">
-                        <span className="text-[10px] font-extrabold uppercase tracking-widest text-goldAccent flex items-center gap-1.5">⭐ AI Prediction</span>
+                        <span className="text-[10px] font-extrabold uppercase tracking-widest text-goldAccent flex items-center gap-1.5">AI Prediction</span>
                         <p className="text-sm text-white font-semibold leading-relaxed">{paper.aiPrediction.prediction}</p>
                         <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-[11px] text-zinc-400 font-semibold mt-1">
                           <span>Confidence: <span className="text-goldAccent">{paper.aiPrediction.confidence}</span></span>

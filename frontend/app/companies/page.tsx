@@ -90,12 +90,10 @@ function CompanyLogo({ letter, size = "md" }: { letter: string; size?: "sm" | "m
   );
 }
 
-function DiscoveryRow({ emoji, title, children }: { emoji: string; title: string; children: React.ReactNode }) {
+function DiscoveryRow({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div data-animate className="flex flex-col gap-3">
-      <h3 className="text-sm font-bold text-white flex items-center gap-2">
-        <span>{emoji}</span> {title}
-      </h3>
+      <h3 className="text-sm font-bold text-white">{title}</h3>
       <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1">{children}</div>
     </div>
   );
@@ -175,7 +173,7 @@ export default function CompaniesPage() {
 
         {/* Discovery sections */}
         <div className="flex flex-col gap-9">
-          <DiscoveryRow emoji="🔥" title="Trending Companies">
+          <DiscoveryRow title="Trending Companies">
             {trending.map((c) => (
               <Link
                 key={c.slug}
@@ -194,7 +192,7 @@ export default function CompaniesPage() {
             ))}
           </DiscoveryRow>
 
-          <DiscoveryRow emoji="🚀" title="Recently Released Models">
+          <DiscoveryRow title="Recently Released Models">
             {recentReleases.map((c) => (
               <Link
                 key={c.slug}
@@ -208,7 +206,7 @@ export default function CompaniesPage() {
             ))}
           </DiscoveryRow>
 
-          <DiscoveryRow emoji="📈" title="Fastest Growing Companies">
+          <DiscoveryRow title="Fastest Growing Companies">
             {fastestGrowing.map((c) => (
               <Link
                 key={c.slug}
@@ -224,7 +222,7 @@ export default function CompaniesPage() {
             ))}
           </DiscoveryRow>
 
-          <DiscoveryRow emoji="📚" title="Most Research Active">
+          <DiscoveryRow title="Most Research Active">
             {researchActive.map((c) => (
               <Link
                 key={c.slug}
@@ -240,7 +238,7 @@ export default function CompaniesPage() {
             ))}
           </DiscoveryRow>
 
-          <DiscoveryRow emoji="⚡" title="Most Active Companies">
+          <DiscoveryRow title="Most Active Companies">
             {mostActive.map((c) => (
               <Link
                 key={c.slug}
@@ -256,7 +254,7 @@ export default function CompaniesPage() {
             ))}
           </DiscoveryRow>
 
-          <DiscoveryRow emoji="💰" title="Funding Leaders">
+          <DiscoveryRow title="Funding Leaders">
             {fundingLeaders.map((c) => (
               <Link
                 key={c.slug}
@@ -270,7 +268,7 @@ export default function CompaniesPage() {
             ))}
           </DiscoveryRow>
 
-          <DiscoveryRow emoji="👨‍💻" title="Hiring Momentum">
+          <DiscoveryRow title="Hiring Momentum">
             {hiringMomentum.map((c) => {
               const glyph = trendGlyph(c.hiringTrend);
               return (
@@ -289,7 +287,7 @@ export default function CompaniesPage() {
             })}
           </DiscoveryRow>
 
-          <DiscoveryRow emoji="🧩" title="Most Models Released">
+          <DiscoveryRow title="Most Models Released">
             {mostModelsReleased.map((c) => (
               <Link
                 key={c.slug}
@@ -305,7 +303,7 @@ export default function CompaniesPage() {
             ))}
           </DiscoveryRow>
 
-          <DiscoveryRow emoji="🏢" title="Enterprise Leaders">
+          <DiscoveryRow title="Enterprise Leaders">
             {enterpriseLeaders.map((c) => (
               <Link
                 key={c.slug}
@@ -321,7 +319,7 @@ export default function CompaniesPage() {
             ))}
           </DiscoveryRow>
 
-          <DiscoveryRow emoji="🌐" title="Open Source Leaders">
+          <DiscoveryRow title="Open Source Leaders">
             {openSourceLeaders.map((c) => (
               <Link
                 key={c.slug}
@@ -337,7 +335,7 @@ export default function CompaniesPage() {
             ))}
           </DiscoveryRow>
 
-          <DiscoveryRow emoji="🌱" title="Startup Spotlight">
+          <DiscoveryRow title="Startup Spotlight">
             {startupSpotlight.map((c) => (
               <Link
                 key={c.slug}
@@ -354,8 +352,8 @@ export default function CompaniesPage() {
           </DiscoveryRow>
 
           <div data-animate className="flex flex-col gap-3">
-            <h3 className="text-sm font-bold text-white flex items-center gap-2">
-              <span>⭐</span> Featured Company
+            <h3 className="text-sm font-bold text-white">
+              Featured Company
             </h3>
             <Link
               href={`/companies/${featuredCompany.slug}`}

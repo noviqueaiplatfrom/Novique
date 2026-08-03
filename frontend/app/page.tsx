@@ -39,6 +39,18 @@ export default function Home() {
     refetchInterval: 60000,
   });
 
+  // Render's free-tier backend can cold-start after inactivity; if the first load
+  // takes a while, say so instead of leaving a generic "loading" message hanging.
+  const [coldStart, setColdStart] = useState(false);
+  useEffect(() => {
+    if (!isLoading) {
+      setColdStart(false);
+      return;
+    }
+    const t = setTimeout(() => setColdStart(true), 4000);
+    return () => clearTimeout(t);
+  }, [isLoading]);
+
   // Live corpus counters (real totals from the database, not just this page's batch)
   const { data: stats } = useQuery({
     queryKey: ["stats"],
@@ -63,18 +75,6 @@ export default function Home() {
   })();
 
   // Trending Intelligence ticker: real topic frequency + momentum from the live feed batch
-  const TOPIC_ICONS: Record<string, string> = {
-    "ai agents": "🤖", agents: "🤖", agentic: "🤖",
-    mcp: "⚡", "model context protocol": "⚡",
-    coding: "💻", "coding models": "💻", code: "💻",
-    voice: "🎙", "voice ai": "🎙", audio: "🎙",
-    robotics: "🦾", robot: "🦾",
-    reasoning: "🧠", "reasoning models": "🧠",
-    enterprise: "🏢", "enterprise ai": "🏢",
-    infrastructure: "🌐", "ai infrastructure": "🌐", compute: "🌐",
-    research: "🔬", "ai research": "🔬",
-    funding: "💰", llms: "🧩", "open source": "📦", safety: "🛡️",
-  };
   const trendingTopics = (() => {
     const counts = new Map<string, { label: string; count: number; totalTrend: number }>();
     (data ?? []).forEach((a) => {
@@ -91,11 +91,10 @@ export default function Home() {
         }
       });
     });
-    return Array.from(counts.entries())
-      .sort((a, b) => b[1].count - a[1].count)
+    return Array.from(counts.values())
+      .sort((a, b) => b.count - a.count)
       .slice(0, 9)
-      .map(([key, v]) => ({
-        icon: TOPIC_ICONS[key] ?? "📊",
+      .map((v) => ({
         label: v.label,
         count: v.count,
         avgTrend: Math.round(v.totalTrend / v.count),
@@ -253,7 +252,7 @@ export default function Home() {
               The AI Intelligence Platform
             </span>
             <p className="text-sm md:text-base font-bold text-[#9AA8BD] mb-2">
-              {greeting} 👋
+              {greeting}
             </p>
             <h1 className="text-4xl md:text-5xl lg:text-6.5xl font-display font-extrabold text-white mb-4 leading-[1.1] tracking-tight">
               One Platform. Every Important AI Decision.
@@ -295,7 +294,9 @@ export default function Home() {
             </div>
 
             <p className="text-sm text-textSecondary leading-relaxed mb-6 font-normal">
-              {isLoading && "Novique engines are aggregating reference nodes..."}
+              {isLoading && (coldStart
+                ? "Waking up the Novique pipeline after inactivity. First load can take up to a minute, hang tight."
+                : "Novique engines are aggregating reference nodes...")}
               {isError && "Unable to reach the Novique pipeline right now. Retrying shortly."}
               {!isLoading && !isError && (
                 <>
@@ -330,18 +331,17 @@ export default function Home() {
 
           <div data-animate className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
             {[
-              { icon: "🛠️", label: "Engineers" },
-              { icon: "🔬", label: "Researchers" },
-              { icon: "🚀", label: "Founders" },
-              { icon: "💰", label: "Investors" },
-              { icon: "📦", label: "Product Teams" },
-              { icon: "🎓", label: "Students" },
+              { label: "Engineers" },
+              { label: "Researchers" },
+              { label: "Founders" },
+              { label: "Investors" },
+              { label: "Product Teams" },
+              { label: "Students" },
             ].map((role) => (
               <div
                 key={role.label}
-                className="bg-[#101B2D] border border-white/[0.05] rounded-2xl py-4 px-3 flex flex-col items-center gap-1.5 text-center hover:border-[#6C63FF]/30 hover:-translate-y-0.5 transition-all"
+                className="bg-[#101B2D] border border-white/[0.05] rounded-2xl py-4 px-3 flex flex-col items-center justify-center text-center hover:border-[#6C63FF]/30 hover:-translate-y-0.5 transition-all"
               >
-                <span className="text-xl">{role.icon}</span>
                 <span className="text-xs font-bold text-[#F7F9FC]">{role.label}</span>
               </div>
             ))}
@@ -591,9 +591,9 @@ export default function Home() {
             <div className="flex items-center gap-1">
               <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mr-2 ml-1">Sort:</span>
               {[
-                { key: "recent", label: "⏱️ Latest" },
-                { key: "impact", label: "🔥 Top Impact" },
-                { key: "trend", label: "📈 Trending" },
+                { key: "recent", label: "Latest" },
+                { key: "impact", label: "Top Impact" },
+                { key: "trend", label: "Trending" },
               ].map((s) => (
                 <button
                   key={s.key}
@@ -688,35 +688,34 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 5. MARKET MOMENTUM (Auto-scrolling ticker) */}
+        {/* 5. MARKET MOMENTUM */}
         <section className="flex flex-col gap-4">
           <div data-animate className="flex items-center justify-between">
             <h3 className="text-xs font-bold uppercase tracking-widest text-[#9AA8BD]">Trending Intelligence</h3>
             <div className="h-[1px] bg-white/[0.06] flex-1 ml-4"></div>
           </div>
 
-          <div className="overflow-hidden py-2 -my-2 relative">
+          <div className="relative">
             {/* Fade edges */}
-            <div className="pointer-events-none absolute left-0 top-0 h-full w-16 bg-gradient-to-r from-[#07111F] to-transparent z-10" />
-            <div className="pointer-events-none absolute right-0 top-0 h-full w-16 bg-gradient-to-l from-[#07111F] to-transparent z-10" />
+            <div className="pointer-events-none absolute left-0 top-0 h-full w-10 bg-gradient-to-r from-[#07111F] to-transparent z-10" />
+            <div className="pointer-events-none absolute right-0 top-0 h-full w-10 bg-gradient-to-l from-[#07111F] to-transparent z-10" />
 
             {trendingTopics.length === 0 ? (
               <p className="text-xs text-zinc-500 py-2.5">No trending topics in the current feed yet.</p>
             ) : (
-              /* Duplicate the list so the loop is seamless */
-              <div className="flex items-center gap-2.5 animate-ticker w-max">
-                {[...trendingTopics, ...trendingTopics].map((topic, i) => (
+              <div className="flex items-center gap-2.5 overflow-x-auto no-scrollbar py-1">
+                {trendingTopics.map((topic, i) => (
                   <Link
-                    key={i}
+                    key={topic.label}
                     href={`/intelligence?q=${encodeURIComponent(topic.label)}`}
-                    className={`relative z-20 flex items-center gap-2 px-5 py-2.5 rounded-full border text-xs font-bold transition-all shrink-0 hover:scale-[1.03] cursor-pointer ${
-                      i % trendingTopics.length === 0
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-full border text-xs font-bold transition-all shrink-0 hover:scale-[1.03] cursor-pointer ${
+                      i === 0
                         ? "bg-[#6C63FF]/10 border-[#6C63FF]/30 text-[#C084FC]"
                         : "bg-[#17253A] border-white/[0.05] text-zinc-300 hover:border-zinc-700 hover:text-white"
                     }`}
                   >
-                    <span>{topic.icon} {topic.label}</span>
-                    <span className={`text-[10px] font-semibold ${i % trendingTopics.length === 0 ? "text-[#C084FC]" : "text-zinc-500"}`}>
+                    <span>{topic.label}</span>
+                    <span className={`text-[10px] font-semibold ${i === 0 ? "text-[#C084FC]" : "text-zinc-500"}`}>
                       {topic.count} update{topic.count === 1 ? "" : "s"} &middot; {topic.avgTrend}% momentum
                     </span>
                   </Link>
@@ -757,7 +756,7 @@ export default function Home() {
                 <div>
                   <h4 className="text-sm font-bold text-white group-hover:text-accent transition-colors">{company.name}</h4>
                   <div className="flex items-center justify-between mt-2 text-[10px] text-zinc-500 font-semibold uppercase tracking-wider">
-                    <span>⚡ Momentum: {company.momentum}</span>
+                    <span>Momentum: {company.momentum}</span>
                     <span className="text-[#16C79A]">{company.funding}</span>
                   </div>
                   <p className="text-[11px] text-[#9AA8BD] mt-2.5 leading-snug">Focus: {company.focus}</p>
@@ -774,7 +773,7 @@ export default function Home() {
         <section className="flex flex-col gap-6">
           <div data-animate className="flex items-center justify-between pb-3 border-b border-white/[0.05]">
             <div>
-              <h2 className="text-2xl font-bold tracking-tight text-white font-plus-jakarta">🤖 Trending Models</h2>
+              <h2 className="text-2xl font-bold tracking-tight text-white font-plus-jakarta">Trending Models</h2>
               <p className="text-xs text-textSecondary mt-0.5">The models everyone's building with right now</p>
             </div>
             <Link href="/models" className="text-xs font-semibold text-[#6C63FF] hover:text-[#5a54e5] flex items-center gap-1.5">

@@ -197,11 +197,11 @@ const CHALLENGES: { title: string; duration: string; difficulty: string; blurb: 
   { title: "Complete RAG in One Week", duration: "7 Days", difficulty: "Intermediate", blurb: "Chunking, embeddings, retrieval, and re-ranking. One working RAG pipeline by day 7." },
 ];
 
-const SKILL_RADAR: { label: string; emoji: string; textClass: string; borderClass: string; skills: string[] }[] = [
-  { label: "Exploding", emoji: "\u{1F680}", textClass: "text-positive", borderClass: "border-positive/25", skills: ["AI Agents", "MCP", "Coding Agents"] },
-  { label: "Growing", emoji: "\u{1F4C8}", textClass: "text-tealAccent", borderClass: "border-tealAccent/25", skills: ["Evaluation", "Voice AI"] },
-  { label: "Stable", emoji: "➖", textClass: "text-goldAccent", borderClass: "border-goldAccent/25", skills: ["Prompt Engineering"] },
-  { label: "Declining", emoji: "\u{1F4C9}", textClass: "text-negative", borderClass: "border-negative/25", skills: ["Traditional Chatbots"] },
+const SKILL_RADAR: { label: string; textClass: string; borderClass: string; skills: string[] }[] = [
+  { label: "Exploding", textClass: "text-positive", borderClass: "border-positive/25", skills: ["AI Agents", "MCP", "Coding Agents"] },
+  { label: "Growing", textClass: "text-tealAccent", borderClass: "border-tealAccent/25", skills: ["Evaluation", "Voice AI"] },
+  { label: "Stable", textClass: "text-goldAccent", borderClass: "border-goldAccent/25", skills: ["Prompt Engineering"] },
+  { label: "Declining", textClass: "text-negative", borderClass: "border-negative/25", skills: ["Traditional Chatbots"] },
 ];
 
 const CROSS_LINKS: { from: string; href: string; text: string }[] = [
@@ -416,24 +416,24 @@ const CAREER_ROADMAPS: RoadmapDef[] = [
   { id: "data-to-ai-engineer", title: "Data Engineer to AI Engineer", nodes: ["SQL & Pipelines", "Python", "Vector Databases", "Embeddings", "LLM Fundamentals", "RAG", "Agents", "Production AI Systems"] },
 ];
 
-interface LeaderboardRow { rank: number; name: string; score: number; badge: string }
+interface LeaderboardRow { rank: number; name: string; score: number }
 
 const MOCK_LEADERBOARD: LeaderboardRow[] = [
-  { rank: 1, name: "J. Alvarez", score: 4820, badge: "\u{1F947}" },
-  { rank: 2, name: "S. Okonkwo", score: 4510, badge: "\u{1F948}" },
-  { rank: 3, name: "M. Chen", score: 4275, badge: "\u{1F949}" },
-  { rank: 4, name: "R. Patel", score: 3990, badge: "" },
-  { rank: 5, name: "A. Kowalski", score: 3810, badge: "" },
+  { rank: 1, name: "J. Alvarez", score: 4820 },
+  { rank: 2, name: "S. Okonkwo", score: 4510 },
+  { rank: 3, name: "M. Chen", score: 4275 },
+  { rank: 4, name: "R. Patel", score: 3990 },
+  { rank: 5, name: "A. Kowalski", score: 3810 },
 ];
 
-interface BadgeDef { emoji: string; label: string; unlocked: (s: { completedCount: number; streak: number; totalLessons: number }) => boolean }
+interface BadgeDef { label: string; unlocked: (s: { completedCount: number; streak: number; totalLessons: number }) => boolean }
 
 const BADGE_DEFS: BadgeDef[] = [
-  { emoji: "\u{1F947}", label: "First Certificate", unlocked: (s) => s.completedCount >= 1 },
-  { emoji: "\u{1F525}", label: "3-Day Streak", unlocked: (s) => s.streak >= 3 },
-  { emoji: "\u{1F9E0}", label: "Halfway There", unlocked: (s) => s.completedCount >= Math.ceil(s.totalLessons / 2) },
-  { emoji: "⚡", label: "7-Day Streak", unlocked: (s) => s.streak >= 7 },
-  { emoji: "\u{1F680}", label: "All Skills Complete", unlocked: (s) => s.completedCount >= s.totalLessons },
+  { label: "First Certificate", unlocked: (s) => s.completedCount >= 1 },
+  { label: "3-Day Streak", unlocked: (s) => s.streak >= 3 },
+  { label: "Halfway There", unlocked: (s) => s.completedCount >= Math.ceil(s.totalLessons / 2) },
+  { label: "7-Day Streak", unlocked: (s) => s.streak >= 7 },
+  { label: "All Skills Complete", unlocked: (s) => s.completedCount >= s.totalLessons },
 ];
 
 interface CertTrack { title: string; issuerNote: string; slugs: string[] }
@@ -770,7 +770,7 @@ export default function LearningPage() {
 
         {/* Daily Learning: one concept a day, rotates deterministically by date */}
         <section data-animate className="flex flex-col gap-5">
-          <SectionHeader eyebrow="Every Day" title="\u{1F4C5} Daily Learning" subtitle="One concept a day, fast enough to fit before your first meeting." color="text-tealAccent" />
+          <SectionHeader eyebrow="Every Day" title="Daily Learning" subtitle="One concept a day, fast enough to fit before your first meeting." color="text-tealAccent" />
           <div className="bg-panel border border-white/[0.05] rounded-3xl p-6 md:p-8 flex flex-col sm:flex-row items-start gap-6">
             <div className="flex flex-col items-center justify-center bg-tealAccent/10 border border-tealAccent/25 rounded-2xl px-5 py-4 shrink-0 min-w-[110px]">
               <span className="text-3xl font-display font-black text-tealAccent">{dailyStreak}</span>
@@ -786,7 +786,7 @@ export default function LearningPage() {
 
         {/* Trending Skills */}
         <section ref={trendingRef} data-animate className="flex flex-col gap-5">
-          <SectionHeader eyebrow="Momentum" title="\u{1F525} Trending Skills" subtitle="Skill Momentum Score blends job postings, GitHub activity, model releases, and search volume into a single 0-100 signal." color="text-goldAccent" />
+          <SectionHeader eyebrow="Momentum" title="Trending Skills" subtitle="Skill Momentum Score blends job postings, GitHub activity, model releases, and search volume into a single 0-100 signal." color="text-goldAccent" />
           <div className="bg-panel border border-white/[0.05] rounded-3xl p-6 md:p-8 flex flex-col gap-5">
             {TRENDING_SKILLS.map((skill, i) => (
               <div key={skill.name} className="flex items-center gap-4">
@@ -812,7 +812,7 @@ export default function LearningPage() {
 
         {/* Personalized Dashboard */}
         <section data-animate className="flex flex-col gap-5">
-          <SectionHeader eyebrow="For You" title="⭐ Personalized Dashboard" subtitle="What you should learn next depends entirely on your role. Pick one to see how Novique's recommendations change." color="text-accent" />
+          <SectionHeader eyebrow="For You" title="Personalized Dashboard" subtitle="What you should learn next depends entirely on your role. Pick one to see how Novique's recommendations change." color="text-accent" />
           <div className="flex flex-wrap gap-2">
             {ROLES.map((r) => (
               <button
@@ -931,7 +931,7 @@ export default function LearningPage() {
 
         {/* AI Labs: hands-on exercises that extend the real lesson/quiz slugs */}
         <section data-animate className="flex flex-col gap-5">
-          <SectionHeader eyebrow="Hands-On" title="\u{1F9EA} AI Labs" subtitle="Interactive exercises built on top of the lessons above. Each lab points at a real assessment you can complete for a certificate." color="text-tealAccent" />
+          <SectionHeader eyebrow="Hands-On" title="AI Labs" subtitle="Interactive exercises built on top of the lessons above. Each lab points at a real assessment you can complete for a certificate." color="text-tealAccent" />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {AI_LABS.map((lab) => {
               const done = !!completed[lab.slug];
@@ -959,7 +959,7 @@ export default function LearningPage() {
         {/* Prompt Playground: illustrative practice tool, static example
             completions per model, no live API calls are made here. */}
         <section data-animate className="flex flex-col gap-5">
-          <SectionHeader eyebrow="Practice" title="\u{1F9EA} Prompt Playground" subtitle="Pick a model and a prompt type to see how output style differs. These are static example completions for practice, not live model output." color="text-accent" />
+          <SectionHeader eyebrow="Practice" title="Prompt Playground" subtitle="Pick a model and a prompt type to see how output style differs. These are static example completions for practice, not live model output." color="text-accent" />
           <div className="bg-panel border border-white/[0.05] rounded-3xl p-6 md:p-8 flex flex-col gap-6">
             <div className="flex flex-col gap-3">
               <span className="text-[10px] font-bold uppercase tracking-widest text-textSecondary">Prompt Type</span>
@@ -1006,7 +1006,7 @@ export default function LearningPage() {
 
         {/* Skill Intelligence */}
         <section ref={skillIntelRef} data-animate className="flex flex-col gap-5">
-          <SectionHeader eyebrow="Deep Dive" title="⭐ Skill Intelligence" subtitle="A closer look at two flagship skills: where they stand today and where they're headed." color="text-accent" />
+          <SectionHeader eyebrow="Deep Dive" title="Skill Intelligence" subtitle="A closer look at two flagship skills: where they stand today and where they're headed." color="text-accent" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {FLAGSHIP_SKILLS.map((skill) => (
               <div key={skill.name} className="bg-panel border border-white/[0.05] rounded-3xl p-6 md:p-7 flex flex-col gap-5">
@@ -1046,7 +1046,7 @@ export default function LearningPage() {
 
         {/* Learning Recommendation Engine */}
         <section data-animate className="flex flex-col gap-5">
-          <SectionHeader eyebrow="Interactive" title="⭐⭐⭐⭐⭐ Learning Recommendation Engine" subtitle="Tell Novique where you're starting from and it will lay out an 8-week plan." color="text-tealAccent" />
+          <SectionHeader eyebrow="Interactive" title="Learning Recommendation Engine" subtitle="Tell Novique where you're starting from and it will lay out an 8-week plan." color="text-tealAccent" />
           <div className="bg-panel border border-white/[0.05] rounded-3xl p-6 md:p-8 flex flex-col gap-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <label className="flex flex-col gap-1.5">
@@ -1102,7 +1102,7 @@ export default function LearningPage() {
         {/* Skill Graph + Skill Health */}
         <section data-animate className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           <div className="flex flex-col gap-5">
-            <SectionHeader eyebrow="Dependency Map" title="⭐ Skill Graph" subtitle="What you need before you need it." color="text-accent" />
+            <SectionHeader eyebrow="Dependency Map" title="Skill Graph" subtitle="What you need before you need it." color="text-accent" />
             <div className="bg-panel border border-white/[0.05] rounded-3xl p-6 md:p-8 flex flex-col items-center">
               {SKILL_GRAPH.map((node, i) => (
                 <div key={node} className="flex flex-col items-center">
@@ -1116,7 +1116,7 @@ export default function LearningPage() {
           </div>
 
           <div className="flex flex-col gap-5">
-            <SectionHeader eyebrow="Health Check" title="⭐ Skill Health" subtitle="Demand, future outlook, and growth at a glance." color="text-tealAccent" />
+            <SectionHeader eyebrow="Health Check" title="Skill Health" subtitle="Demand, future outlook, and growth at a glance." color="text-tealAccent" />
             <div className="flex flex-col gap-4">
               {SKILL_HEALTH.map((skill) => (
                 <div key={skill.name} className="bg-panel border border-white/[0.05] rounded-3xl p-6 flex flex-col gap-3">
@@ -1147,7 +1147,7 @@ export default function LearningPage() {
         {/* AI Career Intelligence + Project Builder */}
         <section data-animate className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           <div className="flex flex-col gap-5">
-            <SectionHeader eyebrow="Career Path" title="⭐⭐⭐⭐⭐ AI Career Intelligence" color="text-goldAccent" />
+            <SectionHeader eyebrow="Career Path" title="AI Career Intelligence" color="text-goldAccent" />
             <div className="bg-panel border border-white/[0.05] rounded-3xl p-6 md:p-7 flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <h4 className="text-lg font-display font-extrabold text-white">{CAREER_INTEL.title}</h4>
@@ -1173,7 +1173,7 @@ export default function LearningPage() {
           </div>
 
           <div className="flex flex-col gap-5">
-            <SectionHeader eyebrow="Build Something" title="⭐⭐⭐⭐⭐ Project Builder" color="text-accent" />
+            <SectionHeader eyebrow="Build Something" title="Project Builder" color="text-accent" />
             <div className="bg-panel border border-white/[0.05] rounded-3xl p-6 md:p-7 flex flex-col gap-4">
               <p className="text-xs text-textSecondary">Suggested projects for <span className="text-white font-bold">{PROJECT_BUILDER.skill}</span>:</p>
               <div className="flex flex-wrap gap-2">
@@ -1194,7 +1194,7 @@ export default function LearningPage() {
 
         {/* AI Career Roadmaps: skill maps with progress tracking in localStorage */}
         <section data-animate className="flex flex-col gap-5">
-          <SectionHeader eyebrow="Skill Map" title="\u{1F5FA}️ AI Career Roadmaps" subtitle="Check off each skill as you cover it. Progress is saved on this device, the same way lesson completion is." color="text-goldAccent" />
+          <SectionHeader eyebrow="Skill Map" title="AI Career Roadmaps" subtitle="Check off each skill as you cover it. Progress is saved on this device, the same way lesson completion is." color="text-goldAccent" />
           <div className="flex flex-wrap gap-2">
             {CAREER_ROADMAPS.map((r) => (
               <button key={r.id} onClick={() => setRoadmapId(r.id)}
@@ -1229,7 +1229,7 @@ export default function LearningPage() {
 
         {/* Interview Preparation: role-based question banks */}
         <section data-animate className="flex flex-col gap-5">
-          <SectionHeader eyebrow="Get Hired" title="\u{1F3AF} Interview Preparation" subtitle="Role-based prep. Pick the role you're interviewing for to see representative questions and how to approach them." color="text-accent" />
+          <SectionHeader eyebrow="Get Hired" title="Interview Preparation" subtitle="Role-based prep. Pick the role you're interviewing for to see representative questions and how to approach them." color="text-accent" />
           <div className="flex flex-wrap gap-2">
             {INTERVIEW_PREP.map((r) => (
               <button key={r.role} onClick={() => setPrepRole(r.role)}
@@ -1253,7 +1253,7 @@ export default function LearningPage() {
 
         {/* AI Mentor */}
         <section data-animate className="flex flex-col gap-5">
-          <SectionHeader eyebrow="Ask" title="⭐⭐⭐⭐⭐ AI Mentor" subtitle="Pick a question close to your situation and see how Novique would answer it." color="text-tealAccent" />
+          <SectionHeader eyebrow="Ask" title="AI Mentor" subtitle="Pick a question close to your situation and see how Novique would answer it." color="text-tealAccent" />
           <div className="bg-panel border border-white/[0.05] rounded-3xl p-6 md:p-8 flex flex-col gap-5">
             <div className="flex flex-wrap gap-2">
               {MENTOR_QUESTIONS.map((mq, i) => (
@@ -1276,7 +1276,7 @@ export default function LearningPage() {
 
         {/* Weekly Challenge: one featured build brief, rotates by ISO week */}
         <section data-animate className="flex flex-col gap-5">
-          <SectionHeader eyebrow="This Week" title="\u{1F6E0}️ Weekly Challenge" subtitle="Build something every week. A new brief rotates in automatically." color="text-tealAccent" />
+          <SectionHeader eyebrow="This Week" title="Weekly Challenge" subtitle="Build something every week. A new brief rotates in automatically." color="text-tealAccent" />
           <div className="bg-panel border border-white/[0.05] rounded-3xl p-6 md:p-8 flex flex-col gap-4">
             <div className="flex items-center justify-between flex-wrap gap-3">
               <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border ${difficultyBadge[weeklyBuild.difficulty] ?? "border-white/10 text-zinc-400"}`}>{weeklyBuild.difficulty}</span>
@@ -1340,7 +1340,7 @@ export default function LearningPage() {
             system. No parallel certificate mechanism, this reads and links to
             the same novique_completed data and /verify/[certId] pages. */}
         <section data-animate className="flex flex-col gap-5">
-          <SectionHeader eyebrow="Get Certified" title="\u{1F4DC} Certifications" subtitle="Curated tracks through the real Novique assessments above, mapped to what popular AI certifications actually test." color="text-goldAccent" />
+          <SectionHeader eyebrow="Get Certified" title="Certifications" subtitle="Curated tracks through the real Novique assessments above, mapped to what popular AI certifications actually test." color="text-goldAccent" />
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
             {CERT_TRACKS.map((track) => {
               const trackLessons = track.slugs.map((slug) => LESSONS.find((l) => l.slug === slug)).filter((l): l is (typeof LESSONS)[number] => !!l);
@@ -1387,14 +1387,13 @@ export default function LearningPage() {
         {/* Community Leaderboard: static mock ranking plus real badges/streaks
             derived from this device's own completion + streak data. */}
         <section data-animate className="flex flex-col gap-5">
-          <SectionHeader eyebrow="Community" title="\u{1F3C6} Community Leaderboard" subtitle="An illustrative leaderboard, community-wide ranking isn't live yet. Your badges below are real, derived from your own progress." color="text-accent" />
+          <SectionHeader eyebrow="Community" title="Community Leaderboard" subtitle="An illustrative leaderboard, community-wide ranking isn't live yet. Your badges below are real, derived from your own progress." color="text-accent" />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             <div className="bg-panel border border-white/[0.05] rounded-3xl p-6 flex flex-col gap-3">
               <span className="text-[10px] font-extrabold uppercase tracking-widest text-goldAccent block mb-1">Top Learners This Week</span>
               {MOCK_LEADERBOARD.map((row) => (
                 <div key={row.rank} className="flex items-center gap-4 px-3 py-2.5 rounded-xl bg-secondaryBg/40">
                   <span className="text-xs font-bold text-zinc-500 w-5 shrink-0">{row.rank}</span>
-                  <span className="text-base w-6 shrink-0">{row.badge}</span>
                   <span className="text-sm font-semibold text-white flex-1">{row.name}</span>
                   <span className="text-xs font-bold text-textSecondary">{row.score.toLocaleString()} pts</span>
                 </div>
@@ -1406,9 +1405,9 @@ export default function LearningPage() {
                 {BADGE_DEFS.map((b) => {
                   const unlocked = earnedBadges.includes(b);
                   return (
-                    <div key={b.label} className={`flex flex-col items-center gap-2 text-center px-3 py-4 rounded-2xl border ${unlocked ? "bg-tealAccent/[0.06] border-tealAccent/25" : "bg-white/[0.01] border-white/[0.05] opacity-40"}`}>
-                      <span className="text-2xl">{b.emoji}</span>
+                    <div key={b.label} className={`flex flex-col items-center justify-center gap-1 text-center px-3 py-5 rounded-2xl border ${unlocked ? "bg-tealAccent/[0.06] border-tealAccent/25" : "bg-white/[0.01] border-white/[0.05] opacity-40"}`}>
                       <span className={`text-[10px] font-bold leading-tight ${unlocked ? "text-white" : "text-zinc-500"}`}>{b.label}</span>
+                      <span className={`text-[9px] font-semibold uppercase tracking-wider ${unlocked ? "text-tealAccent" : "text-zinc-600"}`}>{unlocked ? "Unlocked" : "Locked"}</span>
                     </div>
                   );
                 })}
@@ -1422,11 +1421,11 @@ export default function LearningPage() {
 
         {/* AI Skill Radar */}
         <section data-animate className="flex flex-col gap-5">
-          <SectionHeader eyebrow="Radar" title="⭐⭐⭐⭐⭐ AI Skill Radar" subtitle="Every tracked skill, grouped by where it's headed." color="text-tealAccent" />
+          <SectionHeader eyebrow="Radar" title="AI Skill Radar" subtitle="Every tracked skill, grouped by where it's headed." color="text-tealAccent" />
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {SKILL_RADAR.map((group) => (
               <div key={group.label} className={`bg-panel border rounded-3xl p-6 flex flex-col gap-3 ${group.borderClass}`}>
-                <span className={`text-sm font-display font-extrabold ${group.textClass}`}>{group.emoji} {group.label}</span>
+                <span className={`text-sm font-display font-extrabold ${group.textClass}`}>{group.label}</span>
                 <div className="flex flex-col gap-2">
                   {group.skills.map((s) => (
                     <span key={s} className="text-xs text-zinc-200 font-semibold bg-white/[0.02] rounded-lg px-3 py-2">{s}</span>

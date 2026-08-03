@@ -25,3 +25,6 @@ frontend/.env.local
 .idea/
 .vscode/
 .claude/
+
+# Internal docs (not code, not for the public repo)
+/Novique - CEO and CTO Roles.docx

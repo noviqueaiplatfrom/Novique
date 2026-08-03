@@ -195,12 +195,12 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
   const navLinks = [
     { label: "Morning Brief", path: "/" },
     { label: "Intelligence", path: "/intelligence" },
-    { label: "Reports", path: "/weekly-reports" },
     { label: "Models", path: "/models" },
     { label: "Companies", path: "/companies" },
-    { label: "Research", path: "/research" },
     { label: "Opportunities", path: "/opportunities" },
+    { label: "Research", path: "/research" },
     { label: "Learning", path: "/learning" },
+    { label: "Reports", path: "/weekly-reports" },
   ];
 
   // Suggestions filtering
