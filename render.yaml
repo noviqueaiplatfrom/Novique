@@ -20,7 +20,7 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: CORS_ORIGINS
-        value: "https://novique-frontend.onrender.com,https://novique.ai"
+        value: "https://novique-frontend.onrender.com,https://novique.ai,https://novique-ai-five.vercel.app"
       - key: GOOGLE_CLIENT_ID
         value: 338636590792-t166pujl1hpuroea7p7idnn4em4tpht4.apps.googleusercontent.com
       - key: INGEST_SECRET
