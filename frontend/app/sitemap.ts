@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = "https://novique.ai";
+  const base = "https://novique-ai.com";
 
   const staticRoutes = [
     { url: base, priority: 1.0, changeFrequency: "daily" as const },

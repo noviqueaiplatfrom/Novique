@@ -167,7 +167,7 @@ export async function generateShareCard(article: ShareArticle): Promise<Blob> {
   // Watermark right side
   ctx.font = "bold 18px system-ui, -apple-system, sans-serif";
   ctx.fillStyle = "rgba(255,255,255,0.18)";
-  const wm = "novique.ai";
+  const wm = "novique-ai.com";
   ctx.fillText(wm, W - PADDING - ctx.measureText(wm).width, H - 36);
 
   // Small dot before watermark

@@ -42,7 +42,7 @@ class Settings(BaseSettings):
     smtp_port: int = 587
     smtp_user: str | None = None
     smtp_password: str | None = None
-    smtp_from: str = "no-reply@novique.ai"
+    smtp_from: str = "no-reply@novique-ai.com"
 
     # API
     cors_origins: str = "http://localhost:3000"

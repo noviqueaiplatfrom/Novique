@@ -23,7 +23,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://novique.ai"),
+  metadataBase: new URL("https://novique-ai.com"),
   title: {
     default: "Novique — AI Intelligence Platform",
     template: "%s | Novique",
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://novique.ai",
+    url: "https://novique-ai.com",
     siteName: "Novique",
     title: "Novique — AI Intelligence Platform",
     description:

@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: ["/api/", "/profile"],
     },
-    sitemap: "https://novique.ai/sitemap.xml",
+    sitemap: "https://novique-ai.com/sitemap.xml",
   };
 }
