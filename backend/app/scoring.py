@@ -1,4 +1,4 @@
-"""AI Pulse proprietary scoring engine.
+"""Novique proprietary scoring engine.
 
 Two independent metrics, each on a 0-100 scale, are the platform's core IP:
 

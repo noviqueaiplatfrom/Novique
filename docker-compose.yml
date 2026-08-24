@@ -2,15 +2,15 @@ services:
   db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: aipulse
-      POSTGRES_PASSWORD: aipulse
-      POSTGRES_DB: aipulse
+      POSTGRES_USER: novique
+      POSTGRES_PASSWORD: novique
+      POSTGRES_DB: novique
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U aipulse"]
+      test: ["CMD-SHELL", "pg_isready -U novique"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -28,7 +28,7 @@ services:
   backend:
     build: ./backend
     environment:
-      DATABASE_URL: postgresql+psycopg2://aipulse:aipulse@db:5432/aipulse
+      DATABASE_URL: postgresql+psycopg2://novique:novique@db:5432/novique
       REDIS_URL: redis://redis:6379/0
       CORS_ORIGINS: "http://localhost:3000,http://localhost:3001,http://localhost:3002,http://localhost:3003,http://localhost:3004,http://localhost:3005"
       # Override in any real deployment (≥32 chars). Has a dev default otherwise.
@@ -65,7 +65,7 @@ services:
       sh -c "python -m app.bootstrap &&
              celery -A app.celery_app worker --beat --loglevel=info"
     environment:
-      DATABASE_URL: postgresql+psycopg2://aipulse:aipulse@db:5432/aipulse
+      DATABASE_URL: postgresql+psycopg2://novique:novique@db:5432/novique
       REDIS_URL: redis://redis:6379/0
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       AI_MODEL: ${AI_MODEL:-claude-opus-4-8}

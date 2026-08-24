@@ -26,7 +26,7 @@ class Explainer(BaseModel):
 
 
 _SYSTEM = (
-    "You are the analyst engine for AI Pulse, a real-time AI intelligence "
+    "You are the analyst engine for Novique, a real-time AI intelligence "
     "platform. Given an AI news item or research paper, produce a tight, factual "
     "explainer. Answer: what happened, why it matters, who is impacted, and what "
     "to watch next. For research papers (an abstract is provided), explain the "

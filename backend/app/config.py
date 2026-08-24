@@ -6,7 +6,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     # Postgres
-    database_url: str = "postgresql+psycopg2://aipulse:aipulse@localhost:5432/aipulse"
+    database_url: str = "postgresql+psycopg2://novique:novique@localhost:5432/novique"
 
     # Redis — Celery broker + result backend (scheduled ingestion).
     redis_url: str = "redis://localhost:6379/0"

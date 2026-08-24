@@ -1,4 +1,4 @@
-# AI Pulse — Vertical Slice
+# Novique — Vertical Slice
 
 The real-time AI intelligence platform. This repository currently contains a
 **working vertical slice** of the News Aggregator + AI Explainer + proprietary
@@ -61,7 +61,7 @@ cd backend
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 # point at a local Postgres, or use the compose db on :5432
-export DATABASE_URL=postgresql+psycopg2://aipulse:aipulse@localhost:5432/aipulse
+export DATABASE_URL=postgresql+psycopg2://novique:novique@localhost:5432/novique
 python -m app.seed          # create tables + run one ingestion cycle
 uvicorn app.main:app --reload
 ```
@@ -114,4 +114,3 @@ backend/app/
 frontend/
   app/ (page, layout, providers)  components/  lib/
 ```
-# Novique

@@ -56,7 +56,7 @@ FEATURES
       articles without reloading the page. The hero countdown timer reflects
       the real 60-second ingest cycle.
 
-[x] Topic / interest filter chips  (Signals page)
+[x] Topic / interest filter chips  (Intelligence page)
       AI-generated topic tags (from the Claude explainer) are surfaced as
       clickable chips below the kind selector. Multi-select — pick "LLMs" +
       "Funding" to see only articles tagged with either. "Clear all" resets.
@@ -174,14 +174,14 @@ PREREQUISITES
 
 CREATE THE DATABASE (first time only)
   psql -U postgres
-  CREATE USER aipulse WITH PASSWORD 'aipulse';
-  CREATE DATABASE aipulse OWNER aipulse;
+  CREATE USER novique WITH PASSWORD 'novique';
+  CREATE DATABASE novique OWNER novique;
   \q
 
 SET ENVIRONMENT VARIABLES
   Create backend/.env  (or export in each terminal):
 
-      DATABASE_URL=postgresql+psycopg2://aipulse:aipulse@localhost:5432/aipulse
+      DATABASE_URL=postgresql+psycopg2://novique:novique@localhost:5432/novique
       REDIS_URL=redis://localhost:6379/0
       ANTHROPIC_API_KEY=sk-ant-...   # optional; omit for heuristic fallback
       JWT_SECRET=change-me-in-production-please-use-32-chars
@@ -341,7 +341,7 @@ DONE in this build:
   - 10 live sources (HN, Reddit, 7x RSS, Dev.to, GitHub Trending, arXiv)
   - 60-second ingest cadence (was 5 minutes)
   - Frontend auto-refresh every 60 seconds
-  - Topic / interest filter chips on the Signals page
+  - Topic / interest filter chips on the Intelligence page
   - Time-aware greeting (browser clock, no timezone mismatch)
   - Personalized "For You" feed, bookmarks, topic follows
   - JWT accounts, proprietary impact + trend scoring
