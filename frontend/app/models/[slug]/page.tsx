@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
 import Link from "next/link";
 
@@ -127,6 +127,8 @@ interface ModelDetail {
   alternatives: Alternative[];
   suitability: SuitabilityScore[];
   health: ModelHealth;
+  industriesAffected: string[];
+  skillsRequired: string[];
 }
 
 const LOGO_STYLES: Record<ModelDetail["logoColor"], string> = {
@@ -212,7 +214,9 @@ const MODEL_DATABASE: Record<string, ModelDetail> = {
       { label: "Product Managers", score: 80 },
       { label: "Enterprise Teams", score: 90 }
     ],
-    health: { releaseFrequency: "Steady", improvementVelocity: "Fast", communityAdoption: "Very Strong", enterpriseAdoption: "Strong", ecosystemGrowth: "Expanding", apiStability: "Stable", documentationQuality: "Excellent" }
+    health: { releaseFrequency: "Steady", improvementVelocity: "Fast", communityAdoption: "Very Strong", enterpriseAdoption: "Strong", ecosystemGrowth: "Expanding", apiStability: "Stable", documentationQuality: "Excellent" },
+    industriesAffected: ["Software Engineering", "Enterprise IT", "Financial Services", "Legal & Compliance", "Research & Academia"],
+    skillsRequired: ["Prompt engineering", "API integration", "Agentic tool-use design", "Code review workflows"]
   },
   "gpt-4o": {
     slug: "gpt-4o",
@@ -290,7 +294,9 @@ const MODEL_DATABASE: Record<string, ModelDetail> = {
       { label: "Product Managers", score: 86 },
       { label: "Enterprise Teams", score: 85 }
     ],
-    health: { releaseFrequency: "Frequent", improvementVelocity: "Fast", communityAdoption: "Very Strong", enterpriseAdoption: "Very Strong", ecosystemGrowth: "Expanding", apiStability: "Stable", documentationQuality: "Excellent" }
+    health: { releaseFrequency: "Frequent", improvementVelocity: "Fast", communityAdoption: "Very Strong", enterpriseAdoption: "Very Strong", ecosystemGrowth: "Expanding", apiStability: "Stable", documentationQuality: "Excellent" },
+    industriesAffected: ["Customer Support", "Media & Entertainment", "Education", "E-commerce", "Consumer Apps"],
+    skillsRequired: ["Voice/realtime API integration", "Multimodal prompt design", "Conversational UX design"]
   },
   "llama-3-1-405b": {
     slug: "llama-3-1-405b",
@@ -368,7 +374,9 @@ const MODEL_DATABASE: Record<string, ModelDetail> = {
       { label: "Product Managers", score: 68 },
       { label: "Enterprise Teams", score: 91 }
     ],
-    health: { releaseFrequency: "Moderate", improvementVelocity: "Moderate", communityAdoption: "Exponential", enterpriseAdoption: "Growing", ecosystemGrowth: "Expanding", apiStability: "Stable", documentationQuality: "Good" }
+    health: { releaseFrequency: "Moderate", improvementVelocity: "Moderate", communityAdoption: "Exponential", enterpriseAdoption: "Growing", ecosystemGrowth: "Expanding", apiStability: "Stable", documentationQuality: "Good" },
+    industriesAffected: ["Enterprise IT", "Data Infrastructure", "Government & Public Sector", "Manufacturing"],
+    skillsRequired: ["GPU infrastructure management", "Fine-tuning & LoRA", "Self-hosting & MLOps"]
   },
   "gemini-1-5-pro": {
     slug: "gemini-1-5-pro",
@@ -446,7 +454,9 @@ const MODEL_DATABASE: Record<string, ModelDetail> = {
       { label: "Product Managers", score: 79 },
       { label: "Enterprise Teams", score: 88 }
     ],
-    health: { releaseFrequency: "Steady", improvementVelocity: "Fast", communityAdoption: "Strong", enterpriseAdoption: "Strong", ecosystemGrowth: "Expanding", apiStability: "Stable", documentationQuality: "Good" }
+    health: { releaseFrequency: "Steady", improvementVelocity: "Fast", communityAdoption: "Strong", enterpriseAdoption: "Strong", ecosystemGrowth: "Expanding", apiStability: "Stable", documentationQuality: "Good" },
+    industriesAffected: ["Legal", "Media & Publishing", "Enterprise Knowledge Management", "Financial Services"],
+    skillsRequired: ["Long-context prompt design", "Document/video ingestion pipelines", "Vertex AI integration"]
   },
   "deepseek-v3": {
     slug: "deepseek-v3",
@@ -524,7 +534,9 @@ const MODEL_DATABASE: Record<string, ModelDetail> = {
       { label: "Product Managers", score: 70 },
       { label: "Enterprise Teams", score: 78 }
     ],
-    health: { releaseFrequency: "Fast", improvementVelocity: "Very Fast", communityAdoption: "Exponential", enterpriseAdoption: "Growing", ecosystemGrowth: "Expanding", apiStability: "Improving", documentationQuality: "Fair" }
+    health: { releaseFrequency: "Fast", improvementVelocity: "Very Fast", communityAdoption: "Exponential", enterpriseAdoption: "Growing", ecosystemGrowth: "Expanding", apiStability: "Improving", documentationQuality: "Fair" },
+    industriesAffected: ["Software Engineering", "Quantitative Finance", "Scientific Computing", "Startups"],
+    skillsRequired: ["Cost-optimized inference tuning", "Math/coding benchmark evaluation", "Self-hosting via OpenRouter"]
   },
   "perplexity-sonar": {
     slug: "perplexity-sonar",
@@ -602,7 +614,9 @@ const MODEL_DATABASE: Record<string, ModelDetail> = {
       { label: "Product Managers", score: 75 },
       { label: "Enterprise Teams", score: 70 }
     ],
-    health: { releaseFrequency: "Frequent", improvementVelocity: "Fast", communityAdoption: "Growing", enterpriseAdoption: "Emerging", ecosystemGrowth: "Growing", apiStability: "Stable", documentationQuality: "Good" }
+    health: { releaseFrequency: "Frequent", improvementVelocity: "Fast", communityAdoption: "Growing", enterpriseAdoption: "Emerging", ecosystemGrowth: "Growing", apiStability: "Stable", documentationQuality: "Good" },
+    industriesAffected: ["Market Research", "Journalism", "Competitive Intelligence", "Academia"],
+    skillsRequired: ["Search-grounded prompt design", "Citation verification workflows", "Research synthesis"]
   }
 };
 
@@ -798,13 +812,80 @@ function RecommendationEngine({ database }: { database: ModelDetail[] }) {
   );
 }
 
+function ComparePanel({ model, allModels }: { model: ModelDetail; allModels: ModelDetail[] }) {
+  const others = allModels.filter((m) => m.slug !== model.slug);
+  const defaultSlug = model.alternatives[0]?.slug ?? others[0]?.slug ?? "";
+  const [compareSlug, setCompareSlug] = useState(defaultSlug);
+  const other = allModels.find((m) => m.slug === compareSlug) ?? others[0];
+
+  if (!other) return null;
+
+  const rows: { label: string; a: string; b: string }[] = [
+    { label: "AI Score", a: `${model.aiScore}/100`, b: `${other.aiScore}/100` },
+    { label: "License", a: model.license, b: other.license },
+    { label: "Context Window", a: model.contextWindow, b: other.contextWindow },
+    { label: "Pricing", a: model.pricing, b: other.pricing },
+    { label: "Reasoning DNA", a: `${model.dna.reasoning}/100`, b: `${other.dna.reasoning}/100` },
+    { label: "Coding DNA", a: `${model.dna.coding}/100`, b: `${other.dna.coding}/100` },
+    { label: "Vision DNA", a: `${model.dna.vision}/100`, b: `${other.dna.vision}/100` },
+    { label: "Community Rating", a: `${model.communityRating.toFixed(1)}/5.0`, b: `${other.communityRating.toFixed(1)}/5.0` },
+  ];
+
+  return (
+    <div className="bg-panel border border-accent/20 p-6 rounded-3xl">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <h3 className="text-xs font-bold uppercase tracking-widest text-[#9AA8BD]">Compare With</h3>
+        <select
+          value={compareSlug}
+          onChange={(e) => setCompareSlug(e.target.value)}
+          className="bg-white/[0.03] border border-white/[0.08] rounded-xl px-3 py-1.5 text-xs font-bold text-white"
+        >
+          {others.map((m) => (
+            <option key={m.slug} value={m.slug} className="bg-ink">{m.name}</option>
+          ))}
+        </select>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-left border-collapse min-w-[420px]">
+          <thead>
+            <tr>
+              <th className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 py-2 px-2">Metric</th>
+              <th className="text-[10px] font-bold uppercase tracking-wider text-accent py-2 px-2">{model.name}</th>
+              <th className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 py-2 px-2">{other.name}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.label} className="border-t border-white/[0.05]">
+                <td className="text-xs text-zinc-400 font-semibold py-2.5 px-2">{r.label}</td>
+                <td className="text-xs text-white font-bold py-2.5 px-2">{r.a}</td>
+                <td className="text-xs text-zinc-300 font-semibold py-2.5 px-2">{r.b}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 export default function ModelDetailPage() {
   const { slug } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [bookmarked, setBookmarked] = useState(false);
+  const [compareOpen, setCompareOpen] = useState(false);
+  const [shareState, setShareState] = useState<"idle" | "done">("idle");
 
   const modelKey = String(slug || "").toLowerCase();
   const model = MODEL_DATABASE[modelKey];
+
+  // Auto-open the compare panel when arriving via a "Compare" link (#compare)
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.location.hash === "#compare") {
+      setCompareOpen(true);
+      document.getElementById("compare")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, []);
 
   if (!model) {
     return (
@@ -822,6 +903,22 @@ export default function ModelDetailPage() {
 
   const allModels = Object.values(MODEL_DATABASE);
   const makerSlug = model.maker.toLowerCase().replace(/\s+/g, "-");
+
+  const handleShare = async () => {
+    const url = typeof window !== "undefined" ? window.location.href : "";
+    const shareData = { title: `${model.name} — Novique`, text: model.capabilities, url };
+    try {
+      if (typeof navigator !== "undefined" && navigator.share) {
+        await navigator.share(shareData);
+      } else if (typeof navigator !== "undefined" && navigator.clipboard) {
+        await navigator.clipboard.writeText(url);
+        setShareState("done");
+        setTimeout(() => setShareState("idle"), 2000);
+      }
+    } catch {
+      // User cancelled the native share sheet — no-op
+    }
+  };
 
   const quickStats = [
     { label: "Context Window", value: model.contextWindow },
@@ -891,11 +988,19 @@ export default function ModelDetailPage() {
               >
                 {bookmarked ? "Bookmarked" : "Bookmark"}
               </button>
-              <button className="px-3.5 py-2 rounded-xl border border-white/[0.08] text-xs font-bold text-zinc-300 hover:text-white transition-all">
-                Compare
+              <button
+                onClick={() => setCompareOpen((v) => !v)}
+                className={`px-3.5 py-2 rounded-xl border text-xs font-bold transition-all ${
+                  compareOpen ? "bg-accent border-accent text-white" : "border-white/[0.08] text-zinc-300 hover:text-white"
+                }`}
+              >
+                {compareOpen ? "Comparing" : "Compare"}
               </button>
-              <button className="px-3.5 py-2 rounded-xl border border-white/[0.08] text-xs font-bold text-zinc-300 hover:text-white transition-all">
-                Share
+              <button
+                onClick={handleShare}
+                className="px-3.5 py-2 rounded-xl border border-white/[0.08] text-xs font-bold text-zinc-300 hover:text-white transition-all"
+              >
+                {shareState === "done" ? "Link Copied!" : "Share"}
               </button>
             </div>
           </div>
@@ -910,6 +1015,13 @@ export default function ModelDetailPage() {
             </div>
           ))}
         </div>
+
+        {/* Compare Panel (toggled by the Compare button above) */}
+        {compareOpen && (
+          <div id="compare">
+            <ComparePanel model={model} allModels={allModels} />
+          </div>
+        )}
 
         {/* Layout Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
@@ -960,6 +1072,30 @@ export default function ModelDetailPage() {
                     </li>
                   ))}
                 </ul>
+              </div>
+            </div>
+
+            {/* Industries Affected / Skills Required */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="bg-panel border border-white/[0.05] p-6 rounded-3xl">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-[#9AA8BD] mb-4">Industries Affected</h3>
+                <div className="flex flex-wrap gap-1.5">
+                  {model.industriesAffected.map((tag) => (
+                    <span key={tag} className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-tealAccent/10 border border-tealAccent/20 text-tealAccent">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <div className="bg-panel border border-white/[0.05] p-6 rounded-3xl">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-[#9AA8BD] mb-4">Skills Required</h3>
+                <div className="flex flex-wrap gap-1.5">
+                  {model.skillsRequired.map((tag) => (
+                    <span key={tag} className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-goldAccent/10 border border-goldAccent/20 text-goldAccent">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
 

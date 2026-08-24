@@ -539,6 +539,29 @@ function IntelligencePageInner() {
             </div>
           </div>
 
+          {/* What's Moving: live topic momentum, reusing the same corpus-derived stats as the Trend Radar below */}
+          <div className="flex flex-col gap-3">
+            <span className="text-xs font-bold uppercase tracking-widest text-[#94A3B8]">What&rsquo;s Moving?</span>
+            {fastGrowingTopics.length === 0 ? (
+              <p className="text-xs text-zinc-500">No topic momentum data yet.</p>
+            ) : (
+              <div className="flex flex-wrap items-center gap-2.5">
+                {fastGrowingTopics.map((t) => (
+                  <button
+                    key={t.topic}
+                    onClick={() => setSearchQuery(t.topic)}
+                    className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/[0.06] bg-panel text-xs font-bold text-zinc-200 hover:border-positive/40 hover:text-white transition-all"
+                  >
+                    <span>{t.topic}</span>
+                    <span className="flex items-center gap-0.5 text-positive font-extrabold">
+                      &uarr; {Math.round(t.avgTrend)}%
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
           {/* Today's AI Snapshot (weekly activity score) */}
           <div ref={snapshotRef} className="flex flex-col gap-4">
             <span className="text-xs font-bold uppercase tracking-widest text-[#94A3B8]">Weekly Activity Score</span>

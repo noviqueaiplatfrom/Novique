@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/Navbar";
 import Link from "next/link";
 import { MODELS, type ModelSummary, type PurposeTag } from "@/lib/modelsData";
@@ -16,6 +17,109 @@ const LOGO_STYLES: Record<ModelSummary["logoColor"], string> = {
   teal: "bg-tealAccent/10 border-tealAccent/25 text-tealAccent",
   gold: "bg-goldAccent/10 border-goldAccent/25 text-goldAccent",
 };
+
+interface UseCase {
+  id: string;
+  label: string;
+  score: (m: ModelSummary) => number;
+  driver: string;
+}
+
+const USE_CASES: UseCase[] = [
+  { id: "coding", label: "Coding assistant", score: (m) => m.scores.coding, driver: "coding" },
+  { id: "support", label: "Customer support", score: (m) => (m.scores.speed + m.scores.creativity) / 2, driver: "speed & conversational fit" },
+  { id: "rag", label: "RAG application", score: (m) => (m.scores.reasoning + m.scores.value + (m.tags.includes("Long Context") ? 10 : 0)) / 2, driver: "reasoning & retrieval economics" },
+  { id: "voice", label: "Voice agent", score: (m) => (m.scores.multimodal + m.scores.speed) / 2, driver: "multimodal latency" },
+  { id: "research", label: "Research", score: (m) => m.scores.reasoning + (m.tags.includes("Research") ? 10 : 0), driver: "reasoning depth" },
+  { id: "data", label: "Data analysis", score: (m) => (m.scores.reasoning + m.scores.value) / 2, driver: "reasoning & value" },
+];
+
+function ModelRecommender() {
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+
+  const toggle = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const activeCases = USE_CASES.filter((u) => selected.has(u.id));
+  const ranked = activeCases.length
+    ? MODELS.slice()
+        .sort((a, b) => {
+          const scoreA = activeCases.reduce((sum, u) => sum + u.score(a), 0) / activeCases.length;
+          const scoreB = activeCases.reduce((sum, u) => sum + u.score(b), 0) / activeCases.length;
+          return scoreB - scoreA;
+        })
+        .slice(0, 3)
+    : [];
+
+  const medals = ["\u{1F947}", "\u{1F948}", "\u{1F949}"];
+  const fitLabels = ["Best overall fit", "Strong alternative", "Worth considering"];
+
+  return (
+    <div className="bg-panel border border-white/[0.05] rounded-3xl p-6 md:p-8">
+      <span className="text-[10px] font-extrabold uppercase tracking-widest text-accent mb-2 block">AI Recommendation Engine</span>
+      <h2 className="text-xl md:text-2xl font-display font-extrabold text-white mb-1.5">Which model should I use?</h2>
+      <p className="text-sm text-textSecondary mb-5 max-w-xl">Tell us what you&rsquo;re building. Noviqe ranks the best-fit models from the full index.</p>
+
+      <div className="mb-6">
+        <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wide mb-2 block">What are you building?</span>
+        <div className="flex flex-wrap gap-2">
+          {USE_CASES.map((u) => {
+            const active = selected.has(u.id);
+            return (
+              <button
+                key={u.id}
+                onClick={() => toggle(u.id)}
+                className={`flex items-center gap-2 text-xs font-bold px-3.5 py-2 rounded-full border transition-all ${
+                  active
+                    ? "bg-accent border-accent text-white"
+                    : "bg-white/[0.02] border-white/[0.08] text-textSecondary hover:border-accent/40 hover:text-white"
+                }`}
+              >
+                <span className={`w-3.5 h-3.5 rounded flex items-center justify-center text-[9px] border ${active ? "bg-white text-accent border-white" : "border-white/20"}`}>
+                  {active ? "✓" : ""}
+                </span>
+                {u.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {activeCases.length === 0 ? (
+        <p className="text-xs text-zinc-500 italic">Select at least one use case to see Noviqe&rsquo;s recommendation.</p>
+      ) : (
+        <div className="flex flex-col gap-3">
+          <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wide">Noviqe Recommendation</span>
+          {ranked.map((m, idx) => (
+            <Link
+              key={m.slug}
+              href={`/models/${m.slug}`}
+              className="flex items-start gap-4 p-4 bg-white/[0.02] border border-white/[0.05] rounded-2xl hover:border-accent/30 transition-all"
+            >
+              <span className="text-2xl leading-none shrink-0">{medals[idx]}</span>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-sm font-bold text-white">{m.name}</span>
+                  <span className="text-[10px] font-bold text-accent uppercase tracking-wide">{fitLabels[idx]}</span>
+                </div>
+                <p className="text-xs text-textSecondary mt-1 leading-relaxed">
+                  {m.bestFor}. Selected for its {activeCases.map((c) => c.driver).join(", ")}
+                  {" "}({activeCases.map((c) => `${c.label}: ${Math.round(c.score(m))}/100`).join(" · ")}).
+                </p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function topBy(models: ModelSummary[], keyFn: (m: ModelSummary) => number, n: number) {
   return models.slice().sort((a, b) => keyFn(b) - keyFn(a)).slice(0, n);
@@ -83,6 +187,7 @@ function ModelMiniCard({ model }: { model: ModelSummary }) {
 }
 
 export default function ModelsPage() {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTags, setActiveTags] = useState<Set<PurposeTag>>(new Set());
 
@@ -122,6 +227,9 @@ export default function ModelsPage() {
           <h1 className="text-3xl md:text-4xl font-display font-extrabold text-white">Discover, compare and understand every major AI model.</h1>
           <p className="text-sm text-textSecondary mt-2 max-w-2xl">Find the right model for your work, not just the newest one.</p>
         </div>
+
+        {/* AI Recommendation Engine: "Which model should I use?" */}
+        <ModelRecommender />
 
         {/* Quick purpose filters */}
         <div>
@@ -242,7 +350,16 @@ export default function ModelsPage() {
 
                   <div className="flex items-center justify-between pt-1">
                     <span className="text-xs font-bold text-accent group-hover:underline">View Intelligence &rarr;</span>
-                    <span className="text-[10px] font-bold text-zinc-500 border border-white/[0.08] px-2.5 py-1 rounded-lg">Compare</span>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        router.push(`/models/${model.slug}#compare`);
+                      }}
+                      className="text-[10px] font-bold text-zinc-300 border border-white/[0.08] px-2.5 py-1 rounded-lg hover:border-accent/40 hover:text-white transition-all"
+                    >
+                      Compare
+                    </button>
                   </div>
                 </Link>
               ))}

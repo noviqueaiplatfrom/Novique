@@ -404,50 +404,186 @@ export default function Home() {
         </section>
 
         {/* 1d. WHY NOVIQE */}
-        <section className="flex flex-col gap-8">
+        <section className="flex flex-col gap-10">
           <div data-animate className="max-w-2xl">
             <h2 className="text-2xl md:text-3xl font-display font-extrabold text-white tracking-tight mb-2">
               Why Noviqe?
             </h2>
+            <p className="text-sm md:text-base text-[#9AA8BD] font-semibold mb-2">
+              Because knowing what happened isn&rsquo;t enough.
+            </p>
             <p className="text-sm text-[#9AA8BD]">
-              Most AI sources give you information. Noviqe gives you intelligence.
+              Noviqe connects the signals across AI and turns them into context, trends, and actions.
             </p>
           </div>
 
-          <div data-animate className="overflow-x-auto rounded-3xl border border-white/[0.05]">
-            <table className="w-full text-left border-collapse min-w-[560px]">
-              <thead>
-                <tr className="bg-[#101B2D]">
-                  <th className="text-[10px] font-bold uppercase tracking-wider text-[#9AA8BD] py-4 px-5">Capability</th>
-                  <th className="text-[10px] font-bold uppercase tracking-wider text-white py-4 px-5 bg-[#6C63FF]/10">Noviqe</th>
-                  <th className="text-[10px] font-bold uppercase tracking-wider text-[#9AA8BD] py-4 px-5">News Aggregators</th>
-                  <th className="text-[10px] font-bold uppercase tracking-wider text-[#9AA8BD] py-4 px-5">Newsletters &amp; Blogs</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  { row: "Connects news, research, models, companies & funding", noviqe: true, agg: false, news: false },
-                  { row: "Explains why it matters & what to do next", noviqe: true, agg: false, news: true },
-                  { row: "Company & model intelligence scoring", noviqe: true, agg: false, news: false },
-                  { row: "Live, continuously updated", noviqe: true, agg: true, news: false },
-                  { row: "Practical learning & skill building", noviqe: true, agg: false, news: false },
-                  { row: "Investment & opportunity signals", noviqe: true, agg: false, news: false },
-                ].map((r) => (
-                  <tr key={r.row} className="border-t border-white/[0.05]">
-                    <td className="text-xs md:text-sm text-zinc-200 py-4 px-5 font-medium">{r.row}</td>
-                    <td className="py-4 px-5 bg-[#6C63FF]/5 text-center">
-                      {r.noviqe ? <span className="text-[#16C79A] font-bold">&#10003;</span> : <span className="text-zinc-600">-</span>}
-                    </td>
-                    <td className="py-4 px-5 text-center">
-                      {r.agg ? <span className="text-[#16C79A] font-bold">&#10003;</span> : <span className="text-zinc-600">-</span>}
-                    </td>
-                    <td className="py-4 px-5 text-center">
-                      {r.news ? <span className="text-[#16C79A] font-bold">&#10003;</span> : <span className="text-zinc-600">-</span>}
-                    </td>
-                  </tr>
+          {/* Information -> Intelligence -> Action flow */}
+          <div data-animate className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr_auto_1fr] gap-4 lg:gap-3 items-stretch">
+            {/* INFORMATION */}
+            <div className="bg-[#101B2D] border border-white/[0.05] rounded-3xl p-6 flex flex-col gap-4">
+              <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#9AA8BD]">Information</span>
+              <div className="flex flex-wrap gap-2">
+                {["News", "Research", "Models", "Companies", "Funding", "Open Source", "Skills"].map((n) => (
+                  <span key={n} className="px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.06] text-[11px] font-semibold text-zinc-300">
+                    {n}
+                  </span>
                 ))}
-              </tbody>
-            </table>
+              </div>
+            </div>
+
+            <div className="flex lg:flex-col items-center justify-center text-zinc-600 text-xl shrink-0">
+              <span className="lg:hidden">&darr;</span>
+              <span className="hidden lg:inline">&rarr;</span>
+            </div>
+
+            {/* INTELLIGENCE */}
+            <div className="bg-[#17253A] border border-[#6C63FF]/30 rounded-3xl p-6 flex flex-col gap-4 shadow-[0_16px_40px_rgba(109,99,255,0.08)]">
+              <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#C084FC]">Noviqe Intelligence Layer</span>
+              <div className="flex flex-wrap gap-2">
+                {["Context", "Connections", "Trends", "Impact"].map((n) => (
+                  <span key={n} className="px-3 py-1.5 rounded-full bg-[#6C63FF]/10 border border-[#6C63FF]/25 text-[11px] font-bold text-[#C084FC]">
+                    {n}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex lg:flex-col items-center justify-center text-zinc-600 text-xl shrink-0">
+              <span className="lg:hidden">&darr;</span>
+              <span className="hidden lg:inline">&rarr;</span>
+            </div>
+
+            {/* ACTION */}
+            <div className="bg-[#101B2D] border border-white/[0.05] rounded-3xl p-6 flex flex-col gap-4">
+              <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#9AA8BD]">Action</span>
+              <div className="flex flex-wrap gap-2">
+                {["Decide", "Build", "Invest", "Learn", "Adopt"].map((n) => (
+                  <span key={n} className="px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.06] text-[11px] font-semibold text-zinc-300">
+                    {n}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Five core value cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            {[
+              {
+                title: "CONNECT",
+                desc: "See the AI ecosystem as one connected picture.",
+                supporting: "News, research, companies, models, funding, open source and skills are connected instead of scattered across separate platforms.",
+                flow: ["Research", "Model", "Company", "Industry"],
+              },
+              {
+                title: "UNDERSTAND",
+                desc: "Know why something matters.",
+                supporting: "Go beyond headlines with context, impact, affected industries, important relationships and the changes happening around each development.",
+                flow: ["What Happened?", "Why It Matters", "Who's Affected", "What Changes", "What to Watch"],
+              },
+              {
+                title: "DECIDE",
+                desc: "Turn intelligence into action.",
+                supporting: "Use Noviqe to evaluate models, technologies, companies and opportunities based on your actual needs instead of simply browsing information.",
+                flow: ["New Model Released", "Best For…", "Compare", "Recommendation"],
+              },
+              {
+                title: "PERSONALIZE",
+                desc: "See the AI that matters to you.",
+                supporting: "Different people need different intelligence. Noviqe adapts what you see based on your interests, role, technologies, companies and topics you follow.",
+                flow: ["Engineer", "Researcher", "Founder", "Investor", "Student"],
+              },
+              {
+                title: "ANTICIPATE",
+                desc: "Understand what's changing next.",
+                supporting: "Track momentum over time and identify emerging technologies, companies, models and themes before they become obvious.",
+                flow: ["7 Days ↑", "30 Days ↑↑", "90 Days ↑↑↑"],
+              },
+            ].map((card) => (
+              <div
+                key={card.title}
+                data-animate
+                className="bg-[#17253A] border border-white/[0.05] rounded-3xl p-5 flex flex-col gap-3 hover:border-[#6C63FF]/30 hover:-translate-y-1 transition-all group"
+              >
+                <h4 className="text-sm font-display font-extrabold text-white tracking-tight group-hover:text-[#C084FC] transition-colors">
+                  {card.title}
+                </h4>
+                <p className="text-xs font-bold text-zinc-200">{card.desc}</p>
+                <p className="text-[11px] text-[#9AA8BD] leading-relaxed flex-1">{card.supporting}</p>
+                <div className="flex flex-wrap items-center gap-1 pt-2 border-t border-white/[0.05]">
+                  {card.flow.map((f, i, arr) => (
+                    <span key={f} className="flex items-center gap-1">
+                      <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-wide">{f}</span>
+                      {i < arr.length - 1 && <span className="text-zinc-700 text-[10px]">&rarr;</span>}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Mini example: from information to action */}
+          <div data-animate className="bg-[#101B2D] border border-white/[0.05] rounded-3xl p-6 md:p-8">
+            <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#6C63FF] mb-4 block">
+              Example Noviqe Intelligence &middot; AI Agents
+            </span>
+            <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+              {[
+                { q: "What happened?", a: "New models and agent frameworks are being released." },
+                { q: "Why does it matter?", a: "Agent capabilities and infrastructure are rapidly evolving." },
+                { q: "Who is affected?", a: "Developers, enterprises, AI startups and product teams." },
+                { q: "What is changing?", a: "More software workflows can potentially be automated." },
+                { q: "What should I watch?", a: "Agent infrastructure, tool use, protocols, enterprise adoption." },
+                { q: "What can I do?", a: "Evaluate relevant models, technologies and skills." },
+              ].map((step) => (
+                <div key={step.q} className="flex flex-col gap-1.5">
+                  <span className="text-[10px] font-bold text-[#16C79A] uppercase tracking-wide">{step.q}</span>
+                  <p className="text-[11px] text-[#9AA8BD] leading-relaxed">{step.a}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* From Information to Intelligence comparison */}
+          <div data-animate className="flex flex-col gap-5">
+            <h3 className="text-lg font-display font-extrabold text-white text-center">From Information to Intelligence</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-[#101B2D] border border-white/[0.05] rounded-3xl p-6">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-4 block">Traditional AI Information</span>
+                <ul className="flex flex-col gap-3">
+                  {["Find the headline", "Read the article", "Search for related information", "Visit another platform", "Compare manually", "Decide yourself"].map((s) => (
+                    <li key={s} className="text-xs text-zinc-400 flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-zinc-600 shrink-0" />
+                      {s}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="bg-[#17253A] border-2 border-[#6C63FF]/30 rounded-3xl p-6 shadow-[0_16px_40px_rgba(109,99,255,0.08)]">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-[#C084FC] mb-4 block">Noviqe</span>
+                <ul className="flex flex-col gap-3">
+                  {["What happened?", "Why does it matter?", "What is connected to it?", "Who is affected?", "How is the trend changing?", "What could I do next?"].map((s) => (
+                    <li key={s} className="text-xs text-white font-semibold flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#6C63FF] shrink-0" />
+                      {s}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Closing statement */}
+          <div data-animate className="text-center flex flex-col items-center gap-3 pt-2">
+            <p className="text-sm md:text-base text-white font-bold max-w-lg">
+              AI is moving too fast to follow one source.
+            </p>
+            <p className="text-xs md:text-sm text-[#9AA8BD] max-w-xl">
+              Noviqe helps you understand what changed, why it matters, what is connected, and what to do next.
+            </p>
+            <Link href="/intelligence" className="mt-2 text-xs font-bold text-[#6C63FF] hover:underline">
+              Explore Noviqe Intelligence &rarr;
+            </Link>
           </div>
         </section>
 

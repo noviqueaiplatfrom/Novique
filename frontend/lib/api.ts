@@ -5,7 +5,8 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 // Render's free tier spins the backend down after inactivity; a cold start can take
 // up to ~50s to accept connections. This timeout is long enough to let that finish
 // rather than firing isError while the service is still legitimately waking up.
-const COLD_START_TIMEOUT_MS = 55000;
+// (Measured cold boot ~57s in practice, so keep real margin above that.)
+const COLD_START_TIMEOUT_MS = 80000;
 
 async function fetchWithTimeout(url: string, timeoutMs = COLD_START_TIMEOUT_MS): Promise<Response> {
   const controller = new AbortController();

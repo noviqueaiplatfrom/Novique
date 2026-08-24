@@ -225,8 +225,8 @@ export function ArticleCard({
         </p>
       )}
 
-      {/* Grid of Why it Matters & Who is Impacted */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      {/* Grid of Why it Matters, Who is Impacted & What to Watch */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
         {/* Why it Matters */}
         {article.why_it_matters && (
           <div className="bg-accent/[0.01] border-l-2 border-accent px-4 py-3.5 rounded-r-2xl">
@@ -247,6 +247,18 @@ export function ArticleCard({
             </span>
             <p className="text-xs md:text-sm leading-relaxed text-textPrimary font-medium">
               {article.who_is_impacted}
+            </p>
+          </div>
+        )}
+
+        {/* What to Watch */}
+        {article.what_to_watch && (
+          <div className="bg-goldAccent/[0.01] border-l-2 border-goldAccent px-4 py-3.5 rounded-r-2xl">
+            <span className="block text-[10px] font-bold text-goldAccent uppercase tracking-widest mb-1">
+              What to Watch
+            </span>
+            <p className="text-xs md:text-sm leading-relaxed text-textPrimary font-medium">
+              {article.what_to_watch}
             </p>
           </div>
         )}
