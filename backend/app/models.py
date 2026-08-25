@@ -48,6 +48,7 @@ class Article(Base):
     why_it_matters: Mapped[str | None] = mapped_column(Text, nullable=True)
     who_is_impacted: Mapped[str | None] = mapped_column(Text, nullable=True)
     what_to_watch: Mapped[str | None] = mapped_column(Text, nullable=True)
+    what_changed: Mapped[str | None] = mapped_column(Text, nullable=True)
     key_takeaways: Mapped[list | None] = mapped_column(JSON, nullable=True)
     topics: Mapped[list | None] = mapped_column(JSON, nullable=True)
     sentiment: Mapped[str | None] = mapped_column(String(16), nullable=True)

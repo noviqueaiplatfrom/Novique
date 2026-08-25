@@ -23,6 +23,7 @@ class ArticleOut(BaseModel):
     why_it_matters: str | None
     who_is_impacted: str | None
     what_to_watch: str | None
+    what_changed: str | None
     key_takeaways: list[str] | None
     topics: list[str] | None
     sentiment: str | None

@@ -107,6 +107,7 @@ def run_pipeline(
                     summary_30s=ex.summary_30s,
                     why_it_matters=ex.why_it_matters,
                     who_is_impacted=ex.who_is_impacted,
+                    what_changed=ex.what_changed,
                     what_to_watch=ex.what_to_watch,
                     key_takeaways=ex.key_takeaways,
                     topics=ex.topics,

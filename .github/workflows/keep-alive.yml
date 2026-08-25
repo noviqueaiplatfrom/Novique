@@ -1,8 +1,14 @@
 name: Keep Render services awake
 
+# GitHub Actions doesn't guarantee scheduled-workflow punctuality — a single
+# */10 cron can silently drift to 1-2+ hours between actual runs under load,
+# wide enough for Render's free tier to spin down in between. Two offset
+# cron entries roughly double the number of trigger attempts per hour, so a
+# delay on one doesn't leave as wide a gap.
 on:
   schedule:
     - cron: "*/10 * * * *"
+    - cron: "5,15,25,35,45,55 * * * *"
   workflow_dispatch: {}
 
 jobs:

@@ -14,6 +14,7 @@ export interface Article {
   summary_30s: string | null;
   why_it_matters: string | null;
   who_is_impacted: string | null;
+  what_changed: string | null;
   what_to_watch: string | null;
   key_takeaways: string[] | null;
   topics: string[] | null;

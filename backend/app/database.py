@@ -63,3 +63,11 @@ def run_migrations() -> None:
             print("[migration] picture added")
     except Exception as e:
         print(f"[migration] picture add skipped: {e}")
+
+    # Add what_changed (Explainer Engine: "what changed compared with before")
+    try:
+        with engine.begin() as conn:
+            conn.execute(text("ALTER TABLE articles ADD COLUMN what_changed TEXT;"))
+            print("[migration] what_changed added")
+    except Exception as e:
+        print(f"[migration] what_changed add skipped: {e}")

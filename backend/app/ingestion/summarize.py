@@ -20,6 +20,7 @@ class Explainer(BaseModel):
     key_takeaways: list[str] = Field(description="2-4 bullet takeaways.")
     why_it_matters: str = Field(description="Why this matters for the AI field.")
     who_is_impacted: str = Field(description="Who is most affected (devs, founders, etc.).")
+    what_changed: str = Field(description="What is new or different here compared with the prior state of the art / prior practice, based only on what the source text says.")
     what_to_watch: str = Field(description="What to watch next as a result.")
     topics: list[str] = Field(description="3-6 short topic tags, e.g. 'LLMs', 'Funding'.")
     sentiment: Literal["positive", "neutral", "negative"]
@@ -28,11 +29,14 @@ class Explainer(BaseModel):
 _SYSTEM = (
     "You are the analyst engine for Novique, a real-time AI intelligence "
     "platform. Given an AI news item or research paper, produce a tight, factual "
-    "explainer. Answer: what happened, why it matters, who is impacted, and what "
+    "explainer. Answer: what happened, why it matters, who is impacted, what "
+    "changed compared with the prior state of the art or prior practice, and what "
     "to watch next. For research papers (an abstract is provided), explain the "
     "contribution in plain English first, then note the technical significance. "
     "Be concise and concrete. Do not speculate beyond the given text; if details "
-    "are unknown, say what a reader should look for."
+    "are unknown, say what a reader should look for. If the source text gives no "
+    "basis for what changed, say that this is a new development rather than "
+    "inventing a comparison."
 )
 
 
@@ -60,6 +64,19 @@ _WHO: dict[str, str] = {
     "AI Safety": "Policy teams, AI researchers, legal counsel at AI companies, and regulators drafting AI governance frameworks.",
     "Generative Media": "Creative teams, media companies, content platforms, and IP lawyers tracking synthetic media.",
     "Knowledge & RAG": "Enterprise AI teams building internal search, data engineers, and product teams shipping knowledge assistants.",
+}
+
+_CHANGED: dict[str, str] = {
+    "Agents": "Agent frameworks are moving from single-tool demos toward standardized, multi-step, multi-tool workflows.",
+    "LLMs": "New capability or efficiency gains versus the previous generation of models in this class.",
+    "Funding": "A new capital event that shifts the competitive or valuation baseline for this company/segment.",
+    "Robotics": "A new hardware or software capability that moves embodied systems closer to real-world deployment.",
+    "Voice AI": "Latency, naturalness, or pricing has moved versus the prior generation of voice systems.",
+    "Developer Tools": "AI-assisted workflows are shifting from optional add-ons toward default parts of the developer toolchain.",
+    "Hiring": "AI fluency is shifting from a nice-to-have to an explicit hiring/evaluation criterion.",
+    "AI Safety": "A new proposal, incident, or requirement shifts what companies are expected to do versus prior practice.",
+    "Generative Media": "Generation quality or accessibility has moved versus the prior generation of tools.",
+    "Knowledge & RAG": "Retrieval or grounding techniques are improving versus prior approaches to this problem.",
 }
 
 _WATCH: dict[str, str] = {
@@ -102,6 +119,7 @@ def _heuristic(item: RawItem, domain: str) -> Explainer:
         key_takeaways=[item.title, f"Source: {domain or item.source}"],
         why_it_matters=why,
         who_is_impacted=_WHO.get(primary, "Engineers, product teams, and researchers tracking AI developments."),
+        what_changed=_CHANGED.get(primary, "A new development in this area; no direct prior-state comparison is available from the source."),
         what_to_watch=_WATCH.get(primary, "Follow-up coverage, related announcements, and technical deep-dives."),
         topics=detected[:6],
         sentiment="neutral",
