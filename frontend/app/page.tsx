@@ -293,7 +293,7 @@ export default function Home() {
               </span>
             </div>
 
-            <p className="text-sm text-textSecondary leading-relaxed mb-6 font-normal">
+            <p className="text-sm text-textSecondary leading-relaxed mb-5 font-normal">
               {isLoading && (coldStart
                 ? "Waking up the Novique pipeline after inactivity. First load can take up to a minute, hang tight."
                 : "Novique engines are aggregating reference nodes...")}
@@ -306,7 +306,42 @@ export default function Home() {
               )}
             </p>
 
-            <div className="text-[11px] text-[#9AA8BD] border-t border-white/[0.05] pt-4 flex items-center justify-between">
+            {/* Live preview: real headlines flowing through this cycle's batch */}
+            {!isLoading && !isError && !!data?.length && (
+              <div className="flex flex-col gap-2.5 mb-5">
+                {data.slice(0, 5).map((a) => (
+                  <a
+                    key={a.id}
+                    href={a.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-start gap-2.5 group"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#6C63FF] mt-1.5 shrink-0" />
+                    <span className="text-xs text-zinc-300 group-hover:text-white leading-snug line-clamp-1 transition-colors">
+                      {a.title}
+                    </span>
+                    <span className="text-[10px] text-zinc-500 shrink-0 ml-auto font-semibold">{timeAgo(a.published_at)}</span>
+                  </a>
+                ))}
+              </div>
+            )}
+
+            {/* Live stat strip: real corpus/momentum numbers, not placeholders */}
+            {!isLoading && !isError && (
+              <div className="flex items-center gap-4 mb-5 text-[11px] text-[#9AA8BD]">
+                <span className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#16C79A]" />
+                  <strong className="text-white font-bold">{stats ? stats.total_sources : "—"}</strong> sources connected
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#F6C453]" />
+                  <strong className="text-white font-bold">{briefTargets[5]}%</strong> momentum index
+                </span>
+              </div>
+            )}
+
+            <div className="text-[11px] text-[#9AA8BD] border-t border-white/[0.05] pt-4 mt-auto flex items-center justify-between">
               <span className="flex items-center gap-1.5">
                 <svg className="w-3.5 h-3.5 text-[#16C79A]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
