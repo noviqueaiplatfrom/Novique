@@ -1,12 +1,32 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/Navbar";
 import { useAuth } from "../auth-context";
+import { deleteAccount } from "@/lib/auth";
 
 export default function ProfilePage() {
-  const { user } = useAuth();
+  const { user, token, logout } = useAuth();
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  const handleDeleteAccount = async () => {
+    if (!token) return;
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      await deleteAccount(token);
+      logout();
+      router.push("/");
+    } catch (e) {
+      setDeleteError(e instanceof Error ? e.message : "Failed to delete account.");
+      setDeleting(false);
+    }
+  };
   const [role, setRole] = useState<"engineer" | "founder" | "researcher">("engineer");
   
   const [topics, setTopics] = useState({
@@ -123,6 +143,44 @@ export default function ProfilePage() {
                 value="••••••••••••••••••••••••••••••••"
                 className="w-full h-10 px-4 rounded-xl border border-white/[0.06] bg-white/[0.02] text-xs text-zinc-400 outline-none select-none cursor-default"
               />
+            </div>
+
+            {/* Danger Zone: account deletion */}
+            <div className="bg-negative/[0.03] border border-negative/20 p-6 rounded-3xl">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-negative mb-1">Danger Zone</h3>
+              <p className="text-xs text-textSecondary mb-4">
+                Permanently delete your account, bookmarks, and interest signals. This cannot be undone.
+              </p>
+
+              {deleteError && (
+                <p className="text-xs text-negative mb-3">{deleteError}</p>
+              )}
+
+              {!confirmingDelete ? (
+                <button
+                  onClick={() => setConfirmingDelete(true)}
+                  className="px-4 py-2 rounded-xl border border-negative/30 text-negative text-xs font-bold hover:bg-negative/10 transition-all"
+                >
+                  Delete Account
+                </button>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={handleDeleteAccount}
+                    disabled={deleting}
+                    className="px-4 py-2 rounded-xl bg-negative text-white text-xs font-bold hover:bg-negative/90 transition-all disabled:opacity-60"
+                  >
+                    {deleting ? "Deleting…" : "Yes, permanently delete my account"}
+                  </button>
+                  <button
+                    onClick={() => setConfirmingDelete(false)}
+                    disabled={deleting}
+                    className="px-4 py-2 rounded-xl border border-white/[0.08] text-zinc-300 text-xs font-bold hover:text-white transition-all"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
             </div>
 
           </div>

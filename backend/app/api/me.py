@@ -31,6 +31,13 @@ def me(user: User = Depends(get_current_user)):
     return user
 
 
+@router.delete("/me", status_code=status.HTTP_204_NO_CONTENT)
+def delete_account(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Delete the current user's account. Bookmarks/interests cascade via FK ondelete."""
+    db.delete(user)
+    db.commit()
+
+
 # --- Interests -------------------------------------------------------------
 @router.get("/me/interests", response_model=list[str])
 def list_interests(user: User = Depends(get_current_user), db: Session = Depends(get_db)):

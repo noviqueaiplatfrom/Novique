@@ -57,6 +57,9 @@ export const loginWithGoogle = (idToken: string) =>
 
 export const getMe = (token: string) => request<User>("/api/me", { token });
 
+export const deleteAccount = (token: string) =>
+  request<void>("/api/me", { method: "DELETE", token });
+
 // --- Interests ---
 export const getInterests = (token: string) =>
   request<string[]>("/api/me/interests", { token });
