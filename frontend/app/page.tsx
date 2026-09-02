@@ -1185,26 +1185,6 @@ export default function Home() {
 
       </main>
 
-      {/* 11. FOOTER */}
-      <footer className="border-t border-white/[0.05] py-10 mt-16 bg-[#07111F]">
-        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-[#9AA8BD]">
-          <div className="flex gap-4">
-            <span className="hover:text-white cursor-pointer transition-colors">About</span>
-            <span className="hover:text-white cursor-pointer transition-colors">API</span>
-            <span className="hover:text-white cursor-pointer transition-colors">Blog</span>
-            <span className="hover:text-white cursor-pointer transition-colors">Privacy</span>
-            <span className="hover:text-white cursor-pointer transition-colors">Contact</span>
-          </div>
-          <div>
-            &copy; 2026 Novique. Scored and aggregated by the Novique AI platform.
-          </div>
-          <div className="flex gap-4">
-            <span className="hover:text-white cursor-pointer transition-colors">Twitter</span>
-            <span className="hover:text-white cursor-pointer transition-colors">GitHub</span>
-          </div>
-        </div>
-      </footer>
-
     </div>
   );
 }

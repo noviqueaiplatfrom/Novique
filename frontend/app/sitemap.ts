@@ -12,7 +12,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/research`, priority: 0.7, changeFrequency: "weekly" as const },
     { url: `${base}/companies`, priority: 0.7, changeFrequency: "weekly" as const },
     { url: `${base}/models`, priority: 0.7, changeFrequency: "weekly" as const },
-    { url: `${base}/saved`, priority: 0.4, changeFrequency: "never" as const },
+    { url: `${base}/privacy`, priority: 0.3, changeFrequency: "yearly" as const },
+    { url: `${base}/terms`, priority: 0.3, changeFrequency: "yearly" as const },
+    { url: `${base}/contact`, priority: 0.3, changeFrequency: "yearly" as const },
   ];
 
   const lessonSlugs = [
@@ -41,6 +43,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "mistral",
     "cursor",
     "perplexity",
+    "microsoft-ai",
+    "xai",
+    "deepseek",
+    "cohere",
+    "hugging-face",
   ];
 
   const lessonRoutes = lessonSlugs.map((slug) => ({

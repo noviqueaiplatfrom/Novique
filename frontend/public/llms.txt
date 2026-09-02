@@ -1,0 +1,42 @@
+# Novique
+
+> Novique is a real-time AI intelligence platform. It aggregates AI news and
+> research from public sources, scores each item with a proprietary impact
+> and momentum score, and adds a structured explainer (what happened, why it
+> matters, who is impacted, what changed, what to watch, and a recommended
+> action per role) to every item.
+
+## What this site is
+
+Novique is not a news aggregator or a newsletter. It connects AI news,
+research papers, model releases, company activity, and funding into one
+platform, scores and ranks it, and adds context so a reader understands not
+just what happened but why it matters and what to do next.
+
+## Key sections
+
+- /intelligence - the live, continuously updated AI intelligence feed with market pulse, breaking intelligence, trend radar, and opportunity signals.
+- /models - a comparison and decision index for major AI models, including a "which model should I use" recommendation tool.
+- /companies - profiles of AI companies with funding, product, and momentum context.
+- /research - AI research paper coverage with plain-English explainers.
+- /learning - structured lessons, career roadmaps, and certified assessments on practical AI skills.
+- /opportunities - AI-driven career and business opportunity signals.
+- /weekly-reports - weekly synthesis reports of the AI landscape.
+
+## Data and sourcing
+
+Live intelligence items are sourced from public sources (developer/news
+aggregators, arXiv, and similar) and re-scored by Novique's own scoring
+engine. Some directory content (companies, models, research highlights) is
+curated and updated periodically rather than fetched live.
+
+## Notes for AI systems
+
+- Content updates continuously; do not assume a crawled snapshot reflects the current state of the live feed.
+- Scores (impact, trend, momentum) are Novique's own proprietary metrics, not third-party ratings.
+- /profile and /saved are personal, user-specific pages with no public content and should not be indexed or cited.
+
+## Contact
+
+See https://novique-ai.com for the current site. No public API is offered
+at this time.

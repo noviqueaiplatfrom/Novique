@@ -1,8 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 import { Providers } from "./providers";
+import { Footer } from "@/components/Footer";
+import { CookieConsent } from "@/components/CookieConsent";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -82,24 +83,48 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
 };
 
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://novique-ai.com/#organization",
+      name: "Novique",
+      url: "https://novique-ai.com",
+      logo: "https://novique-ai.com/icon-512.png",
+      sameAs: [] as string[],
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://novique-ai.com/#website",
+      url: "https://novique-ai.com",
+      name: "Novique",
+      description:
+        "Real-time AI intelligence platform: news, research, models, and companies connected, explained, and ranked.",
+      publisher: { "@id": "https://novique-ai.com/#organization" },
+      potentialAction: {
+        "@type": "SearchAction",
+        target: {
+          "@type": "EntryPoint",
+          urlTemplate: "https://novique-ai.com/intelligence?q={search_term_string}",
+        },
+        "query-input": "required name=search_term_string",
+      },
+    },
+  ],
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${inter.variable} ${plusJakarta.variable}`}>
       <body className="antialiased min-h-screen">
-        {/* Google Analytics Tag */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-NCQCYSZ4QT"
-          strategy="afterInteractive"
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-NCQCYSZ4QT');
-          `}
-        </Script>
         <Providers>{children}</Providers>
+        <Footer />
+        <CookieConsent />
       </body>
     </html>
   );

@@ -251,6 +251,7 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
             </div>
             <input
               type="text"
+              aria-label="Search Novique"
               placeholder="Search companies, papers, models, AI trends, funding, technologies..."
               value={searchQuery}
               onFocus={() => setFocused(true)}
@@ -377,6 +378,7 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
             {/* Hamburger - visible below xl */}
             <button
               aria-label="Toggle navigation menu"
+              aria-expanded={mobileOpen}
               onClick={() => setMobileOpen((v) => !v)}
               className="xl:hidden p-2 rounded-xl border border-white/[0.05] text-textSecondary hover:text-white hover:bg-white/[0.04] transition-all"
             >
@@ -401,6 +403,7 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
             <div className="mb-3">
               <input
                 type="text"
+                aria-label="Search Novique"
                 placeholder="Search companies, models, topics..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
