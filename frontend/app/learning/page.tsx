@@ -651,8 +651,22 @@ export default function LearningPage() {
       localStorage.setItem("novique_daily_streak", JSON.stringify({ lastVisit: today, streak: nextStreak }));
     } catch {}
   }, []);
-  const dailyConcept = DAILY_CONCEPTS[dayOfYear(new Date()) % DAILY_CONCEPTS.length];
-  const weeklyBuild = WEEKLY_BUILDS[isoWeekNumber(new Date()) % WEEKLY_BUILDS.length];
+  // Computed client-side only: this page is statically prerendered, so a
+  // `new Date()` evaluated during render would bake in the build-time day/week
+  // and mismatch whatever day/week it actually is when a visitor hydrates the
+  // page, causing a React hydration error. Default to index 0 for a stable
+  // SSR-safe first render, then swap in the real date-based pick on mount.
+  const [dailyConceptIdx, setDailyConceptIdx] = useState(0);
+  const [weeklyBuildIdx, setWeeklyBuildIdx] = useState(0);
+  const [currentWeekNumber, setCurrentWeekNumber] = useState<number | null>(null);
+  useEffect(() => {
+    const now = new Date();
+    setDailyConceptIdx(dayOfYear(now) % DAILY_CONCEPTS.length);
+    setWeeklyBuildIdx(isoWeekNumber(now) % WEEKLY_BUILDS.length);
+    setCurrentWeekNumber(isoWeekNumber(now));
+  }, []);
+  const dailyConcept = DAILY_CONCEPTS[dailyConceptIdx];
+  const weeklyBuild = WEEKLY_BUILDS[weeklyBuildIdx];
 
   // Prompt Playground: pick a model + a canned prompt category, see a static
   // illustrative completion per model. No live API call is made anywhere here.
@@ -1280,7 +1294,7 @@ export default function LearningPage() {
           <div className="bg-panel border border-white/[0.05] rounded-3xl p-6 md:p-8 flex flex-col gap-4">
             <div className="flex items-center justify-between flex-wrap gap-3">
               <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border ${difficultyBadge[weeklyBuild.difficulty] ?? "border-white/10 text-zinc-400"}`}>{weeklyBuild.difficulty}</span>
-              <span className="text-[10px] font-bold text-zinc-500">Week {isoWeekNumber(new Date())}</span>
+              <span className="text-[10px] font-bold text-zinc-500">Week {currentWeekNumber ?? "—"}</span>
             </div>
             <h3 className="text-lg font-display font-extrabold text-white">{weeklyBuild.title}</h3>
             <p className="text-sm text-textSecondary leading-relaxed">{weeklyBuild.brief}</p>
