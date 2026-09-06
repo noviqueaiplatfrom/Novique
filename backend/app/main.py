@@ -44,6 +44,6 @@ app.include_router(auth_router)
 app.include_router(me_router)
 
 
-@app.get("/health")
+@app.api_route("/health", methods=["GET", "HEAD"])
 def health():
     return {"status": "ok"}
