@@ -64,7 +64,7 @@ function ModelRecommender() {
     <div className="bg-panel border border-white/[0.05] rounded-3xl p-6 md:p-8">
       <span className="text-[10px] font-extrabold uppercase tracking-widest text-accent mb-2 block">AI Recommendation Engine</span>
       <h2 className="text-xl md:text-2xl font-display font-extrabold text-white mb-1.5">Which model should I use?</h2>
-      <p className="text-sm text-textSecondary mb-5 max-w-xl">Tell us what you&rsquo;re building. Noviqe ranks the best-fit models from the full index.</p>
+      <p className="text-sm text-textSecondary mb-5 max-w-xl">Tell us what you&rsquo;re building. Novique ranks the best-fit models from the full index.</p>
 
       <div className="mb-6">
         <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wide mb-2 block">What are you building?</span>
@@ -92,10 +92,10 @@ function ModelRecommender() {
       </div>
 
       {activeCases.length === 0 ? (
-        <p className="text-xs text-zinc-500 italic">Select at least one use case to see Noviqe&rsquo;s recommendation.</p>
+        <p className="text-xs text-zinc-500 italic">Select at least one use case to see Novique&rsquo;s recommendation.</p>
       ) : (
         <div className="flex flex-col gap-3">
-          <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wide">Noviqe Recommendation</span>
+          <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wide">Novique Recommendation</span>
           {ranked.map((m, idx) => (
             <Link
               key={m.slug}

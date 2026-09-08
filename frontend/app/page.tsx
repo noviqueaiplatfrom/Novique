@@ -258,9 +258,9 @@ export default function Home() {
               One Platform. Every Important AI Decision.
             </h1>
             <p className="text-sm md:text-base text-[#9AA8BD] font-normal leading-relaxed mb-8 max-w-lg">
-              Noviqe combines AI news, research, models, companies, funding, benchmarks, open-source projects, and industry intelligence into one intelligent platform.
+              Novique combines AI news, research, models, companies, funding, benchmarks, open-source projects, and industry intelligence into one intelligent platform.
               <br /><br />
-              Instead of reading hundreds of updates every day, Noviqe tells you what matters, why it matters, and what you should do next.
+              Instead of reading hundreds of updates every day, Novique tells you what matters, why it matters, and what you should do next.
             </p>
 
             <div className="flex flex-wrap items-center gap-4">
@@ -402,17 +402,17 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 1c. WHAT IS NOVIQE */}
+        {/* 1c. WHAT IS NOVIQUE */}
         <section className="flex flex-col gap-8">
           <div data-animate className="max-w-2xl">
             <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#6C63FF] mb-3 bg-[#6C63FF]/10 px-3.5 py-1 rounded-full w-max block">
-              What is Noviqe?
+              What is Novique?
             </span>
             <h2 className="text-2xl md:text-3xl font-display font-extrabold text-white tracking-tight mb-4">
               An AI Intelligence Platform, not a news feed.
             </h2>
             <p className="text-sm md:text-base text-[#9AA8BD] leading-relaxed">
-              Instead of simply collecting AI news, Noviqe connects companies, AI models, research papers, funding activity, hiring trends, open-source projects, benchmarks, and market signals into one intelligent ecosystem.
+              Instead of simply collecting AI news, Novique connects companies, AI models, research papers, funding activity, hiring trends, open-source projects, benchmarks, and market signals into one intelligent ecosystem.
               <br /><br />
               Every update is summarized, scored, connected, and explained so you can understand not only what happened, but why it matters and what comes next.
             </p>
@@ -438,17 +438,17 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 1d. WHY NOVIQE */}
+        {/* 1d. WHY NOVIQUE */}
         <section className="flex flex-col gap-10">
           <div data-animate className="max-w-2xl">
             <h2 className="text-2xl md:text-3xl font-display font-extrabold text-white tracking-tight mb-2">
-              Why Noviqe?
+              Why Novique?
             </h2>
             <p className="text-sm md:text-base text-[#9AA8BD] font-semibold mb-2">
               Because knowing what happened isn&rsquo;t enough.
             </p>
             <p className="text-sm text-[#9AA8BD]">
-              Noviqe connects the signals across AI and turns them into context, trends, and actions.
+              Novique connects the signals across AI and turns them into context, trends, and actions.
             </p>
           </div>
 
@@ -473,7 +473,7 @@ export default function Home() {
 
             {/* INTELLIGENCE */}
             <div className="bg-[#17253A] border border-[#6C63FF]/30 rounded-3xl p-6 flex flex-col gap-4 shadow-[0_16px_40px_rgba(109,99,255,0.08)]">
-              <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#C084FC]">Noviqe Intelligence Layer</span>
+              <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#C084FC]">Novique Intelligence Layer</span>
               <div className="flex flex-wrap gap-2">
                 {["Context", "Connections", "Trends", "Impact"].map((n) => (
                   <span key={n} className="px-3 py-1.5 rounded-full bg-[#6C63FF]/10 border border-[#6C63FF]/25 text-[11px] font-bold text-[#C084FC]">
@@ -519,13 +519,13 @@ export default function Home() {
               {
                 title: "DECIDE",
                 desc: "Turn intelligence into action.",
-                supporting: "Use Noviqe to evaluate models, technologies, companies and opportunities based on your actual needs instead of simply browsing information.",
+                supporting: "Use Novique to evaluate models, technologies, companies and opportunities based on your actual needs instead of simply browsing information.",
                 flow: ["New Model Released", "Best For…", "Compare", "Recommendation"],
               },
               {
                 title: "PERSONALIZE",
                 desc: "See the AI that matters to you.",
-                supporting: "Different people need different intelligence. Noviqe adapts what you see based on your interests, role, technologies, companies and topics you follow.",
+                supporting: "Different people need different intelligence. Novique adapts what you see based on your interests, role, technologies, companies and topics you follow.",
                 flow: ["Engineer", "Researcher", "Founder", "Investor", "Student"],
               },
               {
@@ -560,7 +560,7 @@ export default function Home() {
           {/* Mini example: from information to action */}
           <div data-animate className="bg-[#101B2D] border border-white/[0.05] rounded-3xl p-6 md:p-8">
             <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#6C63FF] mb-4 block">
-              Example Noviqe Intelligence &middot; AI Agents
+              Example Novique Intelligence &middot; AI Agents
             </span>
             <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
               {[
@@ -595,7 +595,7 @@ export default function Home() {
                 </ul>
               </div>
               <div className="bg-[#17253A] border-2 border-[#6C63FF]/30 rounded-3xl p-6 shadow-[0_16px_40px_rgba(109,99,255,0.08)]">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-[#C084FC] mb-4 block">Noviqe</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-[#C084FC] mb-4 block">Novique</span>
                 <ul className="flex flex-col gap-3">
                   {["What happened?", "Why does it matter?", "What is connected to it?", "Who is affected?", "How is the trend changing?", "What could I do next?"].map((s) => (
                     <li key={s} className="text-xs text-white font-semibold flex items-center gap-2">
@@ -614,10 +614,10 @@ export default function Home() {
               AI is moving too fast to follow one source.
             </p>
             <p className="text-xs md:text-sm text-[#9AA8BD] max-w-xl">
-              Noviqe helps you understand what changed, why it matters, what is connected, and what to do next.
+              Novique helps you understand what changed, why it matters, what is connected, and what to do next.
             </p>
             <Link href="/intelligence" className="mt-2 text-xs font-bold text-[#6C63FF] hover:underline">
-              Explore Noviqe Intelligence &rarr;
+              Explore Novique Intelligence &rarr;
             </Link>
           </div>
         </section>
