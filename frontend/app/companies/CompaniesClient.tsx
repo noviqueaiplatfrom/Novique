@@ -23,23 +23,33 @@ function AnimatedNumber({ value, suffix = "" }: { value: number; suffix?: string
 
   useEffect(() => {
     if (!ref.current) return;
+    const start = () => {
+      if (started.current) return;
+      started.current = true;
+      const steps = 30;
+      let step = 0;
+      const timer = setInterval(() => {
+        step++;
+        const ease = 1 - Math.pow(1 - step / steps, 3);
+        setDisplay(Math.round(value * ease));
+        if (step >= steps) clearInterval(timer);
+      }, 900 / steps);
+    };
     const obs = new IntersectionObserver(
       ([entry]) => {
-        if (!entry.isIntersecting || started.current) return;
-        started.current = true;
-        const steps = 30;
-        let step = 0;
-        const timer = setInterval(() => {
-          step++;
-          const ease = 1 - Math.pow(1 - step / steps, 3);
-          setDisplay(Math.round(value * ease));
-          if (step >= steps) clearInterval(timer);
-        }, 900 / steps);
+        if (entry.isIntersecting) start();
       },
       { threshold: 0.3 }
     );
     obs.observe(ref.current);
-    return () => obs.disconnect();
+    // Safety net: if the observer never fires (element too small, hidden
+    // ancestor, backgrounded tab, etc.), the real value must still show up
+    // rather than staying frozen at 0 forever.
+    const fallback = setTimeout(start, 1500);
+    return () => {
+      obs.disconnect();
+      clearTimeout(fallback);
+    };
   }, [value]);
 
   return (
@@ -66,7 +76,12 @@ function MomentumBar({ score }: { score: number }) {
       { threshold: 0.2 }
     );
     obs.observe(ref.current);
-    return () => obs.disconnect();
+    // Safety net: guarantee the real width renders even if the observer never fires.
+    const fallback = setTimeout(() => setWidth(score), 1500);
+    return () => {
+      obs.disconnect();
+      clearTimeout(fallback);
+    };
   }, [score]);
 
   return (

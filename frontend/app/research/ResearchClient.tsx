@@ -55,6 +55,7 @@ interface ResearchPaper {
   learningRecommendations: LearningRec[];
   shouldYouRead: StarItem[];
   aiPrediction?: AIPrediction;
+  isProtocol?: boolean;
 }
 
 const RESEARCH_CATEGORIES = [
@@ -213,9 +214,10 @@ const papers: ResearchPaper[] = [
   {
     title: "Model Context Protocol (MCP) Specifications",
     maker: "Anthropic Engineering Group",
+    isProtocol: true,
     explanation:
       "A standard client-server protocol enabling LLMs and workspace tools (like Cursor, Claude Desktop) to securely query local databases, inspect systems, and connect with third-party tools via uniform APIs.",
-    citations: "128 citations",
+    citations: "Open Standard",
     impact: "Critical. Standardizing the integration layer for agentic workspaces.",
     confidence: "96% Confidence",
     url: "https://github.com/modelcontextprotocol",
@@ -914,7 +916,7 @@ export default function ResearchPage() {
                     rel="noopener noreferrer"
                     className="w-full text-center py-2.5 bg-secondaryBg/60 hover:bg-secondaryBg border border-white/[0.05] hover:border-accent/30 rounded-xl text-xs font-bold text-zinc-300 hover:text-white transition-all block"
                   >
-                    Read Paper &rarr;
+                    {paper.isProtocol ? "View Protocol Spec" : "Read Paper"} &rarr;
                   </a>
                 </div>
               </div>

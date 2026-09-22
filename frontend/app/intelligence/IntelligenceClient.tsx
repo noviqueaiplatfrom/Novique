@@ -249,6 +249,25 @@ function IntelligencePageInner() {
     refetchInterval: 60000,
   });
 
+  // Whether we've ever received a real feed batch. Distinguishes "still loading"
+  // / "fetch failed" from a genuinely empty result, so every derived dashboard
+  // below shows an honest loading/error state instead of a bare 0 or "no data"
+  // message that reads as a permanent, verified result.
+  const hasFeedData = data !== undefined;
+  const loadingText = isError ? "Unable to load live signals right now." : "Loading live signals...";
+
+  // Render's free-tier backend can cold-start after inactivity; if the first load
+  // takes a while, say so instead of leaving the page looking broken/empty.
+  const [coldStart, setColdStart] = useState(false);
+  useEffect(() => {
+    if (!isLoading) {
+      setColdStart(false);
+      return;
+    }
+    const t = setTimeout(() => setColdStart(true), 4000);
+    return () => clearTimeout(t);
+  }, [isLoading]);
+
   // Unique topics derived from current corpus
   const allTopics = useMemo(() => {
     if (!data) return [];
@@ -486,6 +505,23 @@ function IntelligencePageInner() {
           <p className="text-sm text-textSecondary/80 mt-1 max-w-2xl">Cut through the noise. Understand what matters. Simple. Premium.</p>
         </div>
 
+        {!hasFeedData && (
+          <div
+            className={`rounded-2xl border px-5 py-4 text-sm font-semibold flex items-center gap-3 ${
+              isError
+                ? "border-red-500/20 bg-red-500/10 text-red-400"
+                : "border-white/[0.05] bg-panel text-zinc-300"
+            }`}
+          >
+            {!isError && <span className="w-2 h-2 rounded-full bg-accent animate-pulse shrink-0" />}
+            {isError
+              ? "Novique Engine connection failure. The dashboards below can't load until the connection is restored."
+              : coldStart
+              ? "Waking up the intelligence pipeline (free-tier backend can take up to a minute after inactivity). The dashboards below will populate automatically."
+              : "Loading today's live signals..."}
+          </div>
+        )}
+
         {/* SECTION 1: AI MARKET PULSE */}
         <section className="flex flex-col gap-6">
           <SectionHeader
@@ -499,11 +535,11 @@ function IntelligencePageInner() {
             <div className="bg-panel border border-white/[0.05] rounded-2xl p-5 flex flex-col gap-3">
               <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Market Health Score</span>
               <div className="flex items-end gap-2">
-                <span className="text-3xl font-display font-extrabold text-white">{marketHealth}</span>
+                <span className="text-3xl font-display font-extrabold text-white">{hasFeedData ? marketHealth : "···"}</span>
                 <span className="text-xs text-zinc-500 mb-1">/ 100</span>
               </div>
               <div className="h-1.5 rounded-full bg-white/10">
-                <div className="h-full rounded-full bg-tealAccent" style={{ width: `${Math.min(marketHealth, 100)}%` }} />
+                <div className="h-full rounded-full bg-tealAccent" style={{ width: `${hasFeedData ? Math.min(marketHealth, 100) : 0}%` }} />
               </div>
               <p className="text-[10px] text-zinc-500">Composite index blending live impact and trend scores across today's corpus.</p>
             </div>
@@ -512,11 +548,11 @@ function IntelligencePageInner() {
             <div className="bg-panel border border-white/[0.05] rounded-2xl p-5 flex flex-col gap-3">
               <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Trend Momentum</span>
               <div className="flex items-end gap-2">
-                <span className="text-3xl font-display font-extrabold text-white">{trendMomentum}</span>
+                <span className="text-3xl font-display font-extrabold text-white">{hasFeedData ? trendMomentum : "···"}</span>
                 <span className="text-xs text-zinc-500 mb-1">/ 100</span>
               </div>
               <div className="h-1.5 rounded-full bg-white/10">
-                <div className="h-full rounded-full bg-accent" style={{ width: `${Math.min(trendMomentum, 100)}%` }} />
+                <div className="h-full rounded-full bg-accent" style={{ width: `${hasFeedData ? Math.min(trendMomentum, 100) : 0}%` }} />
               </div>
               <p className="text-[10px] text-zinc-500">Average momentum across active signals. Higher means faster-growing attention.</p>
             </div>
@@ -524,7 +560,9 @@ function IntelligencePageInner() {
             {/* Major Events */}
             <div className="bg-panel border border-white/[0.05] rounded-2xl p-5 flex flex-col gap-1">
               <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-2">Major Events</span>
-              {majorEvents.length === 0 && <p className="text-[11px] text-zinc-500">No signals loaded yet.</p>}
+              {majorEvents.length === 0 && (
+                <p className="text-[11px] text-zinc-500">{!hasFeedData ? loadingText : "No signals in the current feed."}</p>
+              )}
               {majorEvents.map((a, i) => (
                 <button key={a.id} onClick={() => setSearchQuery(a.title.slice(0, 18))} className="text-left">
                   <RankRow
@@ -543,7 +581,7 @@ function IntelligencePageInner() {
           <div className="flex flex-col gap-3">
             <span className="text-xs font-bold uppercase tracking-widest text-[#94A3B8]">What&rsquo;s Moving?</span>
             {fastGrowingTopics.length === 0 ? (
-              <p className="text-xs text-zinc-500">No topic momentum data yet.</p>
+              <p className="text-xs text-zinc-500">{!hasFeedData ? loadingText : "No topic momentum data in the current feed."}</p>
             ) : (
               <div className="flex flex-wrap items-center gap-2.5">
                 {fastGrowingTopics.map((t) => (
@@ -663,7 +701,7 @@ function IntelligencePageInner() {
                   }`}
                 >
                   <span>{c.label}</span>
-                  <span className={activeBreaking === c.key ? "text-accent" : "text-zinc-500"}>{c.count}</span>
+                  <span className={activeBreaking === c.key ? "text-accent" : "text-zinc-500"}>{hasFeedData ? c.count : "···"}</span>
                 </button>
               ))}
               {activeBreaking && (
@@ -976,7 +1014,9 @@ function IntelligencePageInner() {
                 Emerging Technologies
               </h4>
               {emergingTechnologies.length === 0 && (
-                <p className="text-xs text-zinc-500">Not enough low-volume, high-momentum topics in the current feed yet.</p>
+                <p className="text-xs text-zinc-500">
+                  {!hasFeedData ? loadingText : "Not enough low-volume, high-momentum topics in the current feed yet."}
+                </p>
               )}
               <div className="flex flex-col">
                 {emergingTechnologies.map((t, i) => (
@@ -999,7 +1039,9 @@ function IntelligencePageInner() {
                 <span className="w-1.5 h-1.5 rounded-full bg-accent" />
                 Fast-Growing Topics
               </h4>
-              {fastGrowingTopics.length === 0 && <p className="text-xs text-zinc-500">No topic data yet.</p>}
+              {fastGrowingTopics.length === 0 && (
+                <p className="text-xs text-zinc-500">{!hasFeedData ? loadingText : "No topic data in the current feed."}</p>
+              )}
               <div className="flex flex-col">
                 {fastGrowingTopics.map((t, i) => (
                   <button key={t.topic} onClick={() => setSearchQuery(t.topic)} className="text-left w-full">
@@ -1089,7 +1131,7 @@ function IntelligencePageInner() {
                 Research Ready for Commercialization
               </h4>
               {commercializationReady.length === 0 && (
-                <p className="text-xs text-zinc-500">No research papers in the current feed.</p>
+                <p className="text-xs text-zinc-500">{!hasFeedData ? loadingText : "No research papers in the current feed."}</p>
               )}
               <div className="flex flex-col">
                 {commercializationReady.map((a, i) => (
@@ -1130,7 +1172,7 @@ function IntelligencePageInner() {
                 Investment Opportunities
               </h4>
               {investmentOpportunities.length === 0 && (
-                <p className="text-xs text-zinc-500">No funding-tagged signals in the current feed.</p>
+                <p className="text-xs text-zinc-500">{!hasFeedData ? loadingText : "No funding-tagged signals in the current feed."}</p>
               )}
               <div className="flex flex-col">
                 {investmentOpportunities.map((a, i) => (
@@ -1164,7 +1206,9 @@ function IntelligencePageInner() {
                 <span className="w-1.5 h-1.5 rounded-full bg-positive" />
                 Biggest Winners
               </h4>
-              {biggestWinners.length === 0 && <p className="text-xs text-zinc-500">No source data yet.</p>}
+              {biggestWinners.length === 0 && (
+                <p className="text-xs text-zinc-500">{!hasFeedData ? loadingText : "No source data in the current feed."}</p>
+              )}
               <div className="flex flex-col">
                 {biggestWinners.map((s, i) => (
                   <RankRow
@@ -1186,7 +1230,7 @@ function IntelligencePageInner() {
                 Biggest Losers
               </h4>
               {biggestLosers.length === 0 && (
-                <p className="text-xs text-zinc-500">No negative-sentiment signals detected this week.</p>
+                <p className="text-xs text-zinc-500">{!hasFeedData ? loadingText : "No negative-sentiment signals detected this week."}</p>
               )}
               <div className="flex flex-col">
                 {biggestLosers.map((s, i) => (
@@ -1208,7 +1252,9 @@ function IntelligencePageInner() {
                 <span className="w-1.5 h-1.5 rounded-full bg-accent" />
                 Fastest-Moving Companies
               </h4>
-              {fastestMoving.length === 0 && <p className="text-xs text-zinc-500">No source data yet.</p>}
+              {fastestMoving.length === 0 && (
+                <p className="text-xs text-zinc-500">{!hasFeedData ? loadingText : "No source data in the current feed."}</p>
+              )}
               <div className="flex flex-col">
                 {fastestMoving.map((s, i) => (
                   <RankRow
@@ -1229,7 +1275,9 @@ function IntelligencePageInner() {
                 <span className="w-1.5 h-1.5 rounded-full bg-tealAccent" />
                 Key Research
               </h4>
-              {keyResearch.length === 0 && <p className="text-xs text-zinc-500">No research papers in the current feed.</p>}
+              {keyResearch.length === 0 && (
+                <p className="text-xs text-zinc-500">{!hasFeedData ? loadingText : "No research papers in the current feed."}</p>
+              )}
               <div className="flex flex-col">
                 {keyResearch.map((a, i) => (
                   <button key={a.id} onClick={() => setSearchQuery(a.title.slice(0, 18))} className="text-left w-full">
@@ -1251,7 +1299,9 @@ function IntelligencePageInner() {
                 <span className="w-1.5 h-1.5 rounded-full bg-goldAccent" />
                 Most Impactful Models
               </h4>
-              {impactfulModels.length === 0 && <p className="text-xs text-zinc-500">No model-focused signals in the current feed.</p>}
+              {impactfulModels.length === 0 && (
+                <p className="text-xs text-zinc-500">{!hasFeedData ? loadingText : "No model-focused signals in the current feed."}</p>
+              )}
               <div className="grid grid-cols-1 sm:grid-cols-2">
                 {impactfulModels.map((a, i) => (
                   <button key={a.id} onClick={() => setSearchQuery(a.title.slice(0, 18))} className="text-left w-full">

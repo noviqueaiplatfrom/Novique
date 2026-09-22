@@ -58,6 +58,12 @@ export default function Home() {
     refetchInterval: 60000,
   });
 
+  // Whether we have ever received a real feed batch. Distinguishes "still
+  // loading" / "fetch failed" from a genuinely empty result, so the brief
+  // and trending sections never show a bare 0 that looks like a real metric
+  // when it's actually just "no data yet".
+  const hasFeedData = data !== undefined;
+
   // Today's AI Brief: derive real counts from the live feed batch instead of fake numbers
   const briefTargets = (() => {
     const items = data ?? [];
@@ -332,7 +338,7 @@ export default function Home() {
               <div className="flex items-center gap-4 mb-5 text-[11px] text-[#9AA8BD]">
                 <span className="flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#16C79A]" />
-                  <strong className="text-white font-bold">{stats ? stats.total_sources : "—"}</strong> sources connected
+                  <strong className="text-white font-bold">{stats ? stats.total_sources : "N/A"}</strong> sources connected
                 </span>
                 <span className="flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#F6C453]" />
@@ -384,10 +390,10 @@ export default function Home() {
 
           <div data-animate className="grid grid-cols-2 md:grid-cols-5 gap-4 pt-2">
             {[
-              { value: stats ? stats.total_articles.toLocaleString() : "—", label: "AI Updates Analyzed" },
+              { value: stats ? stats.total_articles.toLocaleString() : "N/A", label: "AI Updates Analyzed" },
               { value: String(COMPANIES.length), label: "Companies Tracked" },
               { value: String(MODELS.length), label: "Models Monitored" },
-              { value: stats ? String(stats.total_sources) : "—", label: "AI Sources Connected" },
+              { value: stats ? String(stats.total_sources) : "N/A", label: "AI Sources Connected" },
               { value: "24/7", label: "Live Intelligence" },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
@@ -644,8 +650,10 @@ export default function Home() {
                 data-delay={String(idx + 1) as "1" | "2" | "3" | "4" | "5" | "6"}
                 className="bg-[#101B2D] border border-white/[0.05] p-5 rounded-2xl transition-all hover:border-[#6C63FF]/30 hover:-translate-y-1"
               >
-                <span className={`block text-3xl font-display font-black tabular-nums ${item.highlight ? "text-[#16C79A]" : "text-white"}`}>
-                  {idx === 5 ? `${snapCounts[5]}%` : snapCounts[idx]}
+                <span className={`block text-3xl font-display font-black tabular-nums ${item.highlight ? "text-[#16C79A]" : "text-white"} ${!hasFeedData ? "opacity-50" : ""}`}>
+                  {!hasFeedData
+                    ? (isError ? "N/A" : "···")
+                    : idx === 5 ? `${snapCounts[5]}%` : snapCounts[idx]}
                 </span>
                 <span className="text-[10px] font-bold text-[#9AA8BD] uppercase tracking-wider mt-1 block">
                   {item.label}
@@ -871,7 +879,13 @@ export default function Home() {
             <div className="pointer-events-none absolute left-0 top-0 h-full w-10 bg-gradient-to-r from-[#07111F] to-transparent z-10" />
             <div className="pointer-events-none absolute right-0 top-0 h-full w-10 bg-gradient-to-l from-[#07111F] to-transparent z-10" />
 
-            {trendingTopics.length === 0 ? (
+            {!hasFeedData ? (
+              <p className="text-xs text-zinc-500 py-2.5">
+                {isError
+                  ? "Unable to load trending signals right now. Retrying shortly."
+                  : "Building today's trend map. Novique is analyzing today's signals."}
+              </p>
+            ) : trendingTopics.length === 0 ? (
               <p className="text-xs text-zinc-500 py-2.5">No trending topics in the current feed yet.</p>
             ) : (
               <div className="flex items-center gap-2.5 overflow-x-auto no-scrollbar py-1">
@@ -994,21 +1008,24 @@ export default function Home() {
                 explanation: "An alternative to Multi-Layer Perceptrons (MLPs). Uses spline-based activation functions on edges rather than nodes, improving interpretability.",
                 citations: "1,240 citations",
                 confidence: "98% Confidence",
-                url: "https://arxiv.org/abs/2404.19756"
+                url: "https://arxiv.org/abs/2404.19756",
+                isProtocol: false
               },
               {
                 title: "Model Context Protocol (MCP)",
                 explanation: "Anthropic's open-source architecture connecting AI agents to environments. Standardizes data query formatting to streamline workflows.",
-                citations: "128 citations",
+                citations: "Open Standard",
                 confidence: "96% Confidence",
-                url: "https://github.com/modelcontextprotocol"
+                url: "https://github.com/modelcontextprotocol",
+                isProtocol: true
               },
               {
                 title: "Attention Is All You Need",
                 explanation: "The foundational paper replacing sequential architectures (RNNs) with self-attention networks, forming the basis of modern generative models.",
                 citations: "112,490 citations",
                 confidence: "100% Confidence",
-                url: "https://arxiv.org/abs/1706.03762"
+                url: "https://arxiv.org/abs/1706.03762",
+                isProtocol: false
               }
             ].map((paper, idx) => (
               <div key={idx} data-animate data-delay={String(idx + 1) as "1" | "2" | "3"} className="bg-[#17253A] border border-white/[0.05] p-6 rounded-3xl hover:border-[#6C63FF]/30 hover:-translate-y-1 transition-all flex flex-col justify-between group">
@@ -1028,7 +1045,7 @@ export default function Home() {
                     rel="noopener noreferrer"
                     className="w-full text-center py-2 bg-[#101B2D]/60 hover:bg-[#101B2D] border border-white/[0.05] hover:border-accent/30 rounded-xl text-xs font-bold text-zinc-300 hover:text-white transition-all block"
                   >
-                    Read Paper &rarr;
+                    {paper.isProtocol ? "View Protocol Spec" : "Read Paper"} &rarr;
                   </a>
                 </div>
               </div>

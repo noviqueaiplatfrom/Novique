@@ -1758,23 +1758,33 @@ function AnimatedNumber({ value, suffix = "" }: { value: number; suffix?: string
 
   useEffect(() => {
     if (!ref.current) return;
+    const start = () => {
+      if (started.current) return;
+      started.current = true;
+      const steps = 30;
+      let step = 0;
+      const timer = setInterval(() => {
+        step++;
+        const ease = 1 - Math.pow(1 - step / steps, 3);
+        setDisplay(Math.round(value * ease));
+        if (step >= steps) clearInterval(timer);
+      }, 900 / steps);
+    };
     const obs = new IntersectionObserver(
       ([entry]) => {
-        if (!entry.isIntersecting || started.current) return;
-        started.current = true;
-        const steps = 30;
-        let step = 0;
-        const timer = setInterval(() => {
-          step++;
-          const ease = 1 - Math.pow(1 - step / steps, 3);
-          setDisplay(Math.round(value * ease));
-          if (step >= steps) clearInterval(timer);
-        }, 900 / steps);
+        if (entry.isIntersecting) start();
       },
       { threshold: 0.3 }
     );
     obs.observe(ref.current);
-    return () => obs.disconnect();
+    // Safety net: if the observer never fires (element too small, hidden
+    // ancestor, backgrounded tab, etc.), the real value must still show up
+    // rather than staying frozen at 0 forever.
+    const fallback = setTimeout(start, 1500);
+    return () => {
+      obs.disconnect();
+      clearTimeout(fallback);
+    };
   }, [value]);
 
   return (
@@ -1801,7 +1811,12 @@ function MeterBar({ value, colorClass = "bg-accent" }: { value: number; colorCla
       { threshold: 0.2 }
     );
     obs.observe(ref.current);
-    return () => obs.disconnect();
+    // Safety net: guarantee the real width renders even if the observer never fires.
+    const fallback = setTimeout(() => setWidth(value), 1500);
+    return () => {
+      obs.disconnect();
+      clearTimeout(fallback);
+    };
   }, [value]);
 
   return (
@@ -1930,14 +1945,14 @@ export default function CompanyDetailPage() {
               { label: "Popularity Score", value: company.popularityScore, color: "text-accent" },
               {
                 label: "Enterprise Adoption",
-                value: company.health.find((m) => m.label === "Enterprise Adoption")?.value ?? 0,
+                value: company.health.find((m) => m.label === "Enterprise Adoption")?.value ?? null,
                 color: "text-positive",
               },
               { label: "Innovation Score", value: company.innovationScore, color: "text-white" },
             ].map((metric) => (
               <div key={metric.label} className="bg-panel border border-white/[0.05] rounded-2xl p-5 text-center">
                 <p className={`text-2xl font-display font-extrabold ${metric.color}`}>
-                  <AnimatedNumber value={metric.value} />
+                  {metric.value === null ? "N/A" : <AnimatedNumber value={metric.value} />}
                 </p>
                 <p className="text-[10px] text-textSecondary uppercase tracking-wider font-bold mt-1">{metric.label}</p>
               </div>
