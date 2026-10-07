@@ -1,11 +1,11 @@
 "use client";
 
-import { use } from "react";
+import { use, useEffect, useState } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Navbar } from "@/components/Navbar";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { useState } from "react";
+import { fetchReport } from "@/lib/api";
 
 interface Signal { title: string; source: string; impact: number; momentum: number; summary: string; topic: string }
 interface FundingItem { company: string; amount: string; round: string; focus: string }
@@ -21,7 +21,7 @@ interface Report {
   outlook: string[];
 }
 
-export const REPORTS: Record<string, Report> = {
+export const LEGACY_REPORTS: Record<string, Report> = {
   "july-week-1-2026": {
     slug: "july-week-1-2026",
     title: "Weekly AI Synthesis — July Week 1, 2026",
@@ -237,8 +237,37 @@ function ScorePill({ score, label }: { score: number; label: string }) {
 export default function ReportPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
   const [searchQuery, setSearchQuery] = useState("");
-  const report = REPORTS[slug];
-  if (!report) return notFound();
+  const [report, setReport] = useState<Report | null>(LEGACY_REPORTS[slug] ?? null);
+  const [checkedLive, setCheckedLive] = useState(false);
+
+  useEffect(() => {
+    fetchReport(slug)
+      .then((live) => {
+        if (live) {
+          setReport({
+            slug: live.slug,
+            title: live.title,
+            date: live.date_label,
+            weekOf: live.week_of,
+            executiveSummary: live.executive_summary,
+            topSignals: live.top_signals,
+            modelUpdates: live.model_updates,
+            funding: live.funding,
+            papers: live.papers,
+            outlook: live.outlook,
+          });
+        }
+      })
+      .catch(() => {
+        // Backend may be cold-starting — keep whatever we already have.
+      })
+      .finally(() => setCheckedLive(true));
+  }, [slug]);
+
+  if (!report) {
+    if (!checkedLive) return null;
+    return notFound();
+  }
 
   return (
     <>

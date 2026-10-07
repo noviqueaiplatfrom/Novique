@@ -4,6 +4,8 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/app/auth-context";
+import { COMPANIES } from "@/lib/companiesData";
+import { MODELS } from "@/lib/modelsData";
 
 interface Props {
   searchQuery: string;
@@ -16,25 +18,20 @@ interface SuggestionItem {
   route: string;
 }
 
+// Companies and models are pulled live from the shared data modules so a
+// newly added company/model is searchable automatically, with no separate
+// list to keep in sync.
 const SEARCH_CATALOG: SuggestionItem[] = [
-  // Companies
-  { title: "OpenAI", category: "company", route: "/companies/openai" },
-  { title: "Anthropic", category: "company", route: "/companies/anthropic" },
-  { title: "Google DeepMind", category: "company", route: "/companies/google-deepmind" },
-  { title: "Meta AI", category: "company", route: "/companies/meta-ai" },
-  { title: "Mistral", category: "company", route: "/companies/mistral" },
-  { title: "Cursor", category: "company", route: "/companies/cursor" },
-  { title: "Perplexity", category: "company", route: "/companies/perplexity" },
-  { title: "Microsoft AI", category: "company", route: "/companies/microsoft-ai" },
-  { title: "xAI", category: "company", route: "/companies/xai" },
-  { title: "DeepSeek", category: "company", route: "/companies/deepseek" },
-  { title: "Cohere", category: "company", route: "/companies/cohere" },
-  { title: "Hugging Face", category: "company", route: "/companies/hugging-face" },
-  // Models
-  { title: "Claude 3.5 Sonnet", category: "model", route: "/models/claude-3-5-sonnet" },
-  { title: "GPT-4o", category: "model", route: "/models/gpt-4o" },
-  { title: "Llama 3.1 405B", category: "model", route: "/models/llama-3-1-405b" },
-  { title: "Gemini 1.5 Pro", category: "model", route: "/models/gemini-1-5-pro" },
+  ...COMPANIES.map((c): SuggestionItem => ({
+    title: c.name,
+    category: "company",
+    route: `/companies/${c.slug}`,
+  })),
+  ...MODELS.map((m): SuggestionItem => ({
+    title: m.name,
+    category: "model",
+    route: `/models/${m.slug}`,
+  })),
   // Research
   { title: "KAN: Kolmogorov-Arnold Networks", category: "research", route: "/research" },
   { title: "Model Context Protocol", category: "research", route: "/research" },
@@ -244,62 +241,85 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
 
           {/* Center: Ask Novique Search Bar with intelligent suggestions */}
           <div ref={containerRef} className="flex-1 max-w-md relative hidden md:block">
-            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-zinc-500">
-              <svg className="w-4 h-4 text-textSecondary" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-            <input
-              type="text"
-              aria-label="Search Novique"
-              placeholder="Search companies, papers, models, AI trends, funding, technologies..."
-              value={searchQuery}
-              onFocus={() => setFocused(true)}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setFocused(true);
-              }}
-              className="w-full h-10 pl-10 pr-4 rounded-full border border-white/[0.05] bg-panel/85 text-xs font-semibold text-textPrimary placeholder-textSecondary/55 outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/20 transition-all"
-            />
-            
-            {searchQuery && (
-              <button
-                onClick={() => {
-                  setSearchQuery("");
+            <form
+              role="search"
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (suggestions.length > 0) {
                   setFocused(false);
-                }}
-                className="absolute inset-y-0 right-3.5 flex items-center text-zinc-500 hover:text-white text-xs font-semibold"
+                  router.push(suggestions[0].route);
+                  setSearchQuery("");
+                }
+              }}
+            >
+              <button
+                type="submit"
+                aria-label="Submit search"
+                className="absolute inset-y-0 left-3 flex items-center text-zinc-500 hover:text-white transition-colors"
               >
-                Clear
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
               </button>
-            )}
+              <input
+                type="text"
+                aria-label="Search Novique"
+                placeholder="Search companies, papers, models, AI trends, funding, technologies..."
+                value={searchQuery}
+                onFocus={() => setFocused(true)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setFocused(true);
+                }}
+                className="w-full h-10 pl-10 pr-4 rounded-full border border-white/[0.05] bg-panel/85 text-xs font-semibold text-textPrimary placeholder-textSecondary/55 outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/20 transition-all"
+              />
+
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery("");
+                    setFocused(false);
+                  }}
+                  className="absolute inset-y-0 right-3.5 flex items-center text-zinc-500 hover:text-white text-xs font-semibold"
+                >
+                  Clear
+                </button>
+              )}
+            </form>
 
             {/* Suggestions dropdown */}
-            {focused && suggestions.length > 0 && (
+            {focused && searchQuery.trim() && (
               <div className="absolute top-12 left-0 right-0 bg-[#101B2D] border border-white/[0.08] rounded-2xl p-4 shadow-[0_16px_36px_rgba(0,0,0,0.5)] flex flex-col gap-3 z-50">
                 <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest block">Intelligent Suggestions</span>
-                <div className="flex flex-col gap-1.5">
-                  {suggestions.map((item, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => {
-                        setFocused(false);
-                        router.push(item.route);
-                        if (item.category === "technology") {
-                          setSearchQuery(item.title);
-                        } else {
-                          setSearchQuery("");
-                        }
-                      }}
-                      className="flex items-center justify-between p-2.5 rounded-xl hover:bg-white/[0.03] transition-all text-left"
-                    >
-                      <span className="text-xs text-white font-semibold">{item.title}</span>
-                      <span className="text-[9px] text-[#16C79A] bg-[#16C79A]/10 border border-[#16C79A]/20 px-2.5 py-0.5 rounded-full uppercase tracking-wider font-bold">
-                        {item.category}
-                      </span>
-                    </button>
-                  ))}
-                </div>
+                {suggestions.length > 0 ? (
+                  <div className="flex flex-col gap-1.5">
+                    {suggestions.map((item, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => {
+                          setFocused(false);
+                          router.push(item.route);
+                          if (item.category === "technology") {
+                            setSearchQuery(item.title);
+                          } else {
+                            setSearchQuery("");
+                          }
+                        }}
+                        className="flex items-center justify-between p-2.5 rounded-xl hover:bg-white/[0.03] transition-all text-left"
+                      >
+                        <span className="text-xs text-white font-semibold">{item.title}</span>
+                        <span className="text-[9px] text-[#16C79A] bg-[#16C79A]/10 border border-[#16C79A]/20 px-2.5 py-0.5 rounded-full uppercase tracking-wider font-bold">
+                          {item.category}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-zinc-500 px-2.5 py-1.5">
+                    No matches for &quot;{searchQuery}&quot;. Try a company, model, or topic name.
+                  </p>
+                )}
               </div>
             )}
           </div>
@@ -401,14 +421,26 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
           <div className="xl:hidden border-t border-white/[0.05] bg-ink/95 backdrop-blur-xl px-4 py-4 flex flex-col gap-1">
             {/* Mobile search */}
             <div className="mb-3">
-              <input
-                type="text"
-                aria-label="Search Novique"
-                placeholder="Search companies, models, topics..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-10 px-4 rounded-xl border border-white/[0.06] bg-white/[0.03] text-xs font-semibold text-textPrimary placeholder-textSecondary/55 outline-none focus:border-accent/50 transition-all"
-              />
+              <form
+                role="search"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (suggestions.length > 0) {
+                    router.push(suggestions[0].route);
+                    setSearchQuery("");
+                    setMobileOpen(false);
+                  }
+                }}
+              >
+                <input
+                  type="text"
+                  aria-label="Search Novique"
+                  placeholder="Search companies, models, topics..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full h-10 px-4 rounded-xl border border-white/[0.06] bg-white/[0.03] text-xs font-semibold text-textPrimary placeholder-textSecondary/55 outline-none focus:border-accent/50 transition-all"
+                />
+              </form>
             </div>
             {navLinks.map((link) => {
               const isActive = pathname === link.path;

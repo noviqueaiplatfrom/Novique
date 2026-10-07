@@ -37,5 +37,16 @@ celery_app.conf.update(
             "task": "app.tasks.recompute_scores",
             "schedule": 3600.0,
         },
+        # Weekly Reports page — refresh the in-progress week's report daily
+        # from a rolling 7-day window so it never goes stale.
+        "refresh-weekly-report-daily": {
+            "task": "app.tasks.refresh_weekly_report",
+            "schedule": 86400.0,
+        },
+        # Trending-model discovery — scan the feed for rising model mentions.
+        "discover-models-every-6h": {
+            "task": "app.tasks.discover_models",
+            "schedule": 21600.0,
+        },
     },
 )

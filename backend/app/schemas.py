@@ -95,3 +95,60 @@ class InterestIn(BaseModel):
 
 class BookmarkIn(BaseModel):
     article_id: int
+
+
+# --- Reports -----------------------------------------------------------
+class ReportListOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    slug: str
+    title: str
+    date_label: str
+    week_of: str
+    executive_summary: str
+    signal_count: int
+    source_count: int
+
+
+class ReportDetailOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    slug: str
+    title: str
+    date_label: str
+    week_of: str
+    executive_summary: str
+    top_signals: list[dict]
+    model_updates: list[dict]
+    funding: list[dict]
+    papers: list[dict]
+    outlook: list[str]
+    signal_count: int
+    source_count: int
+    generated_by: str
+
+
+# --- Trending models -----------------------------------------------------
+class AIModelOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    slug: str
+    name: str
+    maker: str | None
+    blurb: str | None
+    topics: list[str] | None
+    mention_count_7d: int
+    mention_count_30d: int
+    is_trending: bool
+    first_seen_at: datetime
+
+
+class ModelStatsOut(BaseModel):
+    total_tracked: int
+    weekly: list[dict]
+    monthly: list[dict]
+
+
+# --- Opportunity signals ---------------------------------------------------
+class OpportunitySignalsOut(BaseModel):
+    weeks: list[dict]
+    totals: dict[str, int]
+    topics: list[str]
+    source_article_count: int

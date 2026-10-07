@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/Navbar";
 import Link from "next/link";
 import { MODELS, type ModelSummary, type PurposeTag } from "@/lib/modelsData";
+import { fetchTrendingModels, fetchModelStats, type TrendingModel, type ModelStats } from "@/lib/api";
 
 const PURPOSE_TAGS: PurposeTag[] = [
   "Coding", "Reasoning", "Vision", "Video", "Audio", "Agents", "Writing",
@@ -186,10 +187,90 @@ function ModelMiniCard({ model }: { model: ModelSummary }) {
   );
 }
 
+function TrendingModelsSection({ models }: { models: TrendingModel[] }) {
+  if (models.length === 0) return null;
+  return (
+    <section className="flex flex-col gap-4">
+      <div>
+        <span className="text-[10px] font-extrabold uppercase tracking-widest text-tealAccent mb-1.5 block">Auto-Detected</span>
+        <h3 className="text-lg font-display font-extrabold text-white">Trending Right Now</h3>
+        <p className="text-xs text-textSecondary mt-1">
+          Models Novique&rsquo;s live feed noticed gaining mention volume recently — not yet in the curated index below.
+        </p>
+      </div>
+      <div className="flex gap-4 overflow-x-auto pb-2">
+        {models.map((m) => (
+          <div key={m.slug} className="shrink-0 w-64 bg-panel border border-white/[0.05] rounded-2xl p-5 flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <h4 className="text-sm font-display font-extrabold text-white">{m.name}</h4>
+              <span className="text-[10px] font-bold text-tealAccent bg-tealAccent/10 border border-tealAccent/20 px-2 py-0.5 rounded-full">
+                {m.mention_count_7d} this week
+              </span>
+            </div>
+            {m.maker && <p className="text-[11px] text-textSecondary font-medium">{m.maker}</p>}
+            {m.blurb && <p className="text-[11px] text-textSecondary leading-relaxed line-clamp-3">{m.blurb}</p>}
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ReleaseStatsBox({ stats, curatedTotal }: { stats: ModelStats | null; curatedTotal: number }) {
+  const weekly = stats?.weekly ?? [];
+  const monthly = stats?.monthly ?? [];
+  const max = Math.max(1, ...weekly.map((w) => w.count), ...monthly.map((m) => m.count));
+
+  return (
+    <div className="bg-panel border border-white/[0.05] rounded-3xl p-6 md:p-8">
+      <span className="text-[10px] font-extrabold uppercase tracking-widest text-accent mb-2 block">Release Cadence</span>
+      <h2 className="text-xl md:text-2xl font-display font-extrabold text-white mb-1.5">How often are new models appearing?</h2>
+      <p className="text-sm text-textSecondary mb-5 max-w-xl">
+        {curatedTotal} models in Novique&rsquo;s curated index, plus {stats?.total_tracked ?? 0} auto-detected signals from the live feed below.
+        This tracks what Novique&rsquo;s own sources report — not a complete census of every model released worldwide.
+      </p>
+
+      {weekly.length === 0 && monthly.length === 0 ? (
+        <p className="text-xs text-zinc-500 italic">No new-model signals detected yet — check back as the feed fills in.</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wide mb-2 block">New signals / week</span>
+            <div className="flex items-end gap-1.5 h-20">
+              {weekly.map((w) => (
+                <div key={w.period} className="flex-1 flex flex-col items-center gap-1" title={`${w.period}: ${w.count}`}>
+                  <div className="w-full rounded-t bg-accent/70" style={{ height: `${(w.count / max) * 100}%`, minHeight: w.count > 0 ? 4 : 0 }} />
+                </div>
+              ))}
+            </div>
+          </div>
+          <div>
+            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wide mb-2 block">New signals / month</span>
+            <div className="flex items-end gap-1.5 h-20">
+              {monthly.map((m) => (
+                <div key={m.period} className="flex-1 flex flex-col items-center gap-1" title={`${m.period}: ${m.count}`}>
+                  <div className="w-full rounded-t bg-goldAccent/70" style={{ height: `${(m.count / max) * 100}%`, minHeight: m.count > 0 ? 4 : 0 }} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function ModelsPage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTags, setActiveTags] = useState<Set<PurposeTag>>(new Set());
+  const [trending, setTrending] = useState<TrendingModel[]>([]);
+  const [modelStats, setModelStats] = useState<ModelStats | null>(null);
+
+  useEffect(() => {
+    fetchTrendingModels().then(setTrending).catch(() => {});
+    fetchModelStats().then(setModelStats).catch(() => {});
+  }, []);
 
   const toggleTag = (tag: PurposeTag) => {
     setActiveTags((prev) => {
@@ -230,6 +311,12 @@ export default function ModelsPage() {
 
         {/* AI Recommendation Engine: "Which model should I use?" */}
         <ModelRecommender />
+
+        {/* Auto-detected trending models */}
+        <TrendingModelsSection models={trending} />
+
+        {/* Release cadence stat box */}
+        <ReleaseStatsBox stats={modelStats} curatedTotal={MODELS.length} />
 
         {/* Quick purpose filters */}
         <div>

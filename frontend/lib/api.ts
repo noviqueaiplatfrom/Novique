@@ -37,3 +37,78 @@ export async function fetchStats(): Promise<Stats> {
   if (!res.ok) throw new Error(`Stats request failed: ${res.status}`);
   return res.json();
 }
+
+export interface ReportListItem {
+  slug: string;
+  title: string;
+  date_label: string;
+  week_of: string;
+  executive_summary: string;
+  signal_count: number;
+  source_count: number;
+}
+
+export interface ReportDetail extends ReportListItem {
+  top_signals: { title: string; source: string; impact: number; momentum: number; summary: string; topic: string }[];
+  model_updates: { name: string; update: string; significance: string }[];
+  funding: { company: string; amount: string; round: string; focus: string }[];
+  papers: { title: string; authors: string; finding: string }[];
+  outlook: string[];
+  generated_by: string;
+}
+
+export async function fetchReports(): Promise<ReportListItem[]> {
+  const res = await fetchWithTimeout(`${API_URL}/api/reports`);
+  if (!res.ok) throw new Error(`Reports request failed: ${res.status}`);
+  return res.json();
+}
+
+export async function fetchReport(slug: string): Promise<ReportDetail | null> {
+  const res = await fetchWithTimeout(`${API_URL}/api/reports/${slug}`);
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`Report request failed: ${res.status}`);
+  return res.json();
+}
+
+export interface TrendingModel {
+  slug: string;
+  name: string;
+  maker: string | null;
+  blurb: string | null;
+  topics: string[] | null;
+  mention_count_7d: number;
+  mention_count_30d: number;
+  is_trending: boolean;
+  first_seen_at: string;
+}
+
+export async function fetchTrendingModels(): Promise<TrendingModel[]> {
+  const res = await fetchWithTimeout(`${API_URL}/api/models/trending`);
+  if (!res.ok) throw new Error(`Trending models request failed: ${res.status}`);
+  return res.json();
+}
+
+export interface ModelStats {
+  total_tracked: number;
+  weekly: { period: string; count: number }[];
+  monthly: { period: string; count: number }[];
+}
+
+export async function fetchModelStats(): Promise<ModelStats> {
+  const res = await fetchWithTimeout(`${API_URL}/api/models/stats`);
+  if (!res.ok) throw new Error(`Model stats request failed: ${res.status}`);
+  return res.json();
+}
+
+export interface OpportunitySignals {
+  weeks: Record<string, number | string>[];
+  totals: Record<string, number>;
+  topics: string[];
+  source_article_count: number;
+}
+
+export async function fetchOpportunitySignals(): Promise<OpportunitySignals> {
+  const res = await fetchWithTimeout(`${API_URL}/api/opportunities`);
+  if (!res.ok) throw new Error(`Opportunity signals request failed: ${res.status}`);
+  return res.json();
+}

@@ -3,7 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { fetchFeed } from "@/lib/api";
+import { fetchFeed, fetchOpportunitySignals, type OpportunitySignals } from "@/lib/api";
 import * as authApi from "@/lib/auth";
 import type { Kind, Sort } from "@/lib/types";
 import { ArticleCard } from "@/components/ArticleCard";
@@ -46,8 +46,9 @@ const TRENDING_TECH = [
   { name: "Vision AI", pct: 40 },
 ];
 
-// Quick filter chips: genuinely filter the live feed via title/topic/summary text match,
-// same mechanism the search box already uses. Not tied to API categories the backend lacks.
+// Quick filter chips: filter the live feed via keyword-bucket text match (same
+// approach as BREAKING_CATEGORIES below), not a literal substring of the chip's
+// own label — most of these labels never appear verbatim in real article text.
 const CONTENT_TYPES = [
   "Announcements",
   "Research",
@@ -59,6 +60,24 @@ const CONTENT_TYPES = [
   "Developer Tools",
 ];
 const INDUSTRIES = ["Healthcare", "Finance", "Coding", "Education", "Enterprise", "Gaming", "Robotics"];
+
+const QUICK_FILTER_KEYWORDS: Record<string, string[]> = {
+  Announcements: ["announc", "unveil", "launch", "introduc", "debut", "reveal"],
+  Research: ["paper", "research", "study", "benchmark", "arxiv"],
+  Funding: ["funding", "raises", "raised", "series ", "investment", "valuation", "ipo"],
+  Acquisitions: ["acqui", "merger", "buys ", "bought"],
+  "Model Releases": ["model", "gpt", "claude", "gemini", "llama", "mistral", "grok", "llm"],
+  "Open Source": ["open source", "open-source", "open weight", "github"],
+  Security: ["security", "vulnerab", "exploit", "breach", "jailbreak", "cve"],
+  "Developer Tools": ["coding", "code", "cursor", "copilot", "ide", "developer tool", "devtool", "api"],
+  Healthcare: ["health", "hospital", "clinical", "patient", "medic", "diagnos", "biotech"],
+  Finance: ["finance", "bank", "trading", "fintech", "payment", "invest"],
+  Coding: ["coding", "code", "developer", "programming", "software engineer"],
+  Education: ["education", "student", "university", "classroom", "learning platform", "edtech"],
+  Enterprise: ["enterprise", "business", "corporate", "b2b", "company adopt"],
+  Gaming: ["gaming", "game ", "games", "esports", "playable"],
+  Robotics: ["robot", "hardware", "embodied", "drone", "sensor", "actuator", "physical"],
+};
 
 // "Should You Care?" mock ratings for today's top story
 const CARE_RATINGS = [
@@ -182,6 +201,74 @@ function StarRow({ filled }: { filled: number }) {
   );
 }
 
+const OPPORTUNITY_COLORS: Record<string, string> = {
+  Hiring: "#16C79A",
+  Funding: "#F6C453",
+  Agents: "#6C63FF",
+  "Developer Tools": "#38BDF8",
+  Robotics: "#F97316",
+  "Voice AI": "#EC4899",
+  "Generative Media": "#A3E635",
+  "Knowledge & RAG": "#94A3B8",
+};
+
+function OpportunitySignalsChart({ data }: { data: OpportunitySignals | undefined }) {
+  if (!data || data.weeks.length === 0) {
+    return (
+      <div className="bg-panel border border-white/[0.05] rounded-2xl p-5">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-2 block">AI Opportunity Signals</span>
+        <p className="text-[11px] text-zinc-500">Not enough tracked signals yet to chart opportunity trends.</p>
+      </div>
+    );
+  }
+
+  const leaders = Object.entries(data.totals)
+    .filter(([, v]) => v > 0)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5);
+  const max = Math.max(1, ...data.weeks.flatMap((w) => data.topics.map((t) => Number(w[t]) || 0)));
+
+  return (
+    <div className="bg-panel border border-white/[0.05] rounded-2xl p-5 flex flex-col gap-4">
+      <div>
+        <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 block mb-1">AI Opportunity Signals</span>
+        <p className="text-[11px] text-zinc-500">
+          Weekly volume of hiring, funding, tooling &amp; agentic-automation stories in Novique&rsquo;s own tracked feed ({data.source_article_count} signals) &mdash; not a global economic measure.
+        </p>
+      </div>
+
+      <div className="flex items-end gap-1.5 h-24">
+        {data.weeks.map((w) => {
+          const weekTotal = data.topics.reduce((sum, t) => sum + (Number(w[t]) || 0), 0);
+          return (
+            <div key={String(w.week)} className="flex-1 flex flex-col-reverse gap-px" title={`${w.week}: ${weekTotal} signals`}>
+              {data.topics.map((t) => {
+                const v = Number(w[t]) || 0;
+                if (v === 0) return null;
+                return (
+                  <div
+                    key={t}
+                    style={{ height: `${(v / max) * 100}%`, backgroundColor: OPPORTUNITY_COLORS[t] ?? "#6C63FF", minHeight: 2 }}
+                  />
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="flex flex-wrap gap-2.5">
+        {leaders.map(([topic, count]) => (
+          <span key={topic} className="flex items-center gap-1.5 text-[10px] font-bold text-zinc-300">
+            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: OPPORTUNITY_COLORS[topic] ?? "#6C63FF" }} />
+            {topic} ({count})
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function IntelligencePage() {
   return (
     <Suspense fallback={null}>
@@ -288,6 +375,13 @@ function IntelligencePageInner() {
     enabled: !!token,
   });
 
+  const { data: opportunitySignals } = useQuery<OpportunitySignals>({
+    queryKey: ["opportunitySignals"],
+    queryFn: fetchOpportunitySignals,
+    refetchInterval: 300000,
+    retry: false,
+  });
+
   const bookmarkedIds = new Set((bookmarks ?? []).map((a) => a.id));
   const followed = new Set((interests ?? []).map((t) => t.toLowerCase()));
 
@@ -327,7 +421,7 @@ function IntelligencePageInner() {
     const haystack = getHaystack(a);
     const matchesQuickFilters =
       selectedQuickFilters.length === 0 ||
-      selectedQuickFilters.some((f) => haystack.includes(f.toLowerCase()));
+      selectedQuickFilters.some((f) => matchesKeywords(haystack, QUICK_FILTER_KEYWORDS[f] ?? [f.toLowerCase()]));
     const activeCategory = BREAKING_CATEGORIES.find((c) => c.key === activeBreaking);
     const matchesBreaking = !activeCategory || matchesKeywords(haystack, activeCategory.keywords);
     return matchesSearch && matchesTopics && matchesQuickFilters && matchesBreaking;
@@ -599,6 +693,9 @@ function IntelligencePageInner() {
               </div>
             )}
           </div>
+
+          {/* AI Opportunity Signals: what's creating new work/tooling/funding */}
+          <OpportunitySignalsChart data={opportunitySignals} />
 
           {/* Today's AI Snapshot (weekly activity score) */}
           <div ref={snapshotRef} className="flex flex-col gap-4">

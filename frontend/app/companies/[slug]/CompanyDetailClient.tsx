@@ -136,6 +136,8 @@ export const COMPANY_DATABASE: Record<string, CompanyDetail> = {
       { name: "GPT-4o", slug: "gpt-4o" },
       { name: "o1 Reasoning Series" },
       { name: "Sora 2" },
+      { name: "GPT-4.5" },
+      { name: "DALL-E 3" },
     ],
     research: [
       {
@@ -280,6 +282,8 @@ export const COMPANY_DATABASE: Record<string, CompanyDetail> = {
       { name: "Claude 3.5 Sonnet", slug: "claude-3-5-sonnet" },
       { name: "Claude 3 Opus" },
       { name: "Claude 3.5 Haiku" },
+      { name: "Claude Code" },
+      { name: "Claude 3 Haiku" },
     ],
     research: [
       {
@@ -424,6 +428,7 @@ export const COMPANY_DATABASE: Record<string, CompanyDetail> = {
       { name: "Gemini 1.5 Pro", slug: "gemini-1-5-pro" },
       { name: "Gemini 1.5 Flash" },
       { name: "Gemma 2" },
+      { name: "Veo 2" },
     ],
     research: [
       {
@@ -568,6 +573,7 @@ export const COMPANY_DATABASE: Record<string, CompanyDetail> = {
       { name: "Llama 3.1 405B", slug: "llama-3-1-405b" },
       { name: "Llama 3 70B" },
       { name: "Segment Anything Model v2" },
+      { name: "Code Llama" },
     ],
     research: [
       {
@@ -712,6 +718,7 @@ export const COMPANY_DATABASE: Record<string, CompanyDetail> = {
       { name: "Codestral 22B" },
       { name: "Mistral 7B" },
       { name: "Pixtral 12B" },
+      { name: "Mixtral 8x22B" },
     ],
     research: [
       {
@@ -1254,6 +1261,7 @@ export const COMPANY_DATABASE: Record<string, CompanyDetail> = {
       { name: "Grok 4" },
       { name: "Grok Vision" },
       { name: "Grok Voice Mode" },
+      { name: "Grok 2" },
     ],
     research: [
       {
@@ -1918,7 +1926,7 @@ export default function CompanyDetailPage() {
         {/* Quick Stats */}
         <div data-animate className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { label: "Models", value: company.quickStats.models },
+            { label: "Models", value: company.models.length },
             { label: "Intelligence", value: company.quickStats.signals },
             { label: "Research Papers", value: company.quickStats.papers },
           ].map((stat) => (

@@ -88,6 +88,70 @@ class Interest(Base):
     topic: Mapped[str] = mapped_column(String(64), nullable=False)
 
 
+class Report(Base):
+    """A weekly synthesis report, generated/refreshed by a scheduled task.
+
+    The current (in-progress) week's slug is upserted daily from a rolling
+    7-day window so the page never goes stale; once the week closes, the row
+    is frozen and next week gets a new slug.
+    """
+    __tablename__ = "reports"
+    __table_args__ = (UniqueConstraint("slug", name="uq_reports_slug"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    slug: Mapped[str] = mapped_column(String(64), nullable=False)
+    title: Mapped[str] = mapped_column(String(256), nullable=False)
+    week_of: Mapped[str] = mapped_column(String(64), nullable=False)
+    date_label: Mapped[str] = mapped_column(String(64), nullable=False)
+
+    executive_summary: Mapped[str] = mapped_column(Text, nullable=False)
+    top_signals: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    model_updates: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    funding: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    papers: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    outlook: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+
+    source_count: Mapped[int] = mapped_column(Integer, default=0)
+    signal_count: Mapped[int] = mapped_column(Integer, default=0)
+
+    generated_by: Mapped[str] = mapped_column(String(64), nullable=False, default="heuristic")
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(), onupdate=lambda: datetime.now()
+    )
+
+
+class AIModel(Base):
+    """An AI model auto-detected as trending from mentions in the live feed.
+
+    Supplements the curated model index — this table only holds models the
+    ingestion pipeline noticed gaining mention volume, not the hand-curated
+    baseline list (which stays in the frontend for now).
+    """
+    __tablename__ = "ai_models"
+    __table_args__ = (UniqueConstraint("slug", name="uq_ai_models_slug"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    slug: Mapped[str] = mapped_column(String(128), nullable=False)
+    name: Mapped[str] = mapped_column(String(128), nullable=False)
+    maker: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    blurb: Mapped[str | None] = mapped_column(Text, nullable=True)
+    topics: Mapped[list | None] = mapped_column(JSON, nullable=True)
+
+    mention_count_7d: Mapped[int] = mapped_column(Integer, default=0)
+    mention_count_30d: Mapped[int] = mapped_column(Integer, default=0)
+    is_trending: Mapped[bool] = mapped_column(default=True)
+
+    first_seen_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now()
+    )
+    last_seen_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now()
+    )
+
+
 class Bookmark(Base):
     """A saved article — both a user feature and an implicit interest signal."""
     __tablename__ = "bookmarks"

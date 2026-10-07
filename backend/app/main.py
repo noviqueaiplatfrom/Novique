@@ -7,6 +7,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.auth import router as auth_router
 from app.api.feed import router as feed_router
 from app.api.me import router as me_router
+from app.api.models_api import router as models_router
+from app.api.reports import router as reports_router
 from app.config import settings
 from app.database import Base, engine
 from app import models  # noqa: F401  (register models on Base before create_all)
@@ -42,6 +44,8 @@ app.add_middleware(
 app.include_router(feed_router)
 app.include_router(auth_router)
 app.include_router(me_router)
+app.include_router(reports_router)
+app.include_router(models_router)
 
 
 @app.api_route("/health", methods=["GET", "HEAD"])

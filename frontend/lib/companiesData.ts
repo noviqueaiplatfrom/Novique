@@ -1,3 +1,5 @@
+import { COMPANY_DATABASE } from "@/app/companies/[slug]/CompanyDetailClient";
+
 export type ResearchLevel = "High" | "Moderate" | "Low";
 export type HiringLevel = "High" | "Stable" | "Low";
 export type Trend = "up" | "flat" | "down";
@@ -31,7 +33,7 @@ export interface CompanySummary {
   enterpriseAdoptionScore: number;
 }
 
-export const COMPANIES: CompanySummary[] = [
+const RAW_COMPANIES: CompanySummary[] = [
   {
     slug: "openai",
     name: "OpenAI",
@@ -333,3 +335,11 @@ export const COMPANIES: CompanySummary[] = [
     enterpriseAdoptionScore: 66,
   },
 ];
+
+// Model counts shown across the Companies pages must match the named model
+// list on each company's detail page, so derive the count from that same
+// source of truth (COMPANY_DATABASE) instead of a second hand-maintained number.
+export const COMPANIES: CompanySummary[] = RAW_COMPANIES.map((c) => ({
+  ...c,
+  modelsReleasedCount: COMPANY_DATABASE[c.slug]?.models.length ?? c.modelsReleasedCount,
+}));
