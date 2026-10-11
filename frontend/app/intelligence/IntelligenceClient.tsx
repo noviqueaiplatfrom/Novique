@@ -3,7 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { fetchFeed, fetchOpportunitySignals, type OpportunitySignals } from "@/lib/api";
+import { fetchFeed, fetchOpportunitySignals, fetchSearch, type OpportunitySignals } from "@/lib/api";
 import * as authApi from "@/lib/auth";
 import type { Kind, Sort } from "@/lib/types";
 import { ArticleCard } from "@/components/ArticleCard";
@@ -336,6 +336,21 @@ function IntelligencePageInner() {
     refetchInterval: 60000,
   });
 
+  // Debounced full-corpus search: the quick client-side text match below only
+  // covers whatever's in the current feed page, so a real search hits every
+  // ingested article regardless of age or current sort/kind.
+  const [debouncedSearch, setDebouncedSearch] = useState(searchQuery);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchQuery.trim()), 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const { data: searchResults } = useQuery({
+    queryKey: ["search", debouncedSearch],
+    queryFn: () => fetchSearch(debouncedSearch),
+    enabled: debouncedSearch.length >= 2,
+  });
+
   // Whether we've ever received a real feed batch. Distinguishes "still loading"
   // / "fetch failed" from a genuinely empty result, so every derived dashboard
   // below shows an honest loading/error state instead of a bare 0 or "no data"
@@ -406,15 +421,27 @@ function IntelligencePageInner() {
     onSuccess: refresh,
   });
 
-  // Client-side filtering: search text + selected topic chips + quick filter chips + breaking category
-  const filteredArticles = data?.filter((a) => {
-    const query = searchQuery.toLowerCase();
-    const matchesSearch =
-      !query ||
-      a.title.toLowerCase().includes(query) ||
-      a.source.toLowerCase().includes(query) ||
-      (a.topics ?? []).some((t) => t.toLowerCase().includes(query)) ||
-      (a.summary_30s ?? "").toLowerCase().includes(query);
+  // Search candidates: instant local matches against the current feed page,
+  // merged with full-corpus search results once the debounced query resolves
+  // (deduped by id) — so results appear immediately and then become complete.
+  const query = searchQuery.toLowerCase();
+  const localSearchMatches = (data ?? []).filter((a) =>
+    !query ||
+    a.title.toLowerCase().includes(query) ||
+    a.source.toLowerCase().includes(query) ||
+    (a.topics ?? []).some((t) => t.toLowerCase().includes(query)) ||
+    (a.summary_30s ?? "").toLowerCase().includes(query)
+  );
+  const searchCandidates = query
+    ? [
+        ...localSearchMatches,
+        ...(searchResults ?? []).filter((a) => !localSearchMatches.some((la) => la.id === a.id)),
+      ]
+    : data ?? [];
+
+  // Client-side filtering: selected topic chips + quick filter chips + breaking category,
+  // applied on top of the search candidates above.
+  const filteredArticles = searchCandidates.filter((a) => {
     const matchesTopics =
       selectedTopics.length === 0 ||
       selectedTopics.some((t) => (a.topics ?? []).includes(t));
@@ -424,7 +451,7 @@ function IntelligencePageInner() {
       selectedQuickFilters.some((f) => matchesKeywords(haystack, QUICK_FILTER_KEYWORDS[f] ?? [f.toLowerCase()]));
     const activeCategory = BREAKING_CATEGORIES.find((c) => c.key === activeBreaking);
     const matchesBreaking = !activeCategory || matchesKeywords(haystack, activeCategory.keywords);
-    return matchesSearch && matchesTopics && matchesQuickFilters && matchesBreaking;
+    return matchesTopics && matchesQuickFilters && matchesBreaking;
   });
 
   // ---- Derived intelligence dashboards (computed live from the current feed corpus) ----

@@ -4,7 +4,7 @@ from __future__ import annotations
 from enum import Enum
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
-from sqlalchemy import func, select
+from sqlalchemy import String, cast, func, or_, select
 from sqlalchemy.orm import Session
 
 from app.config import settings
@@ -50,6 +50,32 @@ def get_feed(
         stmt = stmt.where(Article.kind == kind.value)
     rows = db.scalars(stmt.order_by(order).limit(limit)).all()
     return rows
+
+
+@router.get("/search", response_model=list[ArticleOut])
+def search_articles(
+    q: str = Query(..., min_length=2, max_length=200),
+    limit: int = Query(20, ge=1, le=50),
+    db: Session = Depends(get_db),
+):
+    """Full-corpus search — unlike the client-side text filter on /intelligence,
+    which only matches within whatever page of /feed is currently loaded, this
+    searches every ingested article regardless of age or current feed sort."""
+    needle = f"%{q.strip()}%"
+    stmt = (
+        select(Article)
+        .where(
+            or_(
+                Article.title.ilike(needle),
+                Article.summary_30s.ilike(needle),
+                Article.source.ilike(needle),
+                cast(Article.topics, String).ilike(needle),
+            )
+        )
+        .order_by(Article.published_at.desc())
+        .limit(limit)
+    )
+    return db.scalars(stmt).all()
 
 
 @router.get("/stats", response_model=StatsOut)

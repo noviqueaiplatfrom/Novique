@@ -26,6 +26,13 @@ export async function fetchFeed(sort: Sort, kind: Kind): Promise<Article[]> {
   return res.json();
 }
 
+export async function fetchSearch(query: string, limit = 20): Promise<Article[]> {
+  const params = new URLSearchParams({ q: query, limit: String(limit) });
+  const res = await fetchWithTimeout(`${API_URL}/api/search?${params}`);
+  if (!res.ok) throw new Error(`Search request failed: ${res.status}`);
+  return res.json();
+}
+
 export interface Stats {
   total_articles: number;
   total_sources: number;

@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/app/auth-context";
 import { COMPANIES } from "@/lib/companiesData";
 import { MODELS } from "@/lib/modelsData";
+import { fetchSearch } from "@/lib/api";
 
 interface Props {
   searchQuery: string;
@@ -14,8 +15,9 @@ interface Props {
 
 interface SuggestionItem {
   title: string;
-  category: "company" | "model" | "research" | "technology";
+  category: "company" | "model" | "research" | "technology" | "article";
   route: string;
+  external?: boolean;
 }
 
 // Companies and models are pulled live from the shared data modules so a
@@ -79,6 +81,34 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Live article search: debounced so we don't hit the backend on every keystroke.
+  // Searches the full ingested corpus, not just the catalog of companies/models/topics above.
+  const [articleResults, setArticleResults] = useState<SuggestionItem[]>([]);
+  useEffect(() => {
+    const query = searchQuery.trim();
+    if (query.length < 2) {
+      setArticleResults([]);
+      return;
+    }
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      fetchSearch(query, 5)
+        .then((articles) => {
+          if (cancelled) return;
+          setArticleResults(
+            articles.map((a) => ({ title: a.title, category: "article" as const, route: a.url, external: true }))
+          );
+        })
+        .catch(() => {
+          if (!cancelled) setArticleResults([]);
+        });
+    }, 300);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [searchQuery]);
 
   // Google OAuth Client Loader and Button Initializer
   useEffect(() => {
@@ -200,12 +230,24 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
     { label: "Reports", path: "/weekly-reports" },
   ];
 
-  // Suggestions filtering
-  const suggestions = searchQuery.trim()
+  // Suggestions filtering: catalog matches (companies/models/research/topics) first,
+  // then live article results from the full feed corpus fill remaining slots.
+  const catalogMatches = searchQuery.trim()
     ? SEARCH_CATALOG.filter((item) =>
         item.title.toLowerCase().includes(searchQuery.toLowerCase())
       ).slice(0, 6)
     : [];
+  const suggestions = searchQuery.trim()
+    ? [...catalogMatches, ...articleResults].slice(0, 8)
+    : [];
+
+  const goToSuggestion = (item: SuggestionItem) => {
+    if (item.external) {
+      window.open(item.route, "_blank", "noopener,noreferrer");
+    } else {
+      router.push(item.route);
+    }
+  };
 
   return (
     <>
@@ -247,7 +289,7 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
                 e.preventDefault();
                 if (suggestions.length > 0) {
                   setFocused(false);
-                  router.push(suggestions[0].route);
+                  goToSuggestion(suggestions[0]);
                   setSearchQuery("");
                 }
               }}
@@ -299,7 +341,7 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
                         key={idx}
                         onClick={() => {
                           setFocused(false);
-                          router.push(item.route);
+                          goToSuggestion(item);
                           if (item.category === "technology") {
                             setSearchQuery(item.title);
                           } else {
@@ -426,7 +468,7 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
                 onSubmit={(e) => {
                   e.preventDefault();
                   if (suggestions.length > 0) {
-                    router.push(suggestions[0].route);
+                    goToSuggestion(suggestions[0]);
                     setSearchQuery("");
                     setMobileOpen(false);
                   }
