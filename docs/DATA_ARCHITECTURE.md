@@ -1,6 +1,6 @@
 # Novique — Data Architecture & Page-by-Page Data Sources
 
-This documents, for every page in the app, what data is shown and exactly where it comes from: a live backend endpoint, a hardcoded array in the frontend, something computed client-side from another source, or browser `localStorage`. It reflects the codebase as of 2026-08-02.
+This documents, for every page in the app, what data is shown and exactly where it comes from: a live backend endpoint, a hardcoded array in the frontend, something computed client-side from another source, or browser `localStorage`. It reflects the codebase as of 2026-08-02, with the pipeline/status architecture updated 2026-11-24.
 
 ## Legend
 
@@ -13,7 +13,7 @@ This documents, for every page in the app, what data is shown and exactly where 
 
 ## 1. Backend API reference
 
-Backend: FastAPI, `backend/app/`. Three DB tables back everything real: `Article`, `User`, `Interest` (table `user_interests`), `Bookmark` (`backend/app/models.py`).
+Backend: FastAPI, `backend/app/`. DB tables back everything real: `Article`, `User`, `Interest` (table `user_interests`), `Bookmark`, `Report`, `AIModel`, plus `IngestRun` (table `ingest_runs`, pipeline run history) (`backend/app/models.py`).
 
 ### `feed.py` — prefix `/api`
 
@@ -21,7 +21,23 @@ Backend: FastAPI, `backend/app/`. Three DB tables back everything real: `Article
 |---|---|---|
 | `GET /api/feed?sort=impact\|trend\|recent&kind=news\|paper&limit=` | `ArticleOut[]` — the corpus ranked by impact score, trend score, or recency | `Article` (read) |
 | `GET /api/stats` | `{total_articles, total_sources, total_papers}` | `Article` (read, aggregate) |
-| `POST /api/ingest` | `IngestResult` — runs one ingestion cycle on demand | `Article` (write, via ingestion pipeline) |
+| `POST /api/ingest` | `IngestResult` — runs one news cycle on demand (admin, needs `x-ingest-secret`; locked + recorded like scheduled runs) | `Article` (write, via ingestion pipeline) |
+
+### `status.py` — prefix `/api`
+
+| Method + Path | Returns | Touches |
+|---|---|---|
+| `GET /api/status` | `StatusOut` — measured pipeline health: `state` (`live` / `starting` / `delayed` / `stalled` / `offline`), last finished news cycle with per-source outcome, `last_success_at`, `next_run_at`, articles *ingested* (by `created_at`) in the last hour / 24h, DB + scheduler health. Never 500s on a dead DB: answers `offline` instead. | `IngestRun`, `Article` (read, aggregate) |
+
+### Ingestion scheduling (how "live" stays live)
+
+- **Runner:** `app/scheduler.py`, a daemon thread inside the uvicorn process (started in `main.py`'s lifespan). If the API is up, ingestion is up. Replaced the Celery worker + beat that ran backgrounded with `&` in the Render container and was never restarted if it died. Celery (`app/celery_app.py`, `app/tasks.py`) remains as an optional alternative runner (`SCHEDULER_ENABLED=false` on the API).
+- **Jobs** (`app/jobs.py`, intervals in `config.py`, env-overridable): `news` 60s (HN, Reddit, news RSS, Dev.to, GitHub), `papers` 30 min (arXiv), `models` 6h, `report` daily, `rescore` hourly. On boot each job resumes from its last recorded success; anything overdue (e.g. news after a cold start) fires immediately.
+- **Every run** goes through `run_job`: a per-job Postgres advisory lock (no overlapping runs across instances/runners) and a row in `ingest_runs` (start/finish, fetched/created/updated, error, per-source health). `/api/status` reads this table.
+- **Sources** are fetched in parallel with hard timeouts; a failing source backs off exponentially (1 min → 30 min) instead of being retried every cycle. Only items not already stored go through the summarizer.
+- **Boot without a DB:** the API still binds its port; the scheduler retries the DB every 30s and creates tables once it's reachable.
+- **Alerting:** `.github/workflows/keep-alive.yml` checks `/api/status` and opens (and later auto-closes) a GitHub issue when the pipeline is `stalled` / `offline` / unreachable. That covers a dead database too, so the old Render-DB expiry monitor was retired along with the Render free DB.
+- **Database:** external Postgres via `DATABASE_URL` (set in the Render dashboard, `sync: false` in `render.yaml`). Render's free Postgres was dropped: it is deleted 30 days after creation, which wiped all data on 2026-10-03 and 2026-11-02.
 
 ### `auth.py` — prefix `/api/auth`
 
@@ -56,6 +72,7 @@ Backend: FastAPI, `backend/app/`. Three DB tables back everything real: `Article
 |---|---|---|
 | `fetchFeed(sort, kind)` | `GET /api/feed` | The ranked article/paper feed |
 | `fetchStats()` | `GET /api/stats` | Live corpus counters for homepage trust indicators |
+| `fetchStatus()` | `GET /api/status` | Measured pipeline health for the homepage "Active briefing status" card |
 
 Both go through `fetchWithTimeout` (55s timeout) to tolerate Render free-tier cold starts rather than hanging indefinitely.
 
@@ -80,7 +97,7 @@ Both go through `fetchWithTimeout` (55s timeout) to tolerate Render free-tier co
 | Section | Source |
 |---|---|
 | Live feed (Today's Intelligence top 5), sort/kind filters | **LIVE** `fetchFeed` |
-| "Active briefing status" card (update count, freshest timestamp) | **DERIVED** from the same `fetchFeed` result |
+| "Active briefing status" card (`components/BriefingStatusCard.tsx`): state badge, new-in-24h / new-in-last-hour counts, last ingest time, sources responding, next-ingest countdown | **LIVE** `fetchStatus`, polled every 15s; a newly completed cycle immediately refetches the feed + stats. Headlines are the newest 5 from `fetchFeed("recent", "all")` (shares the homepage feed cache) |
 | Trusted-by stats: AI Updates Analyzed, AI Sources Connected | **LIVE** `fetchStats` |
 | Trusted-by stats: Companies Tracked, Models Monitored | **DERIVED** — `COMPANIES.length` / `MODELS.length` from the static data files below |
 | Today's AI Brief (Major Updates, Model Launches, Breakthroughs, Funding Rounds, OS Launches, Momentum Index) | **DERIVED** — keyword/date/kind filters applied to the same `fetchFeed` batch |

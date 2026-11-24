@@ -5,7 +5,7 @@ Explainer fields, the topic tags, and the two proprietary scores. Other tables
 (Sources, Topics, Companies, Models, ResearchPapers, Users, ...) arrive as the
 corresponding modules are built out.
 """
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import (
     JSON,
@@ -58,9 +58,37 @@ class Article(Base):
     impact_score: Mapped[float] = mapped_column(Float, default=0.0)
     trend_score: Mapped[float] = mapped_column(Float, default=0.0)
 
+    # Ingestion time (when Novique first stored the item), as opposed to
+    # published_at (when the source published it). /api/status uses this to
+    # report how much genuinely new content the pipeline is landing.
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=lambda: datetime.now()
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), index=True
     )
+
+
+class IngestRun(Base):
+    """One execution of a scheduled pipeline job (news, papers, rescore, ...).
+
+    Written by app.jobs.run_job regardless of which runner fired it (the
+    in-process scheduler, a Celery worker, or the manual /api/ingest hook), so
+    /api/status can report real pipeline freshness instead of guessing from
+    article timestamps.
+    """
+    __tablename__ = "ingest_runs"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    job: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    status: Mapped[str] = mapped_column(String(16), nullable=False, default="running")  # running | ok | error
+    started_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc), index=True
+    )
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    fetched: Mapped[int] = mapped_column(Integer, default=0)
+    created: Mapped[int] = mapped_column(Integer, default=0)
+    updated: Mapped[int] = mapped_column(Integer, default=0)
+    error: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # Per-source outcome for fetch jobs: {"Hacker News": "ok", "Reddit": "error: 403 ...", ...}
+    sources: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 
 
 class User(Base):

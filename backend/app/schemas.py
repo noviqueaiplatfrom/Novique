@@ -46,6 +46,44 @@ class StatsOut(BaseModel):
     total_papers: int
 
 
+class JobRunOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    job: str
+    status: str
+    started_at: datetime
+    finished_at: datetime | None
+    fetched: int
+    created: int
+    updated: int
+    error: str | None
+    sources: dict[str, str] | None = None
+
+
+class StatusOut(BaseModel):
+    """Real pipeline health for the homepage "Active briefing status" card."""
+
+    # live: news ingested within ~3 cycles. starting: instance just booted and
+    # its first cycle hasn't landed yet. delayed / stalled: last good cycle is
+    # increasingly old. offline: the API is up but the database is not.
+    state: str
+    message: str
+    server_time: datetime
+    database: str  # ok | unreachable
+    scheduler_running: bool
+    running_job: str | None
+    news_interval_seconds: int
+    last_run: JobRunOut | None
+    last_success_at: datetime | None
+    next_run_at: datetime | None
+    total_articles: int
+    total_sources: int
+    new_last_hour: int
+    new_last_24h: int
+    latest_ingested_at: datetime | None
+    latest_published_at: datetime | None
+
+
 # --- Auth / personalization ------------------------------------------------
 class UserCreate(BaseModel):
     email: str

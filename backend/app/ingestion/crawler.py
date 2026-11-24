@@ -2,7 +2,9 @@
 from __future__ import annotations
 
 import calendar
+import time
 import xml.etree.ElementTree as ET
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 
@@ -22,7 +24,7 @@ _REDDIT_UA = "AI-Pulse/0.1 (AI intelligence aggregator)"
 RSS_FEEDS: list[tuple[str, str]] = [
     ("VentureBeat AI", "https://venturebeat.com/category/ai/feed/"),
     ("TechCrunch AI", "https://techcrunch.com/category/artificial-intelligence/feed/"),
-    ("The Verge AI", "https://www.theverge.com/ai-artificial-intelligence/rss/index.xml"),
+    ("The Verge AI", "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml"),
     ("Wired AI", "https://www.wired.com/feed/tag/ai/latest/rss"),
     ("AI News", "https://artificialintelligence-news.com/feed/"),
     ("MIT Tech Review", "https://www.technologyreview.com/feed/"),
@@ -178,13 +180,60 @@ def fetch_reddit(limit: int | None = None) -> list[RawItem]:
     return items
 
 
+_RSS_TIMEOUT_S = 15.0
+# Publisher feeds update a few times an hour and rate-limit aggressive
+# pollers (VentureBeat returned 429 at the 60s news cadence), so each feed is
+# re-fetched at most this often; in between, the cached parse is reused.
+_RSS_MIN_INTERVAL_S = 600.0
+_rss_cache: dict[str, tuple[float, object]] = {}
+_rss_failed_at: dict[str, float] = {}
+
+
+def _get_feed(feed_url: str):
+    """Parsed feed, a cached parse, or None while cooling down after a failure."""
+    now = time.time()
+    cached = _rss_cache.get(feed_url)
+    if cached and now - cached[0] < _RSS_MIN_INTERVAL_S:
+        return cached[1]
+    if now - _rss_failed_at.get(feed_url, 0.0) < _RSS_MIN_INTERVAL_S:
+        return cached[1] if cached else None  # don't re-hit a feed that just 429'd/404'd
+    # feedparser.parse(url) fetches with no timeout at all, so a single slow
+    # feed could stall the whole news cycle (and the scheduler) indefinitely.
+    try:
+        resp = httpx.get(
+            feed_url,
+            timeout=_RSS_TIMEOUT_S,
+            follow_redirects=True,
+            headers={"User-Agent": "Novique/0.2 (AI news aggregator; +https://novique-ai.com)"},
+        )
+        resp.raise_for_status()
+    except Exception:
+        _rss_failed_at[feed_url] = now
+        raise
+    parsed = feedparser.parse(resp.content)
+    _rss_cache[feed_url] = (time.time(), parsed)
+    return parsed
+
+
 def fetch_rss_feeds(limit: int | None = None) -> list[RawItem]:
     """Pull from major AI news RSS feeds (VentureBeat, TechCrunch, The Verge, Wired, etc.)."""
     per_feed = max(3, (limit or 30) // len(RSS_FEEDS))
     items: list[RawItem] = []
-    for source_name, feed_url in RSS_FEEDS:
+    # Fetch all feeds concurrently: sequentially, worst case was 7 x timeout.
+    with ThreadPoolExecutor(max_workers=len(RSS_FEEDS)) as pool:
+        futures = [pool.submit(_get_feed, url) for _, url in RSS_FEEDS]
+    feeds = []
+    for (source_name, _), fut in zip(RSS_FEEDS, futures):
         try:
-            feed = feedparser.parse(feed_url)
+            feed = fut.result()
+            if feed is not None:
+                feeds.append((source_name, feed))
+        except Exception as exc:
+            print(f"[ingest] RSS feed {source_name} failed: {exc}")
+    if not feeds:
+        raise RuntimeError("every RSS feed failed")
+    for source_name, feed in feeds:
+        try:
             for entry in feed.entries[:per_feed]:
                 title = (entry.get("title") or "").strip()
                 link = entry.get("link") or entry.get("id") or ""
@@ -258,7 +307,9 @@ def fetch_github_trending(limit: int | None = None) -> list[RawItem]:
     resp = httpx.get(
         GITHUB_SEARCH_URL,
         params={
-            "q": f"topic:machine-learning OR topic:llm OR topic:artificial-intelligence pushed:>{since}",
+            # GitHub's OR only applies to text terms, not qualifiers: the old
+            # "topic:a OR topic:b" form was rejected with 422 on every cycle.
+            "q": f"llm OR machine-learning OR artificial-intelligence in:topics pushed:>{since} stars:>50",
             "sort": "stars",
             "order": "desc",
             "per_page": limit,

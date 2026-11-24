@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.database import get_db
-from app.ingestion.pipeline import run_pipeline
+from app.jobs import run_job
 from app.models import Article
 from app.schemas import ArticleOut, IngestResult, StatsOut
 
@@ -92,16 +92,24 @@ def get_stats(db: Session = Depends(get_db)):
 
 
 @router.post("/ingest", response_model=IngestResult)
-def ingest(
-    db: Session = Depends(get_db),
-    x_ingest_secret: str | None = Header(default=None),
-):
-    """Trigger one ingestion cycle on demand.
+def ingest(x_ingest_secret: str | None = Header(default=None)):
+    """Trigger one news ingestion cycle on demand.
 
-    Not used by the scheduled Celery beat job (see app/tasks.py, which calls
-    run_pipeline directly) — this is purely a manual/admin trigger, so it must
-    not be reachable by the public. Requires INGEST_SECRET to be configured.
+    Not used by the scheduler (app/scheduler.py runs jobs itself) — this is
+    purely a manual/admin trigger, so it must not be reachable by the public.
+    Requires INGEST_SECRET to be configured. Goes through run_job, so it is
+    locked against a concurrent scheduled run and recorded in ingest_runs.
     """
     if not settings.ingest_secret or x_ingest_secret != settings.ingest_secret:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    return run_pipeline(db)
+    result = run_job("news")
+    if result.get("skipped"):
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="A news cycle is already running.")
+    if result.get("error"):
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=result["error"])
+    return IngestResult(
+        fetched=result.get("fetched", 0),
+        cleaned=result.get("cleaned", 0),
+        created=result.get("created", 0),
+        updated=result.get("updated", 0),
+    )

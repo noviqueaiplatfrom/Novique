@@ -57,9 +57,12 @@ services:
       db:
         condition: service_healthy
 
-  # Celery worker + embedded beat scheduler: runs the tiered ingestion cadences
-  # (news 5 min, papers 30 min, re-score hourly). Reuses the backend image.
+  # OPTIONAL Celery worker + beat. Ingestion already runs on the backend's
+  # in-process scheduler (app/scheduler.py), so this is off by default.
+  # To use it instead: set SCHEDULER_ENABLED=false on `backend`, then
+  #   docker compose --profile celery up
   worker:
+    profiles: ["celery"]
     build: ./backend
     command: >
       sh -c "python -m app.bootstrap &&

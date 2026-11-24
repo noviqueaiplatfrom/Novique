@@ -16,7 +16,7 @@ Sources:  Hacker News + Reddit (news)  +  arXiv (research papers)
   → Next.js 15 dark-mode feed (React Query) — Discover + For You
 ```
 
-Scheduled by Celery beat: news every 5 min · papers every 30 min · re-score hourly.
+Scheduled by the in-process scheduler (`app/scheduler.py`): news every 60s · papers every 30 min · re-score hourly. Pipeline health: `GET /api/status`.
 Three sources prove the **multi-source contract**: each source is one `fetch_*`
 function returning the same `RawItem` shape, and nothing downstream changes.
 
@@ -27,7 +27,7 @@ function returning the same `RawItem` shape, and nothing downstream changes.
 | Frontend | Next.js 15, TypeScript, Tailwind, React Query       |
 | Backend  | FastAPI, SQLAlchemy 2, Pydantic                     |
 | Data     | PostgreSQL 16                                        |
-| Queue    | Celery + Redis (scheduled ingestion)                |
+| Jobs     | In-process scheduler (Celery + Redis optional)      |
 | Auth     | JWT (PyJWT) + bcrypt                                 |
 | AI       | Anthropic Claude (`claude-opus-4-8`)                |
 | Enrich   | Semantic Scholar (paper citations)                  |
@@ -42,7 +42,7 @@ cp .env.example .env        # then paste your ANTHROPIC_API_KEY
 docker compose up --build
 ```
 
-The Celery worker auto-ingests (news ~5 min, papers ~30 min). To populate
+The backend's scheduler auto-ingests on boot, then news every 60s and papers every 30 min. To populate
 immediately without waiting, trigger one cycle by hand:
 
 ```bash
@@ -83,7 +83,7 @@ Weights live in one place so they can be tuned and scores recomputed offline.
 
 - **Real:** three sources (Hacker News + Reddit + arXiv) with cross-source
   dedup, Semantic Scholar citation enrichment, Claude summarizer (with key-free
-  fallback), both scores, persistence, Celery-beat scheduling (news 5 min /
+  fallback), both scores, persistence, scheduled ingestion (news 60s /
   papers 30 min / hourly re-score), JWT auth (register/login/refresh, bcrypt),
   a personalized "For You" feed (follow topics + save articles), and the
   dark-mode UI with Discover/For You.
@@ -103,7 +103,8 @@ backend/app/
     enrich.py           # Semantic Scholar citation counts (papers)
     summarize.py        # AI Explainer Engine (Claude / fallback)
     pipeline.py         # fetch → enrich → clean → summarize → score → store
-  celery_app.py tasks.py  # scheduled ingestion (beat cadences) + jobs
+  scheduler.py jobs.py   # in-process scheduler + job runner (locks, ingest_runs)
+  celery_app.py tasks.py  # optional Celery runner for the same jobs
   bootstrap.py          # worker-startup table creation
   security.py           # bcrypt + JWT + get_current_user
   personalize.py        # "For You" ranking (interests + reading history)

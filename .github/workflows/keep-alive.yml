@@ -4,12 +4,21 @@ name: Keep Render services awake
 # */10 cron can silently drift to 1-2+ hours between actual runs under load,
 # wide enough for Render's free tier to spin down in between. Two offset
 # cron entries roughly double the number of trigger attempts per hour, so a
-# delay on one doesn't leave as wide a gap.
+# delay on one doesn't leave as wide a gap. (UptimeRobot is the primary
+# 5-minute pinger; this is a backup.)
+#
+# It also checks real pipeline health via /api/status. The pings used to end
+# in `|| true`, so the backend hung for three weeks (Nov 2026, database
+# auto-deleted) while every run here stayed green. Now an unhealthy pipeline
+# opens a GitHub issue, and the issue closes itself once it recovers.
 on:
   schedule:
     - cron: "*/10 * * * *"
     - cron: "5,15,25,35,45,55 * * * *"
   workflow_dispatch: {}
+
+permissions:
+  issues: write
 
 jobs:
   ping:
@@ -19,3 +28,49 @@ jobs:
         run: curl -fsS --max-time 110 https://novique-backend.onrender.com/health || true
       - name: Ping frontend
         run: curl -fsS --max-time 110 https://novique-frontend.onrender.com/ || true
+
+      - name: Check ingestion pipeline health
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -uo pipefail
+          title="🔴 Novique ingestion pipeline is unhealthy"
+
+          # Allow one cold start's worth of wake-up time (the ping above usually
+          # absorbed it already).
+          status=$(curl -fsS --max-time 110 https://novique-backend.onrender.com/api/status || echo '')
+          if [ -z "$status" ]; then
+            state="unreachable"
+            detail="The backend did not answer /api/status within 110s (crashed, failing to boot, or suspended)."
+          else
+            state=$(echo "$status" | jq -r '.state')
+            detail=$(echo "$status" | jq -r '"\(.message) (database: \(.database), last successful ingest: \(.last_success_at // "never"))"')
+          fi
+          echo "Pipeline state: $state - $detail"
+
+          existing=$(gh issue list --search "in:title Novique ingestion pipeline is unhealthy" --state open --json number --jq '.[0].number' || true)
+
+          # live / starting (just woke from a cold start) / delayed (one slow
+          # cycle) are fine. stalled / offline / unreachable mean no new
+          # intelligence is landing.
+          case "$state" in
+            live|starting|delayed)
+              if [ -n "${existing:-}" ] && [ "$existing" != "null" ]; then
+                gh issue close "$existing" --comment "Recovered: pipeline state is \`$state\` as of $(date -u +%FT%TZ)."
+              fi
+              ;;
+            *)
+              if [ -z "${existing:-}" ] || [ "$existing" = "null" ]; then
+                gh issue create --title "$title" --body "Pipeline state: **$state** (first seen $(date -u +%FT%TZ)).
+
+          $detail
+
+          Check https://novique-backend.onrender.com/api/status and the Render logs for \`novique-backend\`. This issue closes automatically once the pipeline reports healthy again.
+
+          Opened automatically by \`.github/workflows/keep-alive.yml\`."
+              fi
+              echo "::error::Ingestion pipeline unhealthy: $state - $detail"
+              exit 1
+              ;;
+          esac

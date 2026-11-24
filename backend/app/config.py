@@ -32,6 +32,18 @@ class Settings(BaseSettings):
     # completely different site could be replayed against this API.
     google_client_id: str | None = None
 
+    # In-process scheduler (app/scheduler.py). This is the production
+    # scheduler: it lives inside the API process, so whenever the API is up,
+    # ingestion is running, and it fires immediately on boot so a cold-started
+    # instance refreshes the feed within seconds. Set SCHEDULER_ENABLED=false
+    # only if an external runner (e.g. a dedicated Celery worker) owns it.
+    scheduler_enabled: bool = True
+    news_interval_seconds: int = 60
+    papers_interval_seconds: int = 1800
+    rescore_interval_seconds: int = 3600
+    report_interval_seconds: int = 86400
+    models_interval_seconds: int = 21600
+
     # Shared secret required in the `x-ingest-secret` header to trigger
     # POST /api/ingest on demand (the scheduled Celery beat job does not use
     # this endpoint, so locking it down doesn't affect the real pipeline).

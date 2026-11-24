@@ -45,6 +45,49 @@ export async function fetchStats(): Promise<Stats> {
   return res.json();
 }
 
+export interface IngestRun {
+  job: string;
+  status: "running" | "ok" | "error";
+  started_at: string;
+  finished_at: string | null;
+  fetched: number;
+  created: number;
+  updated: number;
+  error: string | null;
+  /** Per-source outcome: "ok" | "backoff" | "error: ..." */
+  sources: Record<string, string> | null;
+}
+
+export type PipelineState = "live" | "starting" | "delayed" | "stalled" | "offline";
+
+export interface PipelineStatus {
+  state: PipelineState;
+  message: string;
+  server_time: string;
+  database: "ok" | "unreachable";
+  scheduler_running: boolean;
+  running_job: string | null;
+  news_interval_seconds: number;
+  /** Most recent finished news cycle. */
+  last_run: IngestRun | null;
+  last_success_at: string | null;
+  next_run_at: string | null;
+  total_articles: number;
+  total_sources: number;
+  /** Articles first stored by Novique (ingestion time, not publish time). */
+  new_last_hour: number;
+  new_last_24h: number;
+  latest_ingested_at: string | null;
+  latest_published_at: string | null;
+}
+
+/** Real ingestion-pipeline health, measured server-side from recorded runs. */
+export async function fetchStatus(): Promise<PipelineStatus> {
+  const res = await fetchWithTimeout(`${API_URL}/api/status`);
+  if (!res.ok) throw new Error(`Status request failed: ${res.status}`);
+  return res.json();
+}
+
 export interface ReportListItem {
   slug: string;
   title: string;

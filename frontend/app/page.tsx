@@ -6,6 +6,7 @@ import Link from "next/link";
 import { fetchFeed, fetchStats } from "@/lib/api";
 import * as authApi from "@/lib/auth";
 import { ArticleCard } from "@/components/ArticleCard";
+import { BriefingStatusCard } from "@/components/BriefingStatusCard";
 import { Navbar } from "@/components/Navbar";
 import { useAuth } from "./auth-context";
 import { COMPANIES } from "@/lib/companiesData";
@@ -38,18 +39,6 @@ export default function Home() {
     queryFn: () => fetchFeed(sort, kind),
     refetchInterval: 60000,
   });
-
-  // Render's free-tier backend can cold-start after inactivity; if the first load
-  // takes a while, say so instead of leaving a generic "loading" message hanging.
-  const [coldStart, setColdStart] = useState(false);
-  useEffect(() => {
-    if (!isLoading) {
-      setColdStart(false);
-      return;
-    }
-    const t = setTimeout(() => setColdStart(true), 4000);
-    return () => clearTimeout(t);
-  }, [isLoading]);
 
   // Live corpus counters (real totals from the database, not just this page's batch)
   const { data: stats } = useQuery({
@@ -113,32 +102,6 @@ export default function Home() {
   const [dialVisible, setDialVisible] = useState(false);
   const snapshotRef = useRef<HTMLDivElement>(null);
   const dialRef = useRef<HTMLDivElement>(null);
-
-  // Brief Countdown Timer State (60 seconds loop)
-  const [secondsLeft, setSecondsLeft] = useState(60);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setSecondsLeft((prev) => (prev <= 1 ? 60 : prev - 1));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const formatTime = (secs: number) => {
-    const m = Math.floor(secs / 60);
-    const s = secs % 60;
-    return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
-  };
-
-  const timeAgo = (iso: string) => {
-    const diffMs = Date.now() - new Date(iso).getTime();
-    const mins = Math.floor(diffMs / 60000);
-    if (mins < 1) return "just now";
-    if (mins < 60) return `${mins}m ago`;
-    const hours = Math.floor(mins / 60);
-    if (hours < 24) return `${hours}h ago`;
-    return `${Math.floor(hours / 24)}d ago`;
-  };
 
   // Reveal the snapshot section once, then keep its animated counters in sync with live data
   useEffect(() => {
@@ -285,78 +248,8 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Right Column: Brief Indicator */}
-          <div data-animate data-delay="2" className="flex-1 bg-[#17253A] border border-white/[0.05] rounded-3xl p-7 md:p-8 relative overflow-hidden flex flex-col justify-between shadow-[0_24px_55px_rgba(0,0,0,0.4)] animate-float">
-            <div className="absolute top-0 right-0 w-40 h-40 bg-[#6C63FF]/5 rounded-full blur-3xl pointer-events-none" />
-
-            <div className="mb-6 flex items-center justify-between">
-              <h2 className="text-base font-bold tracking-tight text-[#F7F9FC] flex items-center gap-2">
-                <span className={`w-2 h-2 rounded-full shadow-[0_0_8px_currentColor] ${isError ? "bg-red-400 text-red-400" : "bg-[#16C79A] text-[#16C79A] animate-pulse"}`}></span>
-                Active briefing status
-              </h2>
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider border ${isError ? "text-red-400 bg-red-500/5 border-red-500/20" : "text-[#9AA8BD] bg-white/[0.03] border-white/[0.05]"}`}>
-                {isError ? "Offline" : "Live"}
-              </span>
-            </div>
-
-            <p className="text-sm text-textSecondary leading-relaxed mb-5 font-normal">
-              {isLoading && (coldStart
-                ? "Waking up the Novique pipeline after inactivity. First load can take up to a minute, hang tight."
-                : "Novique engines are aggregating reference nodes...")}
-              {isError && "Unable to reach the Novique pipeline right now. Retrying shortly."}
-              {!isLoading && !isError && (
-                <>
-                  <strong className="text-white font-bold">{data?.length ?? 0}</strong> live updates ingested and ranked this cycle
-                  {data?.[0] ? `, most recent ${timeAgo(data[0].published_at)}` : ""}.
-                </>
-              )}
-            </p>
-
-            {/* Live preview: real headlines flowing through this cycle's batch */}
-            {!isLoading && !isError && !!data?.length && (
-              <div className="flex flex-col gap-2.5 mb-5">
-                {data.slice(0, 5).map((a) => (
-                  <a
-                    key={a.id}
-                    href={a.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-start gap-2.5 group"
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#6C63FF] mt-1.5 shrink-0" />
-                    <span className="text-xs text-zinc-300 group-hover:text-white leading-snug line-clamp-1 transition-colors">
-                      {a.title}
-                    </span>
-                    <span className="text-[10px] text-zinc-500 shrink-0 ml-auto font-semibold">{timeAgo(a.published_at)}</span>
-                  </a>
-                ))}
-              </div>
-            )}
-
-            {/* Live stat strip: real corpus/momentum numbers, not placeholders */}
-            {!isLoading && !isError && (
-              <div className="flex items-center gap-4 mb-5 text-[11px] text-[#9AA8BD]">
-                <span className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#16C79A]" />
-                  <strong className="text-white font-bold">{stats ? stats.total_sources : "N/A"}</strong> sources connected
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#F6C453]" />
-                  <strong className="text-white font-bold">{briefTargets[5]}%</strong> momentum index
-                </span>
-              </div>
-            )}
-
-            <div className="text-[11px] text-[#9AA8BD] border-t border-white/[0.05] pt-4 mt-auto flex items-center justify-between">
-              <span className="flex items-center gap-1.5">
-                <svg className="w-3.5 h-3.5 text-[#16C79A]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Next refresh in <strong className="text-white font-mono">{formatTime(secondsLeft)}</strong>
-              </span>
-              <Link href="/intelligence" className="text-[#6C63FF] font-bold hover:underline">Review Intelligence &rarr;</Link>
-            </div>
-          </div>
+          {/* Right Column: Active briefing status (measured pipeline health) */}
+          <BriefingStatusCard token={token} momentumIndex={hasFeedData ? briefTargets[5] : null} />
         </section>
 
         {/* 1b. TRUSTED BY SECTION */}

@@ -9,8 +9,9 @@ from app.api.feed import router as feed_router
 from app.api.me import router as me_router
 from app.api.models_api import router as models_router
 from app.api.reports import router as reports_router
+from app.api.status import router as status_router
 from app.config import settings
-from app.database import Base, engine
+from app.scheduler import scheduler
 from app import models  # noqa: F401  (register models on Base before create_all)
 
 
@@ -25,11 +26,17 @@ async def lifespan(app: FastAPI):
             "public default secret, which would let anyone forge valid tokens. Set a real "
             "JWT_SECRET env var, or set DEBUG=true for local development only."
         )
-    # Slice: create tables on startup. Replaced by Alembic migrations later.
-    Base.metadata.create_all(bind=engine)
-    from app.database import run_migrations
-    run_migrations()
+    # Create tables / run migrations, but never refuse to boot over it: if the
+    # DB is unreachable the API still binds its port, /api/status reports
+    # "database unreachable", and the scheduler keeps retrying in the
+    # background. (Previously a missing DB meant uvicorn never started, so
+    # every request just hung until the client timed out.)
+    if not scheduler.ensure_db():
+        print("[startup] database unavailable; serving degraded until it comes back")
+    if settings.scheduler_enabled:
+        scheduler.start()
     yield
+    scheduler.stop()
 
 
 app = FastAPI(title="Novique API", version="0.1.0", lifespan=lifespan)
@@ -46,6 +53,7 @@ app.include_router(auth_router)
 app.include_router(me_router)
 app.include_router(reports_router)
 app.include_router(models_router)
+app.include_router(status_router)
 
 
 @app.api_route("/health", methods=["GET", "HEAD"])

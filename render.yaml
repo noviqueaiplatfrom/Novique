@@ -1,17 +1,30 @@
 services:
-  # 1. FastAPI Backend API + Celery Worker (Native Python Runtime)
+  # 1. FastAPI Backend API (Native Python Runtime)
+  #
+  # Ingestion runs on the in-process scheduler (backend/app/scheduler.py)
+  # inside this uvicorn process. It replaced `bootstrap && (celery ... &) &&
+  # uvicorn`, which had two silent failure modes: a missing/unreachable DB
+  # made bootstrap exit so uvicorn never bound its port (every request hung),
+  # and a dead backgrounded Celery worker was never restarted. Now the API
+  # always boots, reports DB/pipeline health at /api/status, and retries the
+  # DB in the background.
   - type: web
     name: novique-backend
     env: python
     rootDir: backend
     plan: free
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "python -m app.bootstrap && (celery -A app.celery_app worker --beat --loglevel=info &) && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    healthCheckPath: /health
     envVars:
+      # External Postgres, set in the Render dashboard (not a Render free DB:
+      # those are deleted 30 days after creation, which wiped all data on
+      # 2026-10-03 and again on 2026-11-02). Any postgres:// or postgresql://
+      # URL works; the app normalizes the scheme.
       - key: DATABASE_URL
-        fromDatabase:
-          name: novique-db
-          property: connectionString
+        sync: false
+      # Only used by the optional Celery runner (app/celery_app.py); the
+      # production scheduler doesn't need Redis.
       - key: REDIS_URL
         fromService:
           type: redis
@@ -59,8 +72,3 @@ services:
         value: https://novique-backend.onrender.com
       - key: NEXT_PUBLIC_GOOGLE_CLIENT_ID
         value: 338636590792-t166pujl1hpuroea7p7idnn4em4tpht4.apps.googleusercontent.com
-
-databases:
-  # 4. PostgreSQL Database
-  - name: novique-db
-    plan: free
